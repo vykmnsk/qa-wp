@@ -1,0 +1,9 @@
+env_*.sh
+
+target/*
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
