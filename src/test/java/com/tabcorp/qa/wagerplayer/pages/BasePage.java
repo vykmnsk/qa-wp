@@ -1,8 +1,8 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.ui.webdriver.DriverWrapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tabcorp.qa.common.DriverWrapper;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -14,14 +14,15 @@ public class BasePage {
 
     public WebDriver driver = DriverWrapper.getInstance().getDriver();
     public WebDriverWait wait = DriverWrapper.getInstance().getDriverWait();
-    public String appId;
+
+    public String appName;
     public String baseUrl;
 
     public BasePage(){
 
         PageFactory.initElements(driver, this);
-        appId = System.getenv(ENV_APP_NAME);
-        Assertions.assertThat(appId)
+        appName = System.getenv(ENV_APP_NAME);
+        Assertions.assertThat(appName)
                 .withFailMessage(ENV_APP_NAME + " env var is not provided")
                 .isNotNull();
 

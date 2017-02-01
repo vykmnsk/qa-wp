@@ -1,11 +1,15 @@
 #!/usr/bin/env groovy
 
 node('java18') {
-    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm', 'defaultFg': 1, 'defaultBg': 2]) {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'css', 'defaultFg': 1, 'defaultBg': 2]) {
 
         try {
-            stage('Test') {
+            stage('Build') {
                 checkout scm
+                sh 'mvn clean compile'
+            }
+
+            stage('Test') {
                 sh 'mvn test'
             }
 

@@ -10,6 +10,3 @@ mvn test -DforkMode=never
 - WAGERPLAYER_USERNAME
 - WAGERPLAYER_PASSWORD
 
-#Create Exec Jar
-mvn package 
-mvn package -DskipTests
