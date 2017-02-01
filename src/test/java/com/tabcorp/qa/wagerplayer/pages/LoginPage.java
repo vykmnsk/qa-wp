@@ -1,4 +1,4 @@
-package com.tabcorp.qa.pages;
+package com.tabcorp.qa.wagerplayer.pages;
 
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
@@ -10,6 +10,9 @@ import java.util.List;
 
 
 public class LoginPage extends BasePage {
+
+    private final String ENV_USERNAME = "WAGERPLAYER_USERNAME";
+    private final String ENV_PASSWORD = "WAGERPLAYER_PASSWORD";
 
     @CacheLookup
     @FindBy(css = ("input[name='entered_login']"))
@@ -34,16 +37,15 @@ public class LoginPage extends BasePage {
 
     public HomePage enterValidCredentials(){
 
-        String usernameValue = System.getenv("WAGERPLAYER_USERNAME");
+        String usernameValue = System.getenv(ENV_USERNAME);
         Assertions.assertThat(usernameValue)
-                .withFailMessage("username not provided")
+                .withFailMessage(ENV_USERNAME + " env var is not provided")
                 .isNotNull();
         username.sendKeys(usernameValue);
 
-        String passwordValue = System.getenv("WAGERPLAYER_PASSWORD");
-
+        String passwordValue = System.getenv(ENV_PASSWORD);
         Assertions.assertThat(passwordValue)
-                .withFailMessage("password not provided")
+                .withFailMessage(ENV_PASSWORD + " env var is not provided")
                 .isNotNull();
         password.sendKeys(passwordValue);
 

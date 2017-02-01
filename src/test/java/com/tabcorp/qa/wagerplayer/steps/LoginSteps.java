@@ -1,7 +1,7 @@
-package com.tabcorp.qa.steps;
+package com.tabcorp.qa.wagerplayer.steps;
 
-import com.tabcorp.qa.pages.HomePage;
-import com.tabcorp.qa.pages.LoginPage;
+import com.tabcorp.qa.wagerplayer.pages.HomePage;
+import com.tabcorp.qa.wagerplayer.pages.LoginPage;
 import cucumber.api.java8.En;
 
     public class LoginSteps implements En {

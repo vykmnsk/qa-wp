@@ -1,4 +1,4 @@
-package com.tabcorp.qa.pages;
+package com.tabcorp.qa.wagerplayer.pages;
 
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
