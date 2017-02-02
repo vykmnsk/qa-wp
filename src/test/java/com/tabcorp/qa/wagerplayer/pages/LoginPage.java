@@ -8,6 +8,8 @@ import org.openqa.selenium.support.CacheLookup;
 
 import java.util.List;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
+
 
 public class LoginPage extends BasePage {
 
@@ -16,27 +18,28 @@ public class LoginPage extends BasePage {
 
     @CacheLookup
     @FindBy(css = ("input[name='entered_login']"))
-    public WebElement username;
+    private WebElement username;
 
     @CacheLookup
     @FindBy(css = ("input[name='entered_password']"))
-    public WebElement password;
+    private WebElement password;
 
-    private String submitRedbookCSS = "input[name='login']";
-    private String submitLuxbetCSS = "input[alt^='Enter']";
+    private By submitLuxbet = By.cssSelector("input[alt^='Enter']");
+    private By submitRedbook = By.cssSelector("input[name='login']");
 
-    @FindBy(css = ("div[class='login-error']"))
-    public WebElement errorDiv;
+    private By errorLuxbet = By.cssSelector("tbody td b i");
+    private By errorRedbook = By.cssSelector("div[class='login-error']");
 
     public void load(){
         driver.get(baseUrl);
+
+        wait.until(visibilityOf(username));
         Assertions.assertThat(username.isDisplayed())
                 .withFailMessage("could not load login page with username input")
                 .isTrue();
     }
 
     public HomePage enterValidCredentials(){
-
         String usernameValue = System.getenv(ENV_USERNAME);
         Assertions.assertThat(usernameValue)
                 .withFailMessage(ENV_USERNAME + " env var is not provided")
@@ -49,7 +52,7 @@ public class LoginPage extends BasePage {
                 .isNotNull();
         password.sendKeys(passwordValue);
 
-        WebElement submit = findSubmitButton();
+        WebElement submit = findOne(submitLuxbet, submitRedbook);
         Assertions.assertThat(submit)
                 .withFailMessage("could not find submit button")
                 .isNotNull();
@@ -58,12 +61,19 @@ public class LoginPage extends BasePage {
         return new HomePage();
     }
 
-    private WebElement findSubmitButton(){
-        List<WebElement> elems = driver.findElements(By.cssSelector(submitRedbookCSS));
-        List<WebElement> elems2 =  driver.findElements(By.cssSelector(submitLuxbetCSS));
-        elems.addAll(elems2);
-        if (elems.size() > 0) return elems.get(0);
-        return null;
+    public LoginPage enterInvalidCredentials(){
+        username.sendKeys("invalid username");
+        password.sendKeys("invalid passowrd");
+        WebElement submit = findOne(submitLuxbet, submitRedbook);
+        submit.click();
+        return this;
+    }
+
+    public void verifyMessage(String msg){
+        String actualMsg = findOne(errorLuxbet, errorRedbook).getText();
+        Assertions.assertThat(actualMsg)
+            .withFailMessage(String.format("Expected %s, but got %s", msg, actualMsg))
+            .contains(msg);
     }
 
 }

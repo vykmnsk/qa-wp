@@ -6,7 +6,7 @@ node('java18') {
         try {
             stage('Build') {
                 checkout scm
-                sh 'mvn clean compile'
+                sh 'mvn install -DskipTests'
             }
 
             stage('Test') {

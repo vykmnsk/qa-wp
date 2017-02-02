@@ -22,5 +22,15 @@ import cucumber.api.java8.En;
                 hp.verifyLoaded();
             });
 
+            When("^I login with wrong username and password$", () -> {
+                lp = new LoginPage();
+                lp.load();
+                lp = lp.enterInvalidCredentials();
+            });
+
+            Then("^I see \"([^\"]*)\" message$", (String msg) -> {
+                lp.verifyMessage(msg);
+            });
+
         }
 }

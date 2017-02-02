@@ -1,12 +1,14 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.tabcorp.qa.common.DriverWrapper;
 import org.assertj.core.api.Assertions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class BasePage {
     private final String ENV_APP_NAME = "WAGERPLAYER_APP_NAME";
@@ -30,5 +32,16 @@ public class BasePage {
         Assertions.assertThat(baseUrl)
                 .withFailMessage(ENV_BASE_URL + " env var is not provided")
                 .isNotNull();
+
+    }
+
+    public WebElement findOne(By loc1, By loc2) {
+        List<WebElement> elems = driver.findElements(loc1);
+        List<WebElement> elems2 = driver.findElements(loc2);
+        elems.addAll(elems2);
+        Assertions.assertThat(elems.size())
+                .withFailMessage("Expected to find one of %s, %s", loc1, loc2)
+                .isEqualTo(1);
+        return elems.get(0);
     }
 }
