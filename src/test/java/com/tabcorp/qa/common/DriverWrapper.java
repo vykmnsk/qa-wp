@@ -22,7 +22,7 @@ public class DriverWrapper {
         if (driver == null) {
             System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
             driver = new ChromeDriver();
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> driver.quit()));
+//            Runtime.getRuntime().addShutdownHook(new Thread(() -> driver.quit()));
             driver.manage().window().maximize();
         }
         return driver;
@@ -33,5 +33,10 @@ public class DriverWrapper {
             wait = new WebDriverWait(getDriver(), DEFAULT_TIMEOUT_SECONDS);
         }
         return wait;
+    }
+
+    public void closeBrowser(){
+        driver.quit();
+        driver = null;
     }
 }

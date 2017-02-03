@@ -7,7 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 
-public class HomePage extends BasePage {
+public class HomePage extends AppPage {
     @FindBy(css = ("frame[id='frame_top']"))
     public WebElement frameTop;
 

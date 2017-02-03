@@ -5,31 +5,37 @@ import com.tabcorp.qa.wagerplayer.pages.LoginPage;
 import cucumber.api.java8.En;
 
     public class LoginSteps implements En {
-        LoginPage lp;
-        HomePage hp;
+        LoginPage loginPage;
+        HomePage homePage;
 
         public LoginSteps() {
-            Given("^the user is on WagerPlayer Login page$", () -> {
-                lp = new LoginPage();
-                lp.load();
-            });
+//            Given("^the user is on WagerPlayer Login page$", () -> {
+//                loginPage = new LoginPage();
+//                loginPage.load();
+//            });
+//
+//            When("^the user enters username and password", () -> {
+//                homePage = loginPage.enterValidCredentials();
+//            });
 
-            When("^the user enters username and password", () -> {
-                hp = lp.enterValidCredentials();
+            When("^I login with valid username and password$", () -> {
+                loginPage = new LoginPage();
+                loginPage.load();
+                homePage = loginPage.enterValidCredentials();
             });
 
             Then("^homepage is displayed$", () -> {
-                hp.verifyLoaded();
+                homePage.verifyLoaded();
             });
 
-            When("^I login with wrong username and password$", () -> {
-                lp = new LoginPage();
-                lp.load();
-                lp = lp.enterInvalidCredentials();
+            When("^I login with invalid username and password$", () -> {
+                loginPage = new LoginPage();
+                loginPage.load();
+                loginPage = loginPage.enterInvalidCredentials();
             });
 
             Then("^I see \"([^\"]*)\" message$", (String msg) -> {
-                lp.verifyMessage(msg);
+                loginPage.verifyErrorMessage(msg);
             });
 
         }

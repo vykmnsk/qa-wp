@@ -1,20 +1,17 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.wagerplayer.Config;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.CacheLookup;
 
-import java.util.List;
-
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 
-public class LoginPage extends BasePage {
+public class LoginPage extends AppPage {
 
-    private final String ENV_USERNAME = "WAGERPLAYER_USERNAME";
-    private final String ENV_PASSWORD = "WAGERPLAYER_PASSWORD";
 
     @CacheLookup
     @FindBy(css = ("input[name='entered_login']"))
@@ -31,8 +28,7 @@ public class LoginPage extends BasePage {
     private By errorRedbook = By.cssSelector("div[class='login-error']");
 
     public void load(){
-        driver.get(baseUrl);
-
+        super.load();
         wait.until(visibilityOf(username));
         Assertions.assertThat(username.isDisplayed())
                 .withFailMessage("could not load login page with username input")
@@ -40,19 +36,11 @@ public class LoginPage extends BasePage {
     }
 
     public HomePage enterValidCredentials(){
-        String usernameValue = System.getenv(ENV_USERNAME);
-        Assertions.assertThat(usernameValue)
-                .withFailMessage(ENV_USERNAME + " env var is not provided")
-                .isNotNull();
-        username.sendKeys(usernameValue);
+        username.sendKeys(Config.username());
+        password.sendKeys(Config.password());
 
-        String passwordValue = System.getenv(ENV_PASSWORD);
-        Assertions.assertThat(passwordValue)
-                .withFailMessage(ENV_PASSWORD + " env var is not provided")
-                .isNotNull();
-        password.sendKeys(passwordValue);
 
-        WebElement submit = findOne(submitLuxbet, submitRedbook);
+        WebElement submit = findEither(submitLuxbet, submitRedbook);
         Assertions.assertThat(submit)
                 .withFailMessage("could not find submit button")
                 .isNotNull();
@@ -64,13 +52,13 @@ public class LoginPage extends BasePage {
     public LoginPage enterInvalidCredentials(){
         username.sendKeys("invalid username");
         password.sendKeys("invalid passowrd");
-        WebElement submit = findOne(submitLuxbet, submitRedbook);
+        WebElement submit = findEither(submitLuxbet, submitRedbook);
         submit.click();
         return this;
     }
 
-    public void verifyMessage(String msg){
-        String actualMsg = findOne(errorLuxbet, errorRedbook).getText();
+    public void verifyErrorMessage(String msg){
+        String actualMsg = findEither(errorLuxbet, errorRedbook).getText();
         Assertions.assertThat(actualMsg)
             .withFailMessage(String.format("Expected %s, but got %s", msg, actualMsg))
             .contains(msg);
