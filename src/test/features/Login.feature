@@ -7,3 +7,4 @@ Feature: Login into WagerPlayer
   Scenario: Login with invalid credentials
     When I login with invalid username and password
     Then I see "Invalid user" message
+

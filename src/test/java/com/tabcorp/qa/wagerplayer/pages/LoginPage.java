@@ -12,7 +12,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 public class LoginPage extends AppPage {
 
-
     @CacheLookup
     @FindBy(css = ("input[name='entered_login']"))
     private WebElement username;

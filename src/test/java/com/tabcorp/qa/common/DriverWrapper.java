@@ -36,6 +36,7 @@ public class DriverWrapper {
     }
 
     public void closeBrowser(){
+        if (null == driver) return;
         driver.quit();
         driver = null;
     }

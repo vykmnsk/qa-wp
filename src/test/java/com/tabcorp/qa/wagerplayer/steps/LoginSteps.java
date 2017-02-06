@@ -9,14 +9,6 @@ import cucumber.api.java8.En;
         HomePage homePage;
 
         public LoginSteps() {
-//            Given("^the user is on WagerPlayer Login page$", () -> {
-//                loginPage = new LoginPage();
-//                loginPage.load();
-//            });
-//
-//            When("^the user enters username and password", () -> {
-//                homePage = loginPage.enterValidCredentials();
-//            });
 
             When("^I login with valid username and password$", () -> {
                 loginPage = new LoginPage();
