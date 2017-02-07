@@ -5,6 +5,7 @@ import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class CreateEventSteps implements En {
@@ -20,12 +21,10 @@ public class CreateEventSteps implements En {
             HomePage hp = lp.enterValidCredentials();
             hp.verifyLoaded();
         });
-
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
             HeaderPage header = new HeaderPage();
             header.pickCategories(category, subcategory);
         });
-
         Then("^I see New Event page$", () -> {
             newEvtPage = new NewEventPage();
             newEvtPage.load();
@@ -35,18 +34,43 @@ public class CreateEventSteps implements En {
                 (Integer inMinutes, DataTable table) -> {
                     Map<String, String> evt = table.asMap(String.class, String.class);
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
-                    marketsPage = newEvtPage.enterEventDetails(evt.get("event name"),
+                    String[] runners = evt.get("runners").split(", ");
+
+                    marketsPage = newEvtPage.enterEventDetails(
+                            Integer.valueOf(inMinutes),
+                            evt.get("event name"),
                             evt.get("bet in run type"),
                             evt.get("create market"),
-                            Integer.valueOf(inMinutes));
-        });
-
+                            Arrays.asList(runners)
+                    );
+                });
         Then("^I see Create Market page$", () -> {
             marketsPage.vefifyLoaded();
         });
 
+        When("^I enter odds \"([^\"]*)\"$", (String oddsCSV) -> {
+            String[] odds = oddsCSV.split(",\\s+");
+            marketsPage.enterPrices(Arrays.asList(odds));
+        });
+
+        When("^I enter market details$", (DataTable table) -> {
+            Map<String, String> mkt = table.asMap(String.class, String.class);
+            marketsPage.showMarketDetails();
+            boolean isLive = mkt.get("Market Status").equals("Live");
+            boolean isEW = mkt.get("E/W").equals("yes");
+            marketsPage.enterMarketDetail(
+                    isLive,
+                    mkt.get("Bets Allowed"),
+                    mkt.get("Bets Allowed Place"),
+                    mkt.get("Place Fraction"),
+                    mkt.get("No of Places"),
+                    isEW);
+        });
+
+        Then("^I can see success status with message \"([^\"]*)\"$", (String msg) -> {
+            marketsPage.verifySuccessStatus(msg);
+        });
 
     }
-
 
 }

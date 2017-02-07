@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import cucumber.api.java.it.Ma;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -8,6 +9,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -55,8 +57,8 @@ public class NewEventPage extends AppPage{
     @FindBy(css = "#filter_table_inner select[name='zone']")
     public WebElement eventDateTimeZone;
 
-    @FindBy(css = "#filter_table_inner table>tbody>tr>td>textarea")
-    public WebElement runnerSelectionsList;
+    @FindBy(css = "textarea[name='add_selections'")
+    WebElement runnersBox;
 
     @FindBy(css = "#filter_table_inner select[name='bet_run']")
     public WebElement betInRunType;
@@ -75,7 +77,7 @@ public class NewEventPage extends AppPage{
         wait.until(ExpectedConditions.visibilityOf(insertEvent));
     }
 
-    public MarketsPage enterEventDetails(String eventNameVal, String betInRunTypeVal, String createMarketVal, int inMinutes) {
+    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, List<String> runners) {
         eventName.sendKeys(eventNameVal);
         (new Select(betInRunType)).selectByVisibleText(betInRunTypeVal);
         createMarket.sendKeys(createMarketVal);
@@ -90,9 +92,18 @@ public class NewEventPage extends AppPage{
         new Select(eventDateTimeHour).selectByValue(format2d(evTime.getHour()));
         new Select(eventDateTimeMin).selectByValue(format2d(evTime.getMinute()));
 
+        String runnersStr = String.join("\n", runners);
+        runnersBox.sendKeys(runnersStr);
         insertEvent.click();
         return new MarketsPage();
     }
+
+//    public MarketsPage enterRunners(List<String> runners){
+//        String runnersStr = String.join("\n", runners);
+//        runnersBox.sendKeys(runnersStr);
+//        insertEvent.click();
+//        return new MarketsPage();
+//    }
 
     private String format2d(int val){
         return String.format("%02d", val);
