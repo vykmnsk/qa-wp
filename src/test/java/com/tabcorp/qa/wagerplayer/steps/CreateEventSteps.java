@@ -53,6 +53,11 @@ public class CreateEventSteps implements En {
             marketsPage.enterPrices(Arrays.asList(odds));
         });
 
+        When("^I update race number to \"([^\"]*)\"$", (String num) -> {
+            marketsPage.showMarketManagement();
+            marketsPage.enterRaceNumber(num);
+        });
+
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
             marketsPage.showMarketDetails();

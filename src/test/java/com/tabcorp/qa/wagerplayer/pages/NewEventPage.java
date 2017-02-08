@@ -98,13 +98,6 @@ public class NewEventPage extends AppPage{
         return new MarketsPage();
     }
 
-//    public MarketsPage enterRunners(List<String> runners){
-//        String runnersStr = String.join("\n", runners);
-//        runnersBox.sendKeys(runnersStr);
-//        insertEvent.click();
-//        return new MarketsPage();
-//    }
-
     private String format2d(int val){
         return String.format("%02d", val);
     }

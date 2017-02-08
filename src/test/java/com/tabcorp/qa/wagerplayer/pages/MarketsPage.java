@@ -4,6 +4,7 @@ package com.tabcorp.qa.wagerplayer.pages;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -19,8 +20,6 @@ public class MarketsPage extends AppPage {
     @FindBy(css = "input[src='images/button_update.gif'")
     WebElement updateBtn;
 
-    @FindBy(css = "table > tbody > tr:nth-child(7) > td > font:nth-child(1) > b")
-    WebElement marketStatus;
     @FindBy(css = "#main_table tr[bgcolor='green'")
     WebElement status;
 
@@ -54,8 +53,13 @@ public class MarketsPage extends AppPage {
     @FindBy(css = ("input[name='MARKET_TYPE_SET_ALLOW_EACHWAY']"))
     WebElement ewChk;
 
+    @FindBy(css = "#market_settings input[name='race_num']")
+    @CacheLookup
+    WebElement raceNumTxt;
+
     By positionLocators = By.cssSelector("input[name^='position[']");
-    By priceLocators = By.cssSelector("input[name^='price[']");
+    By priceLocatorsLuxbet = By.cssSelector("input[type='text'][name^='price[']");
+    By priceLocatorsRedbook = By.cssSelector("input[type='text'][name^='price_']");
 
     public void vefifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
@@ -65,7 +69,7 @@ public class MarketsPage extends AppPage {
 
     public void enterPrices(List<String> priceVals) {
         List<WebElement> positions = driver.findElements(positionLocators);
-        List<WebElement> prices = driver.findElements(priceLocators);
+        List<WebElement> prices = findBoth(priceLocatorsLuxbet, priceLocatorsRedbook);
         Assertions.assertThat(positions.size()).as("position size matches prices size").isEqualTo(prices.size());
         Assertions.assertThat(prices.size()).as("price elems size matches cucumber price values size").isEqualTo(priceVals.size());
         for (int i = 0; i < positions.size(); i++) {
@@ -79,11 +83,16 @@ public class MarketsPage extends AppPage {
         insertBtn.click();
     }
 
-    public void verifySuccessStatus(String msg) {
-        wait.until(ExpectedConditions.visibilityOf(status));
-        String statusMsg = status.getText();
-        Assertions.assertThat(statusMsg).as("market status").contains("SUCCESS");
-        Assertions.assertThat(statusMsg).as("market status message").contains(msg);
+    public void showMarketManagement() {
+        if (!marketManagementSection.isDisplayed()) {
+            showHideMarketManagement.click();
+        }
+        wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+    }
+
+    public void enterRaceNumber(String num){
+        raceNumTxt.clear();
+        raceNumTxt.sendKeys(num);
     }
 
     public void showMarketDetails() {
@@ -92,7 +101,6 @@ public class MarketsPage extends AppPage {
         }
         wait.until(ExpectedConditions.visibilityOf(marketDetailsSection));
     }
-
 
     public void enterMarketDetail(boolean isLive, String betsAllowedWin, String betsAllowedPlace, String placeFraction, String numOfPlaces, boolean isEW) {
         if (isLive) {
@@ -109,4 +117,12 @@ public class MarketsPage extends AppPage {
         }
         updateBtn.click();
     }
+
+    public void verifySuccessStatus(String msg) {
+        wait.until(ExpectedConditions.visibilityOf(status));
+        String statusMsg = status.getText();
+        Assertions.assertThat(statusMsg).as("market status").contains("SUCCESS");
+        Assertions.assertThat(statusMsg).as("market status message").contains(msg);
+    }
+
 }

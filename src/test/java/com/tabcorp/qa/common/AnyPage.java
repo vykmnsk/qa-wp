@@ -22,13 +22,17 @@ public class AnyPage {
         wait = DriverWrapper.getInstance().getDriverWait();
     }
 
-
-    public WebElement findOne(List<By> locators) {
+    public List<WebElement> findAll(List<By> locators) {
         List<WebElement> elems = new ArrayList<>();
 
-        for(By loc: locators){
+        for (By loc : locators) {
             elems.addAll(driver.findElements(loc));
         }
+        return elems;
+    }
+
+    public WebElement findOne(List<By> locators) {
+        List <WebElement> elems = findAll(locators);
         Assertions.assertThat(elems.size())
                 .withFailMessage("Expected to find one of %s", locators)
                 .isEqualTo(1);
