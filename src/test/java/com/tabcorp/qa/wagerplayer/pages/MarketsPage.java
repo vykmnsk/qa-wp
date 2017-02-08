@@ -57,9 +57,11 @@ public class MarketsPage extends AppPage {
     @CacheLookup
     WebElement raceNumTxt;
 
-    By positionLocators = By.cssSelector("input[name^='position[']");
-    By priceLocatorsLuxbet = By.cssSelector("input[type='text'][name^='price[']");
-    By priceLocatorsRedbook = By.cssSelector("input[type='text'][name^='price_']");
+    @FindBy(css = "input[name^='position[']")
+    List<WebElement> positionTxts;
+    @FindBy(css = "input[type=text][id^=price_][onkeyup^=calculate_selection_percent")
+    List<WebElement> priceTxts;
+    By priceLocators = By.cssSelector("input[type=text][id^=price_][onkeyup^=calculate_selection_percent");
 
     public void vefifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
@@ -67,18 +69,16 @@ public class MarketsPage extends AppPage {
     }
 
 
-    public void enterPrices(List<String> priceVals) {
-        List<WebElement> positions = driver.findElements(positionLocators);
-        List<WebElement> prices = findBoth(priceLocatorsLuxbet, priceLocatorsRedbook);
-        Assertions.assertThat(positions.size()).as("position size matches prices size").isEqualTo(prices.size());
-        Assertions.assertThat(prices.size()).as("price elems size matches cucumber price values size").isEqualTo(priceVals.size());
-        for (int i = 0; i < positions.size(); i++) {
-            WebElement pos = positions.get(i);
-            WebElement price = prices.get(i);
+    public void enterPrices(List<String> prices) {
+        Assertions.assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
+        Assertions.assertThat(priceTxts.size()).as("price elems size matches cucumber price values size").isEqualTo(prices.size());
+        for (int i = 0; i < positionTxts.size(); i++) {
+            WebElement pos = positionTxts.get(i);
+            WebElement priceTxt = priceTxts.get(i);
             pos.sendKeys(String.valueOf(i + 1));
-            wait.until(ExpectedConditions.elementToBeClickable(price));
-            price.clear();
-            price.sendKeys(priceVals.get(i));
+//            wait.until(ExpectedConditions.elementToBeClickable(priceTxt));
+            priceTxt.clear();
+            priceTxt.sendKeys(prices.get(i));
         }
         insertBtn.click();
     }
