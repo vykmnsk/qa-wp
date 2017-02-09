@@ -13,6 +13,8 @@ import org.openqa.selenium.support.ui.Select;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
+import java.util.List;
+import java.util.Random;
 
 public class MarketsPage extends AppPage {
 
@@ -75,15 +77,17 @@ public class MarketsPage extends AppPage {
         Assertions.assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
-    public void enterPrices(List<String> prices) {
+    public void enterPrices() {
+        Random rand = new Random();
+        double price;
         Assertions.assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
-        Assertions.assertThat(priceTxts.size()).as("price elems size matches cucumber price values size").isEqualTo(prices.size());
         for (int i = 0; i < positionTxts.size(); i++) {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            priceTxt.sendKeys(prices.get(i));
+            price = (rand.nextInt(50) * 10) / 10.0;
+            priceTxt.sendKeys(Double.toString(price));
         }
         insertBtn.click();
     }

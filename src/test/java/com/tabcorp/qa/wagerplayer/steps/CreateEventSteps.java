@@ -2,6 +2,7 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
 
@@ -13,6 +14,10 @@ public class CreateEventSteps implements En {
 
     NewEventPage newEvtPage;
     MarketsPage marketsPage;
+
+    String numberOfRunners;
+    String raceType;
+    String raceNumber;
 
     public CreateEventSteps() {
 
@@ -26,32 +31,28 @@ public class CreateEventSteps implements En {
             HeaderPage header = new HeaderPage();
             header.pickCategories(category, subcategory);
         });
-        Then("^I see New Event page$", () -> {
-            newEvtPage = new NewEventPage();
-            newEvtPage.load();
-        });
+
 
         When("^I enter event details with current 'show time' and 'event date/time' in (\\d+) minutes with data$",
                 (Integer inMinutes, DataTable table) -> {
                     Map<String, String> evt = table.asMap(String.class, String.class);
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
-                    String[] runners = evt.get("runners").split(", ");
+                    String eventName = evt.get("event name"); //String.format(evt.get("event name"), this.raceNumber, this.raceType, this.raceNumber);
 
                     marketsPage = newEvtPage.enterEventDetails(
-                            Integer.valueOf(inMinutes),
-                            evt.get("event name"),
+                            inMinutes,
+                            eventName,
                             evt.get("bet in run type"),
                             evt.get("create market"),
-                            Arrays.asList(runners)
+                            Integer.valueOf(this.numberOfRunners)
                     );
                 });
         Then("^I see Create Market page$", () -> {
             marketsPage.verifyLoaded();
         });
 
-        When("^I enter odds \"([^\"]*)\"$", (String oddsCSV) -> {
-            String[] odds = oddsCSV.split(",\\s+");
-            marketsPage.enterPrices(Arrays.asList(odds));
+        When("^I enter odds$", () -> {
+            marketsPage.enterPrices();
         });
 
         When("^I update race number to \"([^\"]*)\"$", (String num) -> {
@@ -81,6 +82,14 @@ public class CreateEventSteps implements En {
 
         Then("^I can see success status with message \"([^\"]*)\"$", (String msg) -> {
             marketsPage.verifySuccessStatus(msg);
+        });
+
+        Then("^I see New Event page for creating event with \"([^\"]*)\" horses, \"([^\"]*)\" and \"([^\"]*)\"$", (String numberOfRunners, String raceType, String raceNumber) -> {
+            newEvtPage = new NewEventPage();
+            newEvtPage.load();
+            this.numberOfRunners = numberOfRunners;
+            this.raceType = raceType;
+            this.raceNumber = raceNumber;
         });
 
     }

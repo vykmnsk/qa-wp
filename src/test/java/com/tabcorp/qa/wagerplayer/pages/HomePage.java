@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import org.assertj.core.api.Assertions;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 

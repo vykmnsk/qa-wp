@@ -77,7 +77,7 @@ public class NewEventPage extends AppPage{
         wait.until(ExpectedConditions.visibilityOf(insertEvent));
     }
 
-    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, List<String> runners) {
+    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, int noOfRunners) {
         eventName.sendKeys(eventNameVal);
         (new Select(betInRunType)).selectByVisibleText(betInRunTypeVal);
         createMarket.sendKeys(createMarketVal);
@@ -92,10 +92,22 @@ public class NewEventPage extends AppPage{
         new Select(eventDateTimeHour).selectByValue(format2d(evTime.getHour()));
         new Select(eventDateTimeMin).selectByValue(format2d(evTime.getMinute()));
 
-        String runnersStr = String.join("\n", runners);
-        runnersBox.sendKeys(runnersStr);
+        runnersBox.sendKeys(getRunners(noOfRunners));
         insertEvent.click();
         return new MarketsPage();
+    }
+
+    private String getRunners(int noOfRunners) {
+        String runners = "";
+        String runnerInitial = "Runner_";
+        noOfRunners++;
+        while (noOfRunners > 0)
+        {
+            runners = runnerInitial + noOfRunners + "\n" + runners;
+            noOfRunners--;
+        }
+        runners = runners.substring(0, runners.length()-2);
+        return runners;
     }
 
     private String format2d(int val){
