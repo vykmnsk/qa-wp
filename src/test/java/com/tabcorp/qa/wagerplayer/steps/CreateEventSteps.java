@@ -6,6 +6,7 @@ import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class CreateEventSteps implements En {
@@ -45,7 +46,7 @@ public class CreateEventSteps implements En {
                     );
                 });
         Then("^I see Create Market page$", () -> {
-            marketsPage.vefifyLoaded();
+            marketsPage.verifyLoaded();
         });
 
         When("^I enter odds \"([^\"]*)\"$", (String oddsCSV) -> {
@@ -55,7 +56,13 @@ public class CreateEventSteps implements En {
 
         When("^I update race number to \"([^\"]*)\"$", (String num) -> {
             marketsPage.showMarketManagement();
-            marketsPage.enterRaceNumber(num);
+            marketsPage.updateRaceNumber(num);
+        });
+
+        When("^I enable \"([^\"]*)\" \"([^\"]*)\" product settings$", (String type, String name, DataTable table) -> {
+            List<List<String>> settings = table.raw();
+
+            marketsPage.enableProductSettings(type, name, settings);
         });
 
         When("^I enter market details$", (DataTable table) -> {

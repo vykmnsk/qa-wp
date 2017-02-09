@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
+import cucumber.api.PendingException;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -9,7 +10,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 public class MarketsPage extends AppPage {
 
@@ -61,13 +64,16 @@ public class MarketsPage extends AppPage {
     List<WebElement> positionTxts;
     @FindBy(css = "input[type=text][id^=price_][onkeyup^=calculate_selection_percent")
     List<WebElement> priceTxts;
-    By priceLocators = By.cssSelector("input[type=text][id^=price_][onkeyup^=calculate_selection_percent");
 
-    public void vefifyLoaded() {
+    @FindBy(css = "#bet_types_content_body table.product_options tbody tr")
+    @CacheLookup
+    public List<WebElement> productRows;
+
+
+    public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
         Assertions.assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
-
 
     public void enterPrices(List<String> prices) {
         Assertions.assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
@@ -76,7 +82,6 @@ public class MarketsPage extends AppPage {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
             pos.sendKeys(String.valueOf(i + 1));
-//            wait.until(ExpectedConditions.elementToBeClickable(priceTxt));
             priceTxt.clear();
             priceTxt.sendKeys(prices.get(i));
         }
@@ -90,9 +95,54 @@ public class MarketsPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
     }
 
-    public void enterRaceNumber(String num){
+    public void updateRaceNumber(String num){
         raceNumTxt.clear();
         raceNumTxt.sendKeys(num);
+    }
+
+
+//    protected static Map<Integer, String> extJava8() {
+//        return Collections.unmodifiableMap(Stream.of(
+//                entry(0, "zero"),
+//                entry(1, "one"),
+//                entry(2, "two"),
+//                entry(12, "twelve")).
+//                collect(entriesToMap()));
+//    }
+
+    static Map<List<String>, String> cukeToUI(String prodType) {
+        HashMap <List<String>, String> c2ui = new HashMap<>();
+        if ("Win / Place".equals(prodType)){
+            c2ui.put(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]");
+            c2ui.put(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]");
+            c2ui.put(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]");
+            c2ui.put(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]");
+            c2ui.put(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]");
+            //..
+            c2ui.put(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]");
+        } else {
+            throw new PendingException();
+        }
+        return c2ui;
+    }
+
+    public void enableProductSettings(String prodType, String prodName, List<List<String>> settings){
+        WebElement tr = productRows.stream().filter(p -> p.getText().contains("PA SP")).findFirst().orElse(null);
+        Assertions.assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
+        for (List<String> option: settings) {
+            setOption(prodType, tr, option);
+        }
+    }
+
+    private void setOption(String prodType, WebElement prodRow, List<String> option) {
+        String uiId = cukeToUI(prodType).get(option);
+        String inputCSS = String.format("input[name$='%s']", uiId);
+        WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
+        WebElement cell = findParent(hiddenChk);
+        String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");
+        if (imageFile.endsWith("unselected.png")) {
+            cell.click();
+        }
     }
 
     public void showMarketDetails() {

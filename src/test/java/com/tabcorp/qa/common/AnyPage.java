@@ -3,6 +3,7 @@ package com.tabcorp.qa.common;
 import com.tabcorp.qa.wagerplayer.steps.CreateEventSteps;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -37,6 +38,11 @@ public class AnyPage {
                 .withFailMessage("Expected to find one of %s", locators)
                 .isEqualTo(1);
         return elems.get(0);
+    }
+
+    public WebElement findParent(WebElement elem){
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        return  (WebElement)js.executeScript("return arguments[0].parentNode;", elem);
     }
 
 }
