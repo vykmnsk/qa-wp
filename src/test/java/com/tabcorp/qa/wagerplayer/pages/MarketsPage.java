@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
-import com.tabcorp.qa.common.StrictHashMap;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -10,7 +9,13 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MarketsPage extends AppPage {
 
@@ -99,32 +104,34 @@ public class MarketsPage extends AppPage {
     }
 
     static Map<List<String>, String> productSettingIDs() {
-        StrictHashMap<List<String>, String> cuke2ui = new StrictHashMap<>();
-        cuke2ui.put(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]");
-        cuke2ui.put(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]");
-        cuke2ui.put(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]");
-        cuke2ui.put(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]");
-        cuke2ui.put(Arrays.asList("Betting", "Display Price", "Fluc"), "[2][display_fluctuations]");
-        cuke2ui.put(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]");
-        cuke2ui.put(Arrays.asList("Betting", "Enable Single", "Place"), "[2][place_enabled]");
-        cuke2ui.put(Arrays.asList("Betting", "Enable Single", "EW"), "[2][eachway]");
-        cuke2ui.put(Arrays.asList("Betting", "Display Column", "Win"), "[2][display_column_win]");
-        cuke2ui.put(Arrays.asList("Betting", "Display Column", "Place"), "[2][display_column_place]");
-        cuke2ui.put(Arrays.asList("Betting", "Display Column", "EW"), "[2][display_column_eachway]");
-        cuke2ui.put(Arrays.asList("Betting", "Enable Multi", "Win"), "[2][multi_win]");
-        cuke2ui.put(Arrays.asList("Betting", "Enable Multi", "Place"), "[2][multi_place]");
-        cuke2ui.put(Arrays.asList("Betting", "Enable Multi", "EW"), "[2][multi_eachway]");
-        cuke2ui.put(Arrays.asList("Betting", "Disp. Result", "Win"), "[2][display_result_win]");
-        cuke2ui.put(Arrays.asList("Betting", "Disp. Result", "Place"), "[2][display_result_place]");
+        return Collections.unmodifiableMap(Stream.of(
+            new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Fluc"), "[2][display_fluctuations]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Place"), "[2][place_enabled]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "EW"), "[2][eachway]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Win"), "[2][display_column_win]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Place"), "[2][display_column_place]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "EW"), "[2][display_column_eachway]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Win"), "[2][multi_win]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Place"), "[2][multi_place]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "EW"), "[2][multi_eachway]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Win"), "[2][display_result_win]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Place"), "[2][display_result_place]"),
 
-        cuke2ui.put(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]");
-        cuke2ui.put(Arrays.asList("Liability", "Display Price", "Place"), "[1][place_display_price]");
-        //..
+            new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]"),
+            new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Place"), "[1][place_display_price]"),
+//        TODO: add all the rest of the settings
+//        TODO: vefify works in Luxbet
 
-        cuke2ui.put(Arrays.asList("Defaults", "Display", "Web"), "[2][is_default]");
-        cuke2ui.put(Arrays.asList("Defaults", "Display", "F2"), "[1][is_default]");
-        return cuke2ui;
+            new SimpleEntry<>(Arrays.asList("Defaults", "Display", "Web"), "[2][is_default]"),
+            new SimpleEntry<>(Arrays.asList("Defaults", "Display", "F2"), "[1][is_default]")
+            ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
+
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
@@ -135,7 +142,7 @@ public class MarketsPage extends AppPage {
     }
 
     private void setOption(WebElement prodRow, List<String> option) {
-        String inputCSS = String.format("input[name$='%s']", productSettingIDs().get(option));
+        String inputCSS = String.format("input[name$='%s']", noNullKey(productSettingIDs(), option));
         WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");

@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import cucumber.api.java.it.Ma;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -8,11 +7,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static java.time.format.DateTimeFormatter.ofPattern;
 
 public class NewEventPage extends AppPage{
     @FindBy(css = "textarea[name=add_selections]")

@@ -1,6 +1,5 @@
 package com.tabcorp.qa.common;
 
-import com.tabcorp.qa.wagerplayer.steps.CreateEventSteps;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class AnyPage {
     public WebDriver driver;
@@ -45,4 +45,10 @@ public class AnyPage {
         return  (WebElement)js.executeScript("return arguments[0].parentNode;", elem);
     }
 
+    public Object noNullKey(Map map, Object key){
+        Assertions.assertThat(map.get(key))
+                .withFailMessage("Map key='%s' does not exist in: %s", key, map.keySet())
+                .isNotNull();
+        return map.get(key);
+    }
 }
