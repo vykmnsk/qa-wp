@@ -59,10 +59,10 @@ public class CreateEventSteps implements En {
             marketsPage.updateRaceNumber(num);
         });
 
-        When("^I enable \"([^\"]*)\" \"([^\"]*)\" product settings$", (String type, String name, DataTable table) -> {
+        When("^I enable \"([^\']*)\" product settings$", (String name, DataTable table) -> {
             List<List<String>> settings = table.raw();
 
-            marketsPage.enableProductSettings(type, name, settings);
+            marketsPage.enableProductSettings(name, settings);
         });
 
         When("^I enter market details$", (DataTable table) -> {
