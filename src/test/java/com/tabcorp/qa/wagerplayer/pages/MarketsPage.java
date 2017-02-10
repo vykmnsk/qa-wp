@@ -11,10 +11,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
-import java.util.List;
-import java.util.Random;
 
 public class MarketsPage extends AppPage {
 
@@ -49,7 +45,7 @@ public class MarketsPage extends AppPage {
     @FindBy(css = ("select[name='MARKET_TYPE_SET_ALLOW_PLACE']"))
     WebElement betsAllowedPlaceSel;
 
-    @FindBy(css = ("select[name='MARKET_TYPE_SET_EACHWAY_PERCENT']"))
+    @FindBy(css = ("select[id='MARKET_TYPE_SET_EACHWAY_PERCENT']"))
     WebElement placeFractionSel;
 
     @FindBy(css = ("select[name='MARKET_TYPE_SET_EACHWAY_SELECTIONS']"))
@@ -99,7 +95,7 @@ public class MarketsPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
     }
 
-    public void updateRaceNumber(String num){
+    public void updateRaceNumber(String num) {
         raceNumTxt.clear();
         raceNumTxt.sendKeys(num);
     }
@@ -130,10 +126,11 @@ public class MarketsPage extends AppPage {
         return c2ui;
     }
 
-    public void enableProductSettings(String prodType, String prodName, List<List<String>> settings){
-        WebElement tr = productRows.stream().filter(p -> p.getText().contains("PA SP")).findFirst().orElse(null);
+    public void enableProductSettings(String prodType, String prodName, List<List<String>> settings) {
+        showMarketManagement();
+        WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
         Assertions.assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
-        for (List<String> option: settings) {
+        for (List<String> option : settings) {
             setOption(prodType, tr, option);
         }
     }

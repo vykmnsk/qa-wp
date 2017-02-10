@@ -100,13 +100,12 @@ public class NewEventPage extends AppPage{
     private String getRunners(int noOfRunners) {
         String runners = "";
         String runnerInitial = "Runner_";
-        noOfRunners++;
         while (noOfRunners > 0)
         {
             runners = runnerInitial + noOfRunners + "\n" + runners;
             noOfRunners--;
         }
-        runners = runners.substring(0, runners.length()-2);
+        runners = runners.substring(0, runners.length()-1);
         return runners;
     }
 

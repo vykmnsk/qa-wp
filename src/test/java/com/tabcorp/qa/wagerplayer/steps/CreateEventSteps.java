@@ -2,11 +2,8 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

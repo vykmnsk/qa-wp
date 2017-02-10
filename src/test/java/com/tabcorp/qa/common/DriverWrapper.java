@@ -36,8 +36,9 @@ public class DriverWrapper {
     }
 
     public void closeBrowser(){
-        if (null == driver) return;
+        if (null == driver && null == wait) return;
         driver.quit();
         driver = null;
+        wait = null;
     }
 }
