@@ -24,6 +24,35 @@ Feature: Create Event
       | Betting   | Display Price | Place |
       | Betting   | Enable Single | Win   |
       | Liability | Display Price | Win   |
+    When I update race number to "7"
+
+    And I enable "Luxbook DVP Fixed" product settings
+      | Betting | Display Price | Fluc |
+
+    And I enable "PA SP" product settings
+      | Betting   | Enabled        | On    |
+      | Betting   | Enabled        | Auto  |
+      | Betting   | Display Price  | Win   |
+      | Betting   | Display Price  | Place |
+      | Betting   | Enable Single  | Win   |
+      | Betting   | Enable Single  | Place |
+      | Betting   | Enable Single  | EW    |
+      | Betting   | Display Column | Win   |
+      | Betting   | Display Column | Place |
+      | Betting   | Display Column | EW    |
+      | Betting   | Enable Multi   | Win   |
+      | Betting   | Enable Multi   | Place |
+      | Betting   | Enable Multi   | EW    |
+      | Betting   | Disp. Result   | Win   |
+      | Betting   | Disp. Result   | Place |
+      | Liability | Display Price  | Win   |
+      | Liability | Display Price  | Place |
+      | Defaults  | Display        | Web   |
+      | Defaults  | Display        | F2    |
+
+    And I enable "Forecast Fixed" product settings
+      | Defaults | Display | Web |
+      | Defaults | Display | F2  |
 
     And I enter market details
       | Market Status      | Held           |

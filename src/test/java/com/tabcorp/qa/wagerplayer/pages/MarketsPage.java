@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
-import cucumber.api.PendingException;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,6 +10,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MarketsPage extends AppPage {
 
@@ -48,7 +54,7 @@ public class MarketsPage extends AppPage {
     @FindBy(css = ("select[id='MARKET_TYPE_SET_EACHWAY_PERCENT']"))
     WebElement placeFractionSel;
 
-    @FindBy(css = ("select[name='MARKET_TYPE_SET_EACHWAY_SELECTIONS']"))
+    @FindBy(css = ("select[id='MARKET_TYPE_SET_EACHWAY_SELECTIONS']"))
     WebElement numOfPlacesSel;
 
     @FindBy(css = ("input[name='MARKET_TYPE_SET_ALLOW_EACHWAY']"))
@@ -100,44 +106,47 @@ public class MarketsPage extends AppPage {
         raceNumTxt.sendKeys(num);
     }
 
+    static Map<List<String>, String> productSettingIDs() {
+        return Collections.unmodifiableMap(Stream.of(
+            new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Fluc"), "[2][display_fluctuations]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Place"), "[2][place_enabled]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "EW"), "[2][eachway]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Win"), "[2][display_column_win]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Place"), "[2][display_column_place]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "EW"), "[2][display_column_eachway]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Win"), "[2][multi_win]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Place"), "[2][multi_place]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "EW"), "[2][multi_eachway]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Win"), "[2][display_result_win]"),
+            new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Place"), "[2][display_result_place]"),
 
-//    protected static Map<Integer, String> extJava8() {
-//        return Collections.unmodifiableMap(Stream.of(
-//                entry(0, "zero"),
-//                entry(1, "one"),
-//                entry(2, "two"),
-//                entry(12, "twelve")).
-//                collect(entriesToMap()));
-//    }
+            new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]"),
+            new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Place"), "[1][place_display_price]"),
+//        TODO: add all the rest of the settings
+//        TODO: vefify works in Luxbet
 
-    static Map<List<String>, String> cukeToUI(String prodType) {
-        HashMap <List<String>, String> c2ui = new HashMap<>();
-        if ("Win / Place".equals(prodType)){
-            c2ui.put(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]");
-            c2ui.put(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]");
-            c2ui.put(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]");
-            c2ui.put(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]");
-            c2ui.put(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]");
-            //..
-            c2ui.put(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]");
-        } else {
-            throw new PendingException();
-        }
-        return c2ui;
+            new SimpleEntry<>(Arrays.asList("Defaults", "Display", "Web"), "[2][is_default]"),
+            new SimpleEntry<>(Arrays.asList("Defaults", "Display", "F2"), "[1][is_default]")
+            ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
+
 
     public void enableProductSettings(String prodType, String prodName, List<List<String>> settings) {
         showMarketManagement();
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
         Assertions.assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         for (List<String> option : settings) {
-            setOption(prodType, tr, option);
+            setOption(tr, option);
         }
     }
 
-    private void setOption(String prodType, WebElement prodRow, List<String> option) {
-        String uiId = cukeToUI(prodType).get(option);
-        String inputCSS = String.format("input[name$='%s']", uiId);
+    private void setOption(WebElement prodRow, List<String> option) {
+        String inputCSS = String.format("input[name$='%s']", noNullKey(productSettingIDs(), option));
         WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");
