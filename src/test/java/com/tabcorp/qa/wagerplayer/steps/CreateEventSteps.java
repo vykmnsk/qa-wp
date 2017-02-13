@@ -13,7 +13,7 @@ public class CreateEventSteps implements En {
     NewEventPage newEvtPage;
     MarketsPage marketsPage;
 
-    String numberOfRunners;
+    int numberOfRunners;
     String raceType;
     String raceNumber;
 
@@ -35,14 +35,13 @@ public class CreateEventSteps implements En {
                 (Integer inMinutes, DataTable table) -> {
                     Map<String, String> evt = table.asMap(String.class, String.class);
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
-                    String eventName = evt.get("event name"); //String.format(evt.get("event name"), this.raceNumber, this.raceType, this.raceNumber);
 
                     marketsPage = newEvtPage.enterEventDetails(
                             inMinutes,
-                            eventName,
+                            evt.get("event name"),
                             evt.get("bet in run type"),
                             evt.get("create market"),
-                            Integer.valueOf(this.numberOfRunners)
+                            this.numberOfRunners
                     );
                 });
         Then("^I see Create Market page$", () -> {
@@ -83,7 +82,7 @@ public class CreateEventSteps implements En {
             marketsPage.verifySuccessStatus(msg);
         });
 
-        Then("^I see New Event page for creating event with \"([^\"]*)\" horses, \"([^\"]*)\" and \"([^\"]*)\"$", (String numberOfRunners, String raceType, String raceNumber) -> {
+        Then("^I see New Event page for creating event with (\\d+) horses, \"([^\"]*)\" and \"([^\"]*)\"$", (Integer numberOfRunners, String raceType, String raceNumber) -> {
             newEvtPage = new NewEventPage();
             newEvtPage.load();
             this.numberOfRunners = numberOfRunners;

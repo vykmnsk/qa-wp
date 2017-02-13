@@ -1,5 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.sun.javafx.binding.StringFormatter;
+import org.junit.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -7,6 +9,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewEventPage extends AppPage{
@@ -87,21 +90,16 @@ public class NewEventPage extends AppPage{
         new Select(eventDateTimeHour).selectByValue(format2d(evTime.getHour()));
         new Select(eventDateTimeMin).selectByValue(format2d(evTime.getMinute()));
 
-        runnersBox.sendKeys(getRunners(noOfRunners));
+        runnersBox.sendKeys(generateRunnersString(noOfRunners));
         insertEvent.click();
         return new MarketsPage();
     }
 
-    private String getRunners(int noOfRunners) {
-        String runners = "";
+    public String generateRunnersString(int noOfRunners) {
         String runnerInitial = "Runner_";
-        while (noOfRunners > 0)
-        {
-            runners = runnerInitial + noOfRunners + "\n" + runners;
-            noOfRunners--;
-        }
-        runners = runners.substring(0, runners.length()-1);
-        return runners;
+        List runners = new ArrayList(noOfRunners);
+        for(int i = 0; i < noOfRunners; i++,  runners.add(runnerInitial + i));
+        return String.join("\n", runners);
     }
 
     private String format2d(int val){

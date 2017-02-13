@@ -5,7 +5,7 @@ Feature: Create Event
 
   Scenario Outline: Create Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    Then I see New Event page for creating event with "<NumberOfRunners>" horses, "<RaceType>" and "<RaceNumber>"
+    Then I see New Event page for creating event with <NumberOfRunners> horses, "<RaceType>" and "<RaceNumber>"
 
     When I enter event details with current 'show time' and 'event date/time' in 30 minutes with data
       | event name      | <RaceNumber>. TEST RACE 0<RaceNumber> <RaceType> |
