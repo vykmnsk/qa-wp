@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
+import com.sun.jna.platform.win32.WinDef;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class MarketsPage extends AppPage {
 
@@ -73,16 +76,19 @@ public class MarketsPage extends AppPage {
     @CacheLookup
     public List<WebElement> productRows;
 
+    public final boolean SHOW = true;
+    public final boolean HIDE = false;
+
 
     public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
-        Assertions.assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
+        assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
     public void enterPrices() {
         Random rand = new Random();
         double price;
-        Assertions.assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
+        assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
         for (int i = 0; i < positionTxts.size(); i++) {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
@@ -94,11 +100,13 @@ public class MarketsPage extends AppPage {
         insertBtn.click();
     }
 
-    public void showMarketManagement() {
-        if (!marketManagementSection.isDisplayed()) {
+    public void toggleMarketManagement(Boolean showHide) {
+        if (marketManagementSection.isDisplayed() != showHide) {
             showHideMarketManagement.click();
         }
-        wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+        if (showHide) {
+            wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+        }
     }
 
     public void updateRaceNumber(String num) {
@@ -136,10 +144,10 @@ public class MarketsPage extends AppPage {
     }
 
 
-    public void enableProductSettings(String prodType, String prodName, List<List<String>> settings) {
-        showMarketManagement();
+    public void enableProductSettings(String prodType, String prodName, List<List<String>> settings) {toggleMarketDetails(HIDE);
+        toggleMarketManagement(SHOW);
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
-        Assertions.assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
+        assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         for (List<String> option : settings) {
             setOption(tr, option);
         }
@@ -155,11 +163,13 @@ public class MarketsPage extends AppPage {
         }
     }
 
-    public void showMarketDetails() {
-        if (!marketDetailsSection.isDisplayed()) {
+    public void toggleMarketDetails(boolean showHide) {
+        if (marketDetailsSection.isDisplayed() != showHide) {
             showHideMarketDetails.click();
         }
-        wait.until(ExpectedConditions.visibilityOf(marketDetailsSection));
+        if(showHide) {
+            wait.until(ExpectedConditions.visibilityOf(marketDetailsSection));
+        }
     }
 
     public void enterMarketDetail(boolean isLive, String betsAllowedWin, String betsAllowedPlace, String placeFraction, String numOfPlaces, boolean isEW) {
