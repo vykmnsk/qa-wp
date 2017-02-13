@@ -33,7 +33,6 @@ public class NewEventPageTest {
                         .withFailMessage("String is not matching with expected string " + runners)
                         .isEqualTo(expectedRunners);
 
-        System.out.println(runners);
     }
 
 }

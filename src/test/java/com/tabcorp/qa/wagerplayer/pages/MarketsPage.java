@@ -1,7 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
-import com.sun.jna.platform.win32.WinDef;
+import com.tabcorp.qa.common.SeleniumHelper;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -10,16 +10,12 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MarketsPage extends AppPage {
 
@@ -157,6 +153,7 @@ public class MarketsPage extends AppPage {
         WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");
+        SeleniumHelper.scrollTo(driver, cell);
         if (imageFile.endsWith("unselected.png")) {
             cell.click();
         }
