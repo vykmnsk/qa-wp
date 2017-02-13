@@ -1,3 +1,4 @@
+@redbook
 Feature: Create Event
 
   Background:
@@ -26,6 +27,9 @@ Feature: Create Event
       | Liability | Display Price | Win   |
     When I update race number to "7"
 
+#  Luxbook DVP Fixed
+#  NSW Daily Double
+  
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Display Price | Fluc |
 
