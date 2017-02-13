@@ -143,8 +143,7 @@ public class MarketsPage extends AppPage {
             ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
 
-
-    public void enableProductSettings(String prodType, String prodName, List<List<String>> settings) {toggleMarketDetails(HIDE);
+    public void enableProductSettings(String prodName, List<List<String>> settings) {
         toggleMarketManagement(SHOW);
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();

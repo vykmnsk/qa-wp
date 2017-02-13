@@ -18,14 +18,6 @@ Feature: Create Event
     Then I can see success status with message "Market Created"
 
     When I update race number to "<RaceNumber>"
-    And I enable "Win / Place" "PA SP" product settings
-      | Betting   | Enabled       | On    |
-      | Betting   | Enabled       | Auto  |
-      | Betting   | Display Price | Win   |
-      | Betting   | Display Price | Place |
-      | Betting   | Enable Single | Win   |
-      | Liability | Display Price | Win   |
-    When I update race number to "7"
 
 #  Luxbook DVP Fixed
 #  NSW Daily Double
@@ -69,6 +61,6 @@ Feature: Create Event
 
     Examples:
       | NumberOfRunners | RaceType | RaceNumber |
-      | 24              | HANDICAP | 1          |
-      | 15              | Auto     | 2          |
+#      | 24              | HANDICAP | 1          |
+#      | 15              | Auto     | 2          |
       | 8               | Auto     | 3          |
