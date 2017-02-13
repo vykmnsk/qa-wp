@@ -21,9 +21,24 @@ Feature: Create Event
 
 #  Luxbook DVP Fixed
 #  NSW Daily Double
-  
+
     And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Display Price | Fluc |
+      | Betting   | Display Price   | Fluc        |
+      | Liability | Display Price   | Win         |
+      | Liability | Display Price   | Place       |
+      | Liability | Single          | Win         |
+      | Liability | Single          | Place       |
+      | Liability | Base            | Win         |
+      | Liability | Final Leg Multi | Win         |
+      | Liability | Final Leg Multi | Place       |
+      | Liability | Multi           | Win         |
+      | Liability | Multi           | Place       |
+      | Liability | Betback         | Win         |
+      | Liability | Betback         | Place       |
+      | Liability | Cash Out        | Win         |
+      | Liability | Cash Out        | Place       |
+      | Liability | Cash Out        | Multi Win   |
+      | Liability | Cash Out        | Multi Place |
 
     And I enable "PA SP" product settings
       | Betting   | Enabled        | On    |
