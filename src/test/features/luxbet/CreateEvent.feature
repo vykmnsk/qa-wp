@@ -1,4 +1,5 @@
-Feature: Create Event
+@luxbet
+Feature: Create Luxbet Event
 
   Background:
     Given I am logged in and on Home Page
@@ -21,30 +22,15 @@ Feature: Create Event
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Display Price | Fluc |
 
-    And I enable "PA SP" product settings
+    And I enable "NSW Daily Double" product settings
       | Betting   | Enabled        | On    |
       | Betting   | Enabled        | Auto  |
       | Betting   | Display Price  | Win   |
       | Betting   | Display Price  | Place |
-      | Betting   | Enable Single  | Win   |
-      | Betting   | Enable Single  | Place |
-      | Betting   | Enable Single  | EW    |
-      | Betting   | Display Column | Win   |
-      | Betting   | Display Column | Place |
-      | Betting   | Display Column | EW    |
-      | Betting   | Enable Multi   | Win   |
-      | Betting   | Enable Multi   | Place |
-      | Betting   | Enable Multi   | EW    |
-      | Betting   | Disp. Result   | Win   |
-      | Betting   | Disp. Result   | Place |
-      | Liability | Display Price  | Win   |
-      | Liability | Display Price  | Place |
       | Defaults  | Display        | Web   |
       | Defaults  | Display        | F2    |
 
-    And I enable "Forecast Fixed" product settings
-      | Defaults | Display | Web |
-      | Defaults | Display | F2  |
+    #  NSW Daily Double???
 
     And I enter market details
       | Market Status      | Held           |
@@ -53,4 +39,5 @@ Feature: Create Event
       | Place Fraction     | 1/4            |
       | No of Places       | 4              |
       | E/W                | yes            |
+
     Then I can see success status with message "Market display updated"
