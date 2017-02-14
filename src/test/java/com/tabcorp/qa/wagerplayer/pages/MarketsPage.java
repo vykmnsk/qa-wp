@@ -90,7 +90,7 @@ public class MarketsPage extends AppPage {
             WebElement priceTxt = priceTxts.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            price = (rand.nextInt(50) * 10) / 10.0;
+            price = (double)(rand.nextInt(50) + 10);
             priceTxt.sendKeys(Double.toString(price));
         }
         insertBtn.click();

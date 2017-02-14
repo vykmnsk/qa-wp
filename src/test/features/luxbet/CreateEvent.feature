@@ -4,11 +4,10 @@ Feature: Create Luxbet Event
   Background:
     Given I am logged in and on Home Page
 
-  Scenario: Create Horse Racing event
+  Scenario Outline: Create Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    Then I see New Event page for creating event with <NumberOfRunners> horses, "<RaceType>" and "<RaceNumber>"
-
-    When I enter event details with current 'show time' and 'event date/time' in 30 minutes with data
+    And I see New Event page is loaded
+    And I enter event details with <NumberOfRunners> horses, current 'show time' and 'event date/time' in 30 minutes with data
       | event name      | 1. TEST RACE 01 HANDICAP                                                                                                  |
       | bet in run type | Both Allowed                                                                                                              |
       | create market   | Racing Live                                                                                                               |
@@ -40,3 +39,6 @@ Feature: Create Luxbet Event
       | E/W                | yes            |
 
     Then I can see success status with message "Market display updated"
+    Examples:
+      | NumberOfRunners | RaceType | RaceNumber |
+      | 8               | Auto     | 3          |

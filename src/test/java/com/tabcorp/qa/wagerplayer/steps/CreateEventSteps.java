@@ -13,10 +13,6 @@ public class CreateEventSteps implements En {
     NewEventPage newEvtPage;
     MarketsPage marketsPage;
 
-    int numberOfRunners;
-    String raceType;
-    String raceNumber;
-
     public CreateEventSteps() {
 
         Given("^I am logged in and on Home Page$", () -> {
@@ -31,8 +27,8 @@ public class CreateEventSteps implements En {
         });
 
 
-        When("^I enter event details with current 'show time' and 'event date/time' in (\\d+) minutes with data$",
-                (Integer inMinutes, DataTable table) -> {
+        When("^I enter event details with (\\d+) horses, current 'show time' and 'event date/time' in (\\d+) minutes with data$",
+                (Integer numberOfRunners, Integer inMinutes, DataTable table) -> {
                     Map<String, String> evt = table.asMap(String.class, String.class);
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
 
@@ -41,7 +37,7 @@ public class CreateEventSteps implements En {
                             evt.get("event name"),
                             evt.get("bet in run type"),
                             evt.get("create market"),
-                            this.numberOfRunners
+                            numberOfRunners
                     );
                 });
         Then("^I see Create Market page$", () -> {
@@ -81,12 +77,9 @@ public class CreateEventSteps implements En {
             marketsPage.verifySuccessStatus(msg);
         });
 
-        Then("^I see New Event page for creating event with (\\d+) horses, \"([^\"]*)\" and \"([^\"]*)\"$", (Integer numberOfRunners, String raceType, String raceNumber) -> {
+        Then("^I see New Event page is loaded$", () -> {
             newEvtPage = new NewEventPage();
             newEvtPage.load();
-            this.numberOfRunners = numberOfRunners;
-            this.raceType = raceType;
-            this.raceNumber = raceNumber;
         });
 
     }
