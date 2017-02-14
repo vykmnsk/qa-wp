@@ -1,5 +1,6 @@
 package com.tabcorp.qa.common;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -23,7 +24,7 @@ public class DriverWrapper {
             System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
             driver = new ChromeDriver();
 //            Runtime.getRuntime().addShutdownHook(new Thread(() -> driver.quit()));
-            driver.manage().window().maximize();
+            driver.manage().window().setSize(new Dimension(1024, 768));
         }
         return driver;
     }
