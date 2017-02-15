@@ -61,3 +61,5 @@ Feature: Create Event
     Examples:
       | NumberOfRunners | RaceType | RaceNumber |
       | 24              | HANDICAP | 1          |
+      | 15              | Auto     | 2          |
+      | 8               | Auto     | 3          |
