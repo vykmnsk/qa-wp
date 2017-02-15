@@ -13,7 +13,7 @@ Feature: Create Luxbet Event
       | create market   | Racing Live                                                                                                               |
       | runners         | SNOW SKY, CRITERION, FAME GAME, OUR IVANHOWE, BIG ORANGE, HARTNELL, HOKKO BRAVE, MAX DYNAMITE, RED CADEAUX, TRIP TO PARIS |
     Then I see Create Market page
-    Then I can see success status with message "Market Created"
+    Then I can see success status with message "Event created"
 
     When I update race number to "7"
 
