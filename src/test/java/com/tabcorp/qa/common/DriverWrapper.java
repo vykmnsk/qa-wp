@@ -21,7 +21,6 @@ public class DriverWrapper {
         if (driver == null) {
             System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
             driver = new ChromeDriver();
-            SeleniumHelper.setScreenSizeToMax(driver);
         }
         return driver;
     }

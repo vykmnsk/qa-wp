@@ -35,4 +35,26 @@ public class NewEventPageTest {
 
     }
 
+    @Test
+    public void canGenerateRunnersWithOne() {
+        String runners = systemUnderTest.generateRunnersString(1);
+        expectedRunners = "Runner_1";
+
+        assertThat(runners)
+                .withFailMessage("String is not matching with expected string " + runners)
+                .isEqualTo(expectedRunners);
+
+    }
+
+    @Test
+    public void canGenerateRunnersWithZero() {
+        String runners = systemUnderTest.generateRunnersString(0);
+        expectedRunners = "";
+
+        assertThat(runners)
+                .withFailMessage("String is not matching with expected string " + runners)
+                .isEqualTo(expectedRunners);
+
+    }
+
 }
