@@ -36,10 +36,12 @@ public class DriverWrapper {
         return wait;
     }
 
-    public void closeBrowser(){
-        if (null == driver && null == wait) return;
-        driver.quit();
-        driver = null;
+    public void closeBrowser() {
+        if (null != driver) {
+            driver.quit();
+            driver = null;
+        }
         wait = null;
     }
+
 }

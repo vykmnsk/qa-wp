@@ -149,8 +149,8 @@ public class MarketsPage extends AppPage {
         WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");
-        scrollTo(cell);
         if (imageFile.endsWith("unselected.png")) {
+            scrollTo(cell);
             cell.click();
         }
     }
