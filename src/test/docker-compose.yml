@@ -1,0 +1,11 @@
+seleniumhub:
+  image: selenium/hub:3.0.1
+  ports:
+    - 4444:4444
+
+chromednode:
+  image: selenium/node-chrome-debug:3.0.1
+  expose:
+    - 5900
+  links:
+    - seleniumhub:hub

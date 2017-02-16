@@ -2,6 +2,8 @@ package com.tabcorp.qa.common;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class DriverWrapper {
@@ -23,8 +25,15 @@ public class DriverWrapper {
 
     public WebDriver getDriver() {
         if (driver == null) {
-            System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
-            driver = new ChromeDriver();
+
+            DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+
+            // Add the WebDriver proxy capability.
+            Proxy proxy = new Proxy();
+            proxy.setHttpProxy("localhost:4444");
+            capabilities.setCapability("proxy", proxy);
+            capabilities.setJavascriptEnabled(true);
+            driver = new RemoteWebDriver(capabilities);
         }
         return driver;
     }
