@@ -94,7 +94,7 @@ public class MarketsPage extends AppPage {
     }
 
     public void showMarketManagement() {
-        if (marketManagementSection.isDisplayed()) {
+        if (!marketManagementSection.isDisplayed()) {
             showHideMarketManagement.click();
         }
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
@@ -156,7 +156,7 @@ public class MarketsPage extends AppPage {
     }
 
     public void showMarketDetails() {
-        if (marketDetailsSection.isDisplayed()) {
+        if (!marketDetailsSection.isDisplayed()) {
             showHideMarketDetails.click();
         }
         wait.until(ExpectedConditions.visibilityOf(marketDetailsSection));
