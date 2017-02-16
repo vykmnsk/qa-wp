@@ -17,6 +17,10 @@ public class DriverWrapper {
         return instance;
     }
 
+    public static void setInstance(DriverWrapper wrapper) {
+        instance = wrapper;
+    }
+
     public WebDriver getDriver() {
         if (driver == null) {
             System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");

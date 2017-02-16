@@ -2,7 +2,6 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
 import java.util.List;
@@ -49,7 +48,7 @@ public class CreateEventSteps implements En {
         });
 
         When("^I update race number to \"([^\"]*)\"$", (String num) -> {
-            marketsPage.toggleMarketManagement(marketsPage.SHOW);
+            marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(num);
         });
 
@@ -60,7 +59,7 @@ public class CreateEventSteps implements En {
 
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
-            marketsPage.toggleMarketDetails(marketsPage.SHOW);
+            marketsPage.showMarketDetails();
             boolean isLive = mkt.get("Market Status").equals("Live");
             boolean isEW = mkt.get("E/W").equals("yes");
             marketsPage.enterMarketDetail(

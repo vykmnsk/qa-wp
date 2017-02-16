@@ -90,16 +90,16 @@ public class NewEventPage extends AppPage{
         new Select(eventDateTimeHour).selectByValue(format2d(evTime.getHour()));
         new Select(eventDateTimeMin).selectByValue(format2d(evTime.getMinute()));
 
-        runnersBox.sendKeys(generateRunnersString(noOfRunners));
+        List runners = generateRunnersString("Runner_", noOfRunners);
+        runnersBox.sendKeys(String.join("\n", runners));
         insertEvent.click();
         return new MarketsPage();
     }
 
-    public String generateRunnersString(int noOfRunners) {
-        String runnerInitial = "Runner_";
+    public List generateRunnersString(String initial, int noOfRunners) {
         List runners = new ArrayList(noOfRunners);
-        for(int i = 0; i < noOfRunners; i++,  runners.add(runnerInitial + i));
-        return String.join("\n", runners);
+        for(int i = 0; i < noOfRunners; i++,  runners.add(initial + i));
+        return runners;
     }
 
     private String format2d(int val){

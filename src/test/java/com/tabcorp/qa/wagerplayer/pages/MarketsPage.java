@@ -71,9 +71,6 @@ public class MarketsPage extends AppPage {
     @CacheLookup
     public List<WebElement> productRows;
 
-    public final boolean SHOW = true;
-    public final boolean HIDE = false;
-
 
     public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
@@ -82,6 +79,7 @@ public class MarketsPage extends AppPage {
 
     public void enterPrices() {
         Random rand = new Random();
+        int maxPrice = 30;
         double price;
         assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
         for (int i = 0; i < positionTxts.size(); i++) {
@@ -89,19 +87,18 @@ public class MarketsPage extends AppPage {
             WebElement priceTxt = priceTxts.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            price = (double)(rand.nextInt(50) + 10);
+            price = (rand.nextInt(maxPrice) * 2.00);
             priceTxt.sendKeys(Double.toString(price));
         }
         insertBtn.click();
     }
 
-    public void toggleMarketManagement(Boolean showHide) {
-        if (marketManagementSection.isDisplayed() != showHide) {
+    public void showMarketManagement() {
+        if (marketManagementSection.isDisplayed()) {
             showHideMarketManagement.click();
         }
-        if (showHide) {
-            wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
-        }
+        wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+
     }
 
     public void updateRaceNumber(String num) {
@@ -139,7 +136,7 @@ public class MarketsPage extends AppPage {
     }
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
-        toggleMarketManagement(SHOW);
+        showMarketManagement();
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         for (List<String> option : settings) {
@@ -158,13 +155,11 @@ public class MarketsPage extends AppPage {
         }
     }
 
-    public void toggleMarketDetails(boolean showHide) {
-        if (marketDetailsSection.isDisplayed() != showHide) {
+    public void showMarketDetails() {
+        if (marketDetailsSection.isDisplayed()) {
             showHideMarketDetails.click();
         }
-        if(showHide) {
-            wait.until(ExpectedConditions.visibilityOf(marketDetailsSection));
-        }
+        wait.until(ExpectedConditions.visibilityOf(marketDetailsSection));
     }
 
     public void enterMarketDetail(boolean isLive, String betsAllowedWin, String betsAllowedPlace, String placeFraction, String numOfPlaces, boolean isEW) {

@@ -22,7 +22,6 @@ public class AnyPage {
     public AnyPage(){
         driver = DriverWrapper.getInstance().getDriver();
         wait = DriverWrapper.getInstance().getDriverWait();
-        setScreenSizeToMax();
     }
 
     public List<WebElement> findAll(List<By> locators) {
