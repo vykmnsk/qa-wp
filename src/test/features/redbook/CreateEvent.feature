@@ -4,20 +4,19 @@ Feature: Create Event
   Background:
     Given I am logged in and on Home Page
 
-  Scenario: Create Horse Racing event
+  Scenario Outline: Create Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    Then I see New Event page
-
-    When I enter event details with current 'show time' and 'event date/time' in 30 minutes with data
-      | event name      | 1. TEST RACE 01 HANDICAP                                                                                                  |
-      | bet in run type | Both Allowed                                                                                                              |
-      | create market   | Racing Live                                                                                                               |
-      | runners         | SNOW SKY, CRITERION, FAME GAME, OUR IVANHOWE, BIG ORANGE, HARTNELL, HOKKO BRAVE, MAX DYNAMITE, RED CADEAUX, TRIP TO PARIS |
+    And I see New Event page is loaded
+    And I enter event details with <NumberOfRunners> horses, current 'show time' and 'event date/time' in 30 minutes with data
+      | event name      | <RaceNumber>. TEST RACE 0<RaceNumber> <RaceType> |
+      | bet in run type | Both Allowed                                           |
+      | create market   | Racing Live                                            |
     Then I see Create Market page
-    When I enter odds "3, 3, 3.5, 2.6, 5.1, 3.5, 3.5, 1.5, 2.6, 5"
+
+    When I enter odds
     Then I can see success status with message "Market Created"
 
-    When I update race number to "7"
+    When I update race number to "<RaceNumber>"
 
 #  Luxbook DVP Fixed
 #  NSW Daily Double
@@ -73,3 +72,9 @@ Feature: Create Event
       | No of Places       | 4              |
       | E/W                | yes            |
     Then I can see success status with message "Market display updated"
+
+    Examples:
+      | NumberOfRunners | RaceType | RaceNumber |
+      | 24              | HANDICAP | 1          |
+      | 15              | Auto     | 2          |
+      | 8               | Auto     | 3          |

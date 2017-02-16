@@ -1,9 +1,8 @@
 package com.tabcorp.qa.common;
 
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 
 public class DriverWrapper {
     private static final int DEFAULT_TIMEOUT_SECONDS = 10;
@@ -18,12 +17,14 @@ public class DriverWrapper {
         return instance;
     }
 
+    public static void setInstance(DriverWrapper wrapper) {
+        instance = wrapper;
+    }
+
     public WebDriver getDriver() {
         if (driver == null) {
             System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
             driver = new ChromeDriver();
-//            Runtime.getRuntime().addShutdownHook(new Thread(() -> driver.quit()));
-            driver.manage().window().maximize();
         }
         return driver;
     }
@@ -35,9 +36,12 @@ public class DriverWrapper {
         return wait;
     }
 
-    public void closeBrowser(){
-        if (null == driver) return;
-        driver.quit();
-        driver = null;
+    public void closeBrowser() {
+        if (null != driver) {
+            driver.quit();
+            driver = null;
+        }
+        wait = null;
     }
+
 }

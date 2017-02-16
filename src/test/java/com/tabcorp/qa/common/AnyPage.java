@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,17 @@ public class AnyPage {
     public WebElement findParent(WebElement elem){
         JavascriptExecutor js = (JavascriptExecutor) driver;
         return  (WebElement)js.executeScript("return arguments[0].parentNode;", elem);
+    }
+
+    public void scrollTo(WebElement elem) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elem);
+    }
+
+    public void setScreenSizeToMax() {
+        java.awt.Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = (int)screenSize.getWidth();
+        int height = (int)screenSize.getHeight();
+        driver.manage().window().setSize(new org.openqa.selenium.Dimension(width,height));
     }
 
     public Object noNullKey(Map map, Object key){

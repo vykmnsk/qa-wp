@@ -10,12 +10,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MarketsPage extends AppPage {
 
@@ -75,18 +74,21 @@ public class MarketsPage extends AppPage {
 
     public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
-        Assertions.assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
+        assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
-    public void enterPrices(List<String> prices) {
-        Assertions.assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
-        Assertions.assertThat(priceTxts.size()).as("price elems size matches cucumber price values size").isEqualTo(prices.size());
+    public void enterPrices() {
+        Random rand = new Random();
+        int maxPrice = 30;
+        double price;
+        assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
         for (int i = 0; i < positionTxts.size(); i++) {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            priceTxt.sendKeys(prices.get(i));
+            price = (rand.nextInt(maxPrice) * 2.00);
+            priceTxt.sendKeys(Double.toString(price));
         }
         insertBtn.click();
     }
@@ -96,6 +98,7 @@ public class MarketsPage extends AppPage {
             showHideMarketManagement.click();
         }
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+
     }
 
     public void updateRaceNumber(String num) {
@@ -142,10 +145,10 @@ public class MarketsPage extends AppPage {
             ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
 
-
     public void enableProductSettings(String prodName, List<List<String>> settings) {
+        showMarketManagement();
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
-        Assertions.assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
+        assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         for (List<String> option : settings) {
             setOption(tr, option);
         }
@@ -157,6 +160,7 @@ public class MarketsPage extends AppPage {
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");
         if (imageFile.endsWith("unselected.png")) {
+            scrollTo(cell);
             cell.click();
         }
     }

@@ -21,6 +21,7 @@ public class AppPage extends AnyPage{
     }
 
     public void load(){
+        setScreenSizeToMax();
         driver.get(baseUrl);
     }
 

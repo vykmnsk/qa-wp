@@ -1,5 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.sun.javafx.binding.StringFormatter;
+import org.junit.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -7,6 +9,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewEventPage extends AppPage{
@@ -72,7 +75,7 @@ public class NewEventPage extends AppPage{
         wait.until(ExpectedConditions.visibilityOf(insertEvent));
     }
 
-    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, List<String> runners) {
+    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, int noOfRunners) {
         eventName.sendKeys(eventNameVal);
         (new Select(betInRunType)).selectByVisibleText(betInRunTypeVal);
         createMarket.sendKeys(createMarketVal);
@@ -87,10 +90,16 @@ public class NewEventPage extends AppPage{
         new Select(eventDateTimeHour).selectByValue(format2d(evTime.getHour()));
         new Select(eventDateTimeMin).selectByValue(format2d(evTime.getMinute()));
 
-        String runnersStr = String.join("\n", runners);
-        runnersBox.sendKeys(runnersStr);
+        List runners = generateRunnersString("Runner_", noOfRunners);
+        runnersBox.sendKeys(String.join("\n", runners));
         insertEvent.click();
         return new MarketsPage();
+    }
+
+    public List generateRunnersString(String initial, int noOfRunners) {
+        List runners = new ArrayList(noOfRunners);
+        for(int i = 0; i < noOfRunners; i++,  runners.add(initial + i));
+        return runners;
     }
 
     private String format2d(int val){
