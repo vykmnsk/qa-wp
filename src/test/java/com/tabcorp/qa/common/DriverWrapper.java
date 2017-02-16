@@ -40,8 +40,8 @@ public class DriverWrapper {
         if (null != driver) {
             driver.quit();
             driver = null;
-            wait = null;
         }
+        wait = null;
     }
 
 }
