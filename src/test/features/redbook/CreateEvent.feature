@@ -65,13 +65,14 @@ Feature: Create Event
       | Defaults | Display | F2  |
 
     And I enter market details
-      | Market Status      | Held           |
+      | Market Status      | Live           |
       | Bets Allowed       | WIN No         |
       | Bets Allowed Place | PLACE Fraction |
       | Place Fraction     | 1/4            |
       | No of Places       | 4              |
       | E/W                | yes            |
     Then I can see success status with message "Market display updated"
+    And event status is "L"
 
     Examples:
       | NumberOfRunners | RaceType | RaceNumber |
