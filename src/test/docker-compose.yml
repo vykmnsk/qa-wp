@@ -1,11 +1,20 @@
-seleniumhub:
-  image: selenium/hub:3.0.1
-  ports:
-    - 4444:4444
+version: '2'
+services:
+  chromednode:
+      image: selenium/node-chrome-debug:3.0.1
+      depends_on: 
+        - seleniumhub
+      ports: 
+        - "5900:5900"
+      environment: 
+        - "HUB_PORT_4444_TCP_ADDR=seleniumhub"
+        - "HUB_PORT_4444_TCP_PORT=4444"  
+      expose:
+      - "5900"   
 
-chromednode:
-  image: selenium/node-chrome-debug:3.0.1
-  expose:
-    - 5900
-  links:
-    - seleniumhub:hub
+  seleniumhub:
+    image: selenium/hub:3.0.1
+    ports: 
+      - "4444:4444"
+    expose:
+      - "4444"   
