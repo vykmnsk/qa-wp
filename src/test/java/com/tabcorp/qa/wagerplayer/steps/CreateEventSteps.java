@@ -44,8 +44,8 @@ public class CreateEventSteps implements En {
             marketsPage.verifyLoaded();
         });
 
-        When("^I enter odds$", () -> {
-            marketsPage.enterPrices();
+        When("^I enter random prices matching (\\d+)$", (Integer count) -> {
+            marketsPage.enterPrices(count);
         });
 
         When("^I update race number to \"([^\"]*)\"$", (String num) -> {

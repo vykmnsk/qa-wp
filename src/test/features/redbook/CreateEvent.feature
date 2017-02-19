@@ -13,7 +13,7 @@ Feature: Create Event
       | create market   | Racing Live                                            |
     Then I see Create Market page
 
-    When I enter odds
+    When I enter random prices matching <NumberOfRunners>
     Then I can see success status with message "Market Created"
 
     When I update race number to "<RaceNumber>"
@@ -76,6 +76,6 @@ Feature: Create Event
 
     Examples:
       | NumberOfRunners | RaceType | RaceNumber |
-      | 24              | HANDICAP | 1          |
-      | 15              | Auto     | 2          |
       | 8               | Auto     | 3          |
+      | 15              | Auto     | 2          |
+      | 24              | HANDICAP | 1          |

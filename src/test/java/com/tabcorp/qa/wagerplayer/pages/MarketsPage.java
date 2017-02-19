@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
+import com.tabcorp.qa.common.Helpers;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
@@ -81,18 +82,18 @@ public class MarketsPage extends AppPage {
         assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
-    public void enterPrices() {
-        Random rand = new Random();
-        int maxPrice = 30;
-        double price;
-        assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
+    public void enterPrices(int count) {
+        List<String> prices = Helpers.generateRandomPrices(0, 100, count);
+        List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
+        Integer size0 = sizes.get(0);
+        assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
         for (int i = 0; i < positionTxts.size(); i++) {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
+            String priceVal = prices.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            price = (rand.nextInt(maxPrice) * 2.00);
-            priceTxt.sendKeys(Double.toString(price));
+            priceTxt.sendKeys(priceVal);
         }
         insertBtn.click();
     }
