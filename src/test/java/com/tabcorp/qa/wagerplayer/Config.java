@@ -9,8 +9,6 @@ public class Config {
     private static final String ENV_BASE_URL = "WAGERPLAYER_BASE_URL";
     private static final String ENV_USERNAME = "WAGERPLAYER_USERNAME";
     private static final String ENV_PASSWORD = "WAGERPLAYER_PASSWORD";
-    private static final String RUN_MODE = "RUN_MODE";
-    // RUN_MODE needs to be set to "DOCKER_RUN" to run it on containers or it runs normally.
 
     public static String appName(){
         String appName = System.getenv(ENV_APP_NAME);
@@ -37,9 +35,10 @@ public class Config {
     }
 
     public static  boolean isDockerRun() {
-        String runMode = System.getenv(RUN_MODE);
-        if(runMode != null && runMode.equalsIgnoreCase("DOCKER_RUN"))
+        // RUN_MODE needs to be set to "DOCKER" to run it on containers or it runs normally.
+        if("DOCKER".equalsIgnoreCase(System.getenv("RUN_MODE"))){
             return true;
+        }
         return false;
     }
 

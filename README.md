@@ -9,7 +9,7 @@ mvn test -DforkMode=never
 - WAGERPLAYER_BASE_URL
 - WAGERPLAYER_USERNAME
 - WAGERPLAYER_PASSWORD
-- RUN_MODE=[ DOCKER_RUN | anything-else ]
+- RUN_MODE=[ DOCKER | anything-else ]
 
 #Docker Run
 
