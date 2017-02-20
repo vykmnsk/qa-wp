@@ -1,5 +1,6 @@
 package com.tabcorp.qa.common;
 
+import com.tabcorp.qa.wagerplayer.Config;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -24,19 +25,32 @@ public class DriverWrapper {
     }
 
     public WebDriver getDriver() {
+        String envRun = Config.envRun();
+
         if (driver == null) {
-
-            DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-
-            // Add the WebDriver proxy capability.
-            Proxy proxy = new Proxy();
-            proxy.setHttpProxy("localhost:4444");
-            capabilities.setCapability("proxy", proxy);
-            capabilities.setJavascriptEnabled(true);
-            driver = new RemoteWebDriver(capabilities);
+            if (envRun.equalsIgnoreCase("DOCKER_RUN")) {
+                driver = getRemoteDriver();
+            }
+            else {
+                System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
+                driver = new ChromeDriver();
+            }
         }
         return driver;
     }
+
+    private WebDriver getRemoteDriver() {
+
+        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+        // Add the WebDriver proxy capability.
+        Proxy proxy = new Proxy();
+        // Proxy set to local host because the container would be executed from the same instance.
+        proxy.setHttpProxy("localhost:4444");
+        capabilities.setCapability("proxy", proxy);
+        capabilities.setJavascriptEnabled(true);
+        return new RemoteWebDriver(capabilities);
+    }
+
 
     public WebDriverWait getDriverWait() {
         if (wait == null) {
