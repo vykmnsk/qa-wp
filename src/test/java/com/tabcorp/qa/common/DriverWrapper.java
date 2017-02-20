@@ -25,10 +25,8 @@ public class DriverWrapper {
     }
 
     public WebDriver getDriver() {
-        String envRun = Config.envRun();
-
         if (driver == null) {
-            if (envRun.equalsIgnoreCase("DOCKER_RUN")) {
+            if (Config.isDockerRun()) {
                 driver = getRemoteDriver();
             }
             else {

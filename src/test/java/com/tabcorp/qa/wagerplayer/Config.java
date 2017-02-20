@@ -36,10 +36,11 @@ public class Config {
         return password;
     }
 
-    public static  String envRun() {
+    public static  boolean isDockerRun() {
         String runMode = System.getenv(RUN_MODE);
-        verifyExists(runMode,RUN_MODE);
-        return  runMode;
+        if(runMode != null && runMode.equalsIgnoreCase("DOCKER_RUN"))
+            return true;
+        return false;
     }
 
     private static void verifyExists(String var, String envVarName) {
