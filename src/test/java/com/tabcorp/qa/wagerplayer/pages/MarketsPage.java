@@ -1,7 +1,9 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
+import com.tabcorp.qa.common.Helpers;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.CacheLookup;
@@ -27,6 +29,9 @@ public class MarketsPage extends AppPage {
 
     @FindBy(css = "#main_table tr[bgcolor='green'")
     WebElement status;
+
+    @FindBy(css = "td.market_status_cell a[id^='market_status']")
+    WebElement marketStatus;
 
     @FindBy(css = ("#market_details"))
     WebElement marketDetailsSection;
@@ -77,18 +82,18 @@ public class MarketsPage extends AppPage {
         assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
-    public void enterPrices() {
-        Random rand = new Random();
-        int maxPrice = 30;
-        double price;
-        assertThat(positionTxts.size()).as("position size matches prices size").isEqualTo(priceTxts.size());
+    public void enterPrices(int count) {
+        List<String> prices = Helpers.generateRandomPrices(0, 100, count);
+        List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
+        Integer size0 = sizes.get(0);
+        assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
         for (int i = 0; i < positionTxts.size(); i++) {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
+            String priceVal = prices.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            price = (rand.nextInt(maxPrice) * 2.00);
-            priceTxt.sendKeys(Double.toString(price));
+            priceTxt.sendKeys(priceVal);
         }
         insertBtn.click();
     }
@@ -108,31 +113,41 @@ public class MarketsPage extends AppPage {
 
     static Map<List<String>, String> productSettingIDs() {
         return Collections.unmodifiableMap(Stream.of(
-            new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Fluc"), "[2][display_fluctuations]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Place"), "[2][place_enabled]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "EW"), "[2][eachway]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Win"), "[2][display_column_win]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Place"), "[2][display_column_place]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "EW"), "[2][display_column_eachway]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Win"), "[2][multi_win]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Place"), "[2][multi_place]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "EW"), "[2][multi_eachway]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Win"), "[2][display_result_win]"),
-            new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Place"), "[2][display_result_place]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "On"), "[2][enabled]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enabled", "Auto"), "[1][auto]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Win"), "[2][win_display_price]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Place"), "[2][place_display_price]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Display Price", "Fluc"), "[2][display_fluctuations]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Win"), "[2][win_enabled]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "Place"), "[2][place_enabled]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enable Single", "EW"), "[2][eachway]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Win"), "[2][display_column_win]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "Place"), "[2][display_column_place]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Display Column", "EW"), "[2][display_column_eachway]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Win"), "[2][multi_win]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "Place"), "[2][multi_place]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Enable Multi", "EW"), "[2][multi_eachway]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Win"), "[2][display_result_win]"),
+                new SimpleEntry<>(Arrays.asList("Betting", "Disp. Result", "Place"), "[2][display_result_place]"),
 
-            new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]"),
-            new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Place"), "[1][place_display_price]"),
-//        TODO: add all the rest of the settings
-//        TODO: vefify works in Luxbet
-
-            new SimpleEntry<>(Arrays.asList("Defaults", "Display", "Web"), "[2][is_default]"),
-            new SimpleEntry<>(Arrays.asList("Defaults", "Display", "F2"), "[1][is_default]")
-            ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
+                new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Win"), "[1][win_display_price]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Display Price", "Place"), "[1][place_display_price]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Single", "Win"), "[1][win_enabled]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Single", "Place"), "[1][place_enabled]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Base", "Win"), "[1][win_base_display_price]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Final Leg Multi", "Win"), "[1][final_leg_win]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Final Leg Multi", "Place"), "[1][final_leg_place]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Multi", "Win"), "[1][multi_win]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Multi", "Place"), "[1][multi_place]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Betback", "Win"), "[1][betback_win]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Betback", "Place"), "[1][betback_place]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Cash Out", "Win"), "[1][liab_single_win_cashout]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Cash Out", "Place"), "[1][liab_single_place_cashout]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Cash Out", "Multi Win"), "[1][liab_multi_win_cashout]"),
+                new SimpleEntry<>(Arrays.asList("Liability", "Cash Out", "Multi Place"), "[1][liab_multi_place_cashout]"),
+                new SimpleEntry<>(Arrays.asList("Defaults", "Display", "Web"), "[2][is_default]"),
+                new SimpleEntry<>(Arrays.asList("Defaults", "Display", "F2"), "[1][is_default]")
+        ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
@@ -183,6 +198,13 @@ public class MarketsPage extends AppPage {
         String statusMsg = status.getText();
         Assertions.assertThat(statusMsg).as("market status").contains("SUCCESS");
         Assertions.assertThat(statusMsg).as("market status message").contains(msg);
+    }
+
+    public void verifyMarketStatus(String expectedStatus) {
+        String actualStatus = marketStatus.getAttribute("status");
+        AssertionsForClassTypes.assertThat(actualStatus)
+                .withFailMessage(String.format("Actual status %s doesn't match with expected status %s", actualStatus, expectedStatus))
+                .isEqualTo(expectedStatus);
     }
 
 }

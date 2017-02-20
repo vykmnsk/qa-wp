@@ -13,16 +13,31 @@ Feature: Create Event
       | create market   | Racing Live                                            |
     Then I see Create Market page
 
-    When I enter odds
+    When I enter random prices matching <NumberOfRunners>
     Then I can see success status with message "Market Created"
 
     When I update race number to "<RaceNumber>"
 
 #  Luxbook DVP Fixed
 #  NSW Daily Double
-  
+
     And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Display Price | Fluc |
+      | Betting   | Display Price   | Fluc        |
+      | Liability | Display Price   | Win         |
+      | Liability | Display Price   | Place       |
+      | Liability | Single          | Win         |
+      | Liability | Single          | Place       |
+      | Liability | Base            | Win         |
+      | Liability | Final Leg Multi | Win         |
+      | Liability | Final Leg Multi | Place       |
+      | Liability | Multi           | Win         |
+      | Liability | Multi           | Place       |
+      | Liability | Betback         | Win         |
+      | Liability | Betback         | Place       |
+      | Liability | Cash Out        | Win         |
+      | Liability | Cash Out        | Place       |
+      | Liability | Cash Out        | Multi Win   |
+      | Liability | Cash Out        | Multi Place |
 
     And I enable "PA SP" product settings
       | Betting   | Enabled        | On    |
@@ -50,16 +65,17 @@ Feature: Create Event
       | Defaults | Display | F2  |
 
     And I enter market details
-      | Market Status      | Held           |
+      | Market Status      | Live           |
       | Bets Allowed       | WIN No         |
       | Bets Allowed Place | PLACE Fraction |
       | Place Fraction     | 1/4            |
       | No of Places       | 4              |
       | E/W                | yes            |
     Then I can see success status with message "Market display updated"
+    And event status is "L"
 
     Examples:
       | NumberOfRunners | RaceType | RaceNumber |
-      | 24              | HANDICAP | 1          |
-      | 15              | Auto     | 2          |
       | 8               | Auto     | 3          |
+      | 15              | Auto     | 2          |
+      | 24              | HANDICAP | 1          |
