@@ -10,7 +10,6 @@ public class Config {
     private static final String ENV_USERNAME = "WAGERPLAYER_USERNAME";
     private static final String ENV_PASSWORD = "WAGERPLAYER_PASSWORD";
 
-
     public static String appName(){
         String appName = System.getenv(ENV_APP_NAME);
         verifyExists(appName, ENV_APP_NAME);
@@ -33,6 +32,14 @@ public class Config {
         String password = System.getenv(ENV_PASSWORD);
         verifyExists(password, ENV_PASSWORD);
         return password;
+    }
+
+    public static  boolean isDockerRun() {
+        // RUN_MODE needs to be set to "DOCKER" to run it on containers or it runs normally.
+        if("DOCKER".equalsIgnoreCase(System.getenv("RUN_MODE"))){
+            return true;
+        }
+        return false;
     }
 
     private static void verifyExists(String var, String envVarName) {
