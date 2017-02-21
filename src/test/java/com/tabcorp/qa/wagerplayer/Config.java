@@ -41,4 +41,38 @@ public class Config {
                 .isNotNull();
     }
 
+    private static final String ENV_WAPI_URL = "WAGERPLAYER_WAPI_URL";
+    private static final String ENV_WAPI_USERNAME = "WAGERPLAYER_WAPI_USERNAME";
+    private static final String ENV_WAPI_PASSWORD = "WAGERPLAYER_WAPI_PASSWORD";
+    private static final String ENV_CUSTOMER_USERNAME = "WAGERPLAYER_CUSTOMER_USERNAME";
+    private static final String ENV_CUSTOMER_PASSWORD = "WAGERPLAYER_CUSTOMER_PASSWORD";
+
+
+    private static String readVerify(String envVarName){
+        String var = System.getenv((envVarName));
+        verifyExists(var, envVarName);
+        return var;
+    }
+
+    public static String wapiURL() {
+        return readVerify(ENV_WAPI_URL);
+    }
+
+    public static String wapiUsername() {
+        return readVerify(ENV_WAPI_USERNAME);
+    }
+
+    public static String wapiPassword(){
+        return readVerify(ENV_WAPI_PASSWORD);
+    }
+
+    public static String customerUsername(){
+        return readVerify(ENV_CUSTOMER_USERNAME);
+    }
+
+    public static String customerPassword(){
+        return readVerify(ENV_CUSTOMER_PASSWORD);
+    }
+
+
 }
