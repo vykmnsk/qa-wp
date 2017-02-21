@@ -83,7 +83,7 @@ public class MarketsPage extends AppPage {
     }
 
     public void enterPrices(int count) {
-        List<String> prices = Helpers.generateRandomPrices(0, 100, count);
+        List<String> prices = Helpers.generateRandomPrices(2, 100, count);
         List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
         Integer size0 = sizes.get(0);
         assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
