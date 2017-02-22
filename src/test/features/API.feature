@@ -7,3 +7,4 @@ Feature: REST API
     Then I get WAPI session ID
 
     Given Customer balance is greater than $20
+

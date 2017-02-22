@@ -18,11 +18,9 @@ public class APISteps implements En {
             Assertions.assertThat(wapiSessionId).as("session ID").isNotEmpty();
         });
 
-
         Given("^Customer balance is greater than \\$(\\d+)$", (Integer minBal) -> {
             WAPI.verifyBalanceGreaterThan(wapiSessionId, minBal);
         });
 
     }
-
 }

@@ -14,8 +14,8 @@ public class REST {
         HttpResponse<String> jsonResponse = null;
         try {
             jsonResponse = Unirest.post(url)
-                        .fields(fields)
-                        .asString();
+                    .fields(fields)
+                    .asString();
         } catch (UnirestException e) {
             throw new RuntimeException(e);
         }

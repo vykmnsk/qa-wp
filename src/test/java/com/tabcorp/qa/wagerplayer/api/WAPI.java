@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
@@ -14,7 +13,7 @@ import java.util.Map;
 public class WAPI {
 
     static String URL = Config.wapiURL();
-    
+
     static Object post(Map<String, Object> fields) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
@@ -22,7 +21,6 @@ public class WAPI {
         Assertions.assertThat(errors).as("Errors in response").isEmpty();
         return resp;
     }
-
     public static String login(){
         Map<String, Object> fields = new HashMap<>();
         fields.put("action", "bet_customer_login");
