@@ -9,8 +9,8 @@ Feature: Create Event
     And I see New Event page is loaded
     And I enter event details with <NumberOfRunners> horses, current 'show time' and 'event date/time' in 30 minutes with data
       | event name      | <RaceNumber>. TEST RACE 0<RaceNumber> <RaceType> |
-      | bet in run type | Both Allowed                                           |
-      | create market   | Racing Live                                            |
+      | bet in run type | Both Allowed                                     |
+      | create market   | Racing Live                                      |
     Then I see Create Market page
 
     When I enter random prices matching <NumberOfRunners>
@@ -65,17 +65,17 @@ Feature: Create Event
       | Defaults | Display | F2  |
 
     And I enter market details
-      | Market Status      | Live           |
-      | Bets Allowed       | WIN No         |
-      | Bets Allowed Place | PLACE Fraction |
-      | Place Fraction     | 1/4            |
-      | No of Places       | 4              |
-      | E/W                | yes            |
+      | Market Status      | Live            |
+      | Bets Allowed       | WIN No          |
+      | Bets Allowed Place | PLACE Fraction  |
+      | Place Fraction     | <PlaceFraction> |
+      | No of Places       | <NoOfPlaces>    |
+      | E/W                | yes             |
     Then I can see success status with message "Market display updated"
     And event status is "L"
 
     Examples:
-      | NumberOfRunners | RaceType | RaceNumber |
-      | 8               | Auto     | 3          |
-      | 15              | Auto     | 2          |
-      | 24              | HANDICAP | 1          |
+      | NumberOfRunners | RaceType | RaceNumber | PlaceFraction | NoOfPlaces |
+      | 24              | HANDICAP | 1          | 1/4           | 4          |
+      | 15              | Auto     | 2          | 1/5           | 3          |
+      | 8               | Auto     | 3          | 1/5           | 3          |
