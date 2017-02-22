@@ -1,8 +1,11 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
+import net.minidev.json.JSONArray;
+import org.assertj.core.api.Assertions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +14,14 @@ import java.util.Map;
 public class WAPI {
 
     static String URL = Config.wapiURL();
+    
+    static Object post(Map<String, Object> fields) {
+        fields.put("output_type", "json");
+        Object resp = REST.post(URL, fields);
+        JSONArray errors = JsonPath.read(resp, "$..error..error_text");
+        Assertions.assertThat(errors).as("Errors in response").isEmpty();
+        return resp;
+    }
 
     public static String login(){
         Map<String, Object> fields = new HashMap<>();
@@ -19,7 +30,22 @@ public class WAPI {
         fields.put("wapi_client_pass", Config.wapiPassword());
         fields.put("username", Config.customerUsername());
         fields.put("password", Config.customerPassword());
-        Object doc = REST.post(URL, fields);
-        return JsonPath.read(doc, "$.RSP.login[0].session");
+        Object resp = post(fields);
+        return JsonPath.read(resp, "$.RSP.login[0].session");
+    }
+
+    public static Double getBalance(String sessionId){
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("action", "bet_get_balance");
+        fields.put("session_id", sessionId);
+        Object resp = post(fields);
+        String balanceValue = JsonPath.read(resp, "$.RSP.account[0].balance");
+        return Double.valueOf(balanceValue);
+    }
+
+    public static void verifyBalanceGreaterThan(String sessionId, Integer minBalance) {
+        Double currentBalance = getBalance(sessionId);
+        minBalance =+ 1000000;
+        Assertions.assertThat(currentBalance).as("Current balance").isGreaterThan(Double.valueOf(minBalance));
     }
 }

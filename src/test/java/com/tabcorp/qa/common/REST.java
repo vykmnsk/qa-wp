@@ -11,17 +11,15 @@ import java.util.Map;
 public class REST {
 
     public static Object post(String url, Map<String, Object> fields) {
-        fields.put("output_type", "json");
         HttpResponse<String> jsonResponse = null;
         try {
             jsonResponse = Unirest.post(url)
-                    .fields(fields)
-                    .asString();
+                        .fields(fields)
+                        .asString();
         } catch (UnirestException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         String body = jsonResponse.getBody();
         return Configuration.defaultConfiguration().jsonProvider().parse(body);
     }
-
 }
