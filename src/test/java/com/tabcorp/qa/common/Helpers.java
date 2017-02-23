@@ -1,6 +1,10 @@
 package com.tabcorp.qa.common;
 
+import org.apache.commons.lang3.SystemUtils;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,6 +29,18 @@ public class Helpers {
         List<String> runners = new ArrayList(count);
         for(int i = 0; i < count; i++,  runners.add(initial + i));
         return runners;
+    }
+
+    public static String getChromeDriverPath() {
+
+        List<String> strings = new LinkedList<>();
+        strings.add("src");
+        strings.add("test");
+        strings.add("resources");
+        strings.add(SystemUtils.IS_OS_WINDOWS ? "chromedriver.exe" : "chromedriver");
+
+        return String.join(File.separator, strings);
+
     }
 
 }

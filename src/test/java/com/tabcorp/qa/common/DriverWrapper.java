@@ -1,5 +1,6 @@
 package com.tabcorp.qa.common;
 
+
 import com.tabcorp.qa.wagerplayer.Config;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,17 +21,13 @@ public class DriverWrapper {
         return instance;
     }
 
-    public static void setInstance(DriverWrapper wrapper) {
-        instance = wrapper;
-    }
-
     public WebDriver getDriver() {
         if (driver == null) {
             if (Config.isDockerRun()) {
                 driver = getRemoteDriver();
-            }
-            else {
-                System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver");
+            } else {
+                System.setProperty("webdriver.chrome.driver",Helpers.getChromeDriverPath());
+
                 driver = new ChromeDriver();
             }
         }
