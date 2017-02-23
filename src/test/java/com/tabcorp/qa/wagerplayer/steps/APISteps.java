@@ -4,6 +4,8 @@ import com.tabcorp.qa.wagerplayer.api.WAPI;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
 
+import java.math.BigDecimal;
+
 
 public class APISteps implements En {
 
@@ -18,7 +20,7 @@ public class APISteps implements En {
             Assertions.assertThat(wapiSessionId).as("session ID").isNotEmpty();
         });
 
-        Given("^Customer balance is greater than \\$(\\d+)$", (Integer minBal) -> {
+        Given("^Customer balance is greater than \\$(\\d+.\\d\\d)$", (BigDecimal minBal) -> {
             WAPI.verifyBalanceGreaterThan(wapiSessionId, minBal);
         });
 

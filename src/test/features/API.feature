@@ -6,5 +6,5 @@ Feature: REST API
     When I login to WAPI
     Then I get WAPI session ID
 
-    Given Customer balance is greater than $20
+    Given Customer balance is greater than $20.50
 

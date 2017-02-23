@@ -6,6 +6,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.assertj.core.api.Assertions;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,18 +33,19 @@ public class WAPI {
         return JsonPath.read(resp, "$.RSP.login[0].session");
     }
 
-    public static Double getBalance(String sessionId){
+    public static BigDecimal getBalance(String sessionId){
         Map<String, Object> fields = new HashMap<>();
         fields.put("action", "bet_get_balance");
+        fields.put("wapi_client_user", Config.wapiUsername());
+        fields.put("wapi_client_pass", Config.wapiPassword());
         fields.put("session_id", sessionId);
         Object resp = post(fields);
         String balanceValue = JsonPath.read(resp, "$.RSP.account[0].balance");
-        return Double.valueOf(balanceValue);
+        return new BigDecimal(balanceValue);
     }
 
-    public static void verifyBalanceGreaterThan(String sessionId, Integer minBalance) {
-        Double currentBalance = getBalance(sessionId);
-        minBalance =+ 1000000;
-        Assertions.assertThat(currentBalance).as("Current balance").isGreaterThan(Double.valueOf(minBalance));
+    public static void verifyBalanceGreaterThan(String sessionId, BigDecimal minBalance) {
+        BigDecimal currentBalance = getBalance(sessionId);
+        Assertions.assertThat(currentBalance).as("Current balance").isGreaterThan(minBalance);
     }
 }
