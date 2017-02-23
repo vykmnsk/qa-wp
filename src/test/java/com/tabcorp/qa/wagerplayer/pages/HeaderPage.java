@@ -56,14 +56,26 @@ public class HeaderPage extends AppPage {
     public WebElement reloadPage;
 
     public void pickCategories(String catVal, String subcatVal) {
-        driver.switchTo().defaultContent();
-        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_top"));
+        switchToHeaderFrame();
         wait.until(ExpectedConditions.visibilityOf(category));
         (new Select(category)).selectByVisibleText(catVal);
         wait.until(ExpectedConditions.visibilityOf(subcategory));
         wait.until(ExpectedConditions.textToBePresentInElement(subcategory, subcatVal));
         (new Select(subcategory)).selectByVisibleText(subcatVal);
         f3.click();
+    }
+
+    public LiabilityPage navigateToF5() {
+        switchToHeaderFrame();
+        f5.click();
+        LiabilityPage liabilityPage = new LiabilityPage();
+        liabilityPage.load();
+        return liabilityPage;
+    }
+
+    private void switchToHeaderFrame() {
+        driver.switchTo().defaultContent();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_top"));
     }
 
 }
