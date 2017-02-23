@@ -12,6 +12,9 @@ public class CreateEventSteps implements En {
 
     NewEventPage newEvtPage;
     MarketsPage marketsPage;
+    LiabilityPage liabilityPage;
+    HeaderPage header;
+
 
     public CreateEventSteps() {
 
@@ -22,7 +25,7 @@ public class CreateEventSteps implements En {
             hp.verifyLoaded();
         });
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
-            HeaderPage header = new HeaderPage();
+            header = new HeaderPage();
             header.pickCategories(category, subcategory);
         });
 
@@ -83,6 +86,10 @@ public class CreateEventSteps implements En {
         Then("^event status is \"([^\"]*)\"$", (String expectedStatus) -> {
             marketsPage.verifyMarketStatus(expectedStatus);
 
+        });
+        When("^i collect mpid of selections$", () -> {
+            liabilityPage = header.navigateToF5();
+            List<String> mpids = liabilityPage.getMarketPriceIds();
         });
 
     }
