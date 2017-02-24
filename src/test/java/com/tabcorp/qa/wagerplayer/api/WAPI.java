@@ -24,10 +24,8 @@ public class WAPI {
     }
 
     public static String login() {
-        Map<String, Object> fields = new HashMap<>();
+        Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "bet_customer_login");
-        fields.put("wapi_client_user", Config.wapiUsername());
-        fields.put("wapi_client_pass", Config.wapiPassword());
         fields.put("username", Config.customerUsername());
         fields.put("password", Config.customerPassword());
         Object resp = post(fields);
@@ -35,11 +33,8 @@ public class WAPI {
     }
 
     public static BigDecimal getBalance(String sessionId) {
-        Map<String, Object> fields = new HashMap<>();
+        Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
-        fields.put("wapi_client_user", Config.wapiUsername());
-        fields.put("wapi_client_pass", Config.wapiPassword());
-        fields.put("session_id", sessionId);
         Object resp = post(fields);
         String balance = JsonPath.read(resp, "$.RSP.account[0].balance");
         return new BigDecimal(balance);
