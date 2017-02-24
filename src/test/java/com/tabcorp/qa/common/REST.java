@@ -9,14 +9,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class REST {
     public static Logger log = LoggerFactory.getLogger(REST.class);
 
     public static Object post(String url, Map<String, Object> fields) {
-        HttpResponse<String> jsonResponse = null;
+        HttpResponse<String> resp = null;
         try {
-            jsonResponse = Unirest.post(url)
+            resp = Unirest.post(url)
                     .fields(fields)
                     .asString();
         } catch (UnirestException e) {
@@ -24,7 +26,8 @@ public class REST {
             log.info("REST fields=" + fields);
             throw new RuntimeException(e);
         }
-        String body = jsonResponse.getBody();
+        assertThat(resp.getStatus()).as("response code").isBetween(200, 300);
+        String body = resp.getBody();
         return Configuration.defaultConfiguration().jsonProvider().parse(body);
     }
 }
