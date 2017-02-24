@@ -3,8 +3,6 @@ Feature: REST API
 
   @wip
   Scenario: WAPI
-    When I login to WAPI
-    Then I get WAPI session ID
-
+    Given I am logged in WAPI
     Given Customer balance is greater than $20.50
 
