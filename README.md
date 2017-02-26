@@ -4,6 +4,9 @@ mvn test -Dcucumber.options="--name Login"
 #Debug in ItelliJ
 mvn test -DforkMode=never
 
+#Confluence Link
+   [Click-this](http://wiki.corpad.net.local:8090/display/WTG/qa-wagerplayer+code+setup)
+
 #Env vars required
 - WAGERPLAYER_APP_NAME=[luxbet|redbook]
 - WAGERPLAYER_BASE_URL
