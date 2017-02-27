@@ -22,30 +22,60 @@ public class WAPI {
         Assertions.assertThat(errors).as("Errors in response").isEmpty();
         return resp;
     }
-    public static String login(){
-        Map<String, Object> fields = new HashMap<>();
+
+    public static String login() {
+        Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "bet_customer_login");
-        fields.put("wapi_client_user", Config.wapiUsername());
-        fields.put("wapi_client_pass", Config.wapiPassword());
         fields.put("username", Config.customerUsername());
         fields.put("password", Config.customerPassword());
         Object resp = post(fields);
         return JsonPath.read(resp, "$.RSP.login[0].session");
     }
 
-    public static BigDecimal getBalance(String sessionId){
-        Map<String, Object> fields = new HashMap<>();
+    public static BigDecimal getBalance(String sessionId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
-        fields.put("wapi_client_user", Config.wapiUsername());
-        fields.put("wapi_client_pass", Config.wapiPassword());
-        fields.put("session_id", sessionId);
         Object resp = post(fields);
-        String balanceValue = JsonPath.read(resp, "$.RSP.account[0].balance");
-        return new BigDecimal(balanceValue);
+        String balance = JsonPath.read(resp, "$.RSP.account[0].balance");
+        return new BigDecimal(balance);
     }
 
-    public static void verifyBalanceGreaterThan(String sessionId, BigDecimal minBalance) {
-        BigDecimal currentBalance = getBalance(sessionId);
-        Assertions.assertThat(currentBalance).as("Current balance").isGreaterThan(minBalance);
+    public static Object placeBetSingleWin(String sessionId, String productId, String mpid, String winPrice, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        fields.put("mpid", mpid);
+        fields.put("win_price", winPrice);
+        fields.put("amount", stake);
+        return post(fields);
+    }
+
+    public static Object placeBetSingleEW(String sessionId, String productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        fields.put("mpid", mpid);
+        fields.put("win_price", winPrice);
+        fields.put("place_price", placePrice);
+        fields.put("amount", stake);
+        return post(fields);
+    }
+
+    static Map<String, Object> wapiAuthFields(){
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("wapi_client_user", Config.wapiUsername());
+        fields.put("wapi_client_pass", Config.wapiPassword());
+        return fields;
+    }
+
+    static Map<String, Object> wapiAuthFields(String sessionId){
+        Map<String, Object> fields = wapiAuthFields();
+        fields.put("session_id", sessionId);
+        return fields;
+    }
+
+    public static BigDecimal readNewBalance(Object resp){
+        String newBalance = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
+        return new BigDecimal(newBalance);
     }
 }
