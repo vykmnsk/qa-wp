@@ -5,6 +5,7 @@ import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -88,8 +89,10 @@ public class CreateEventSteps implements En {
 
         });
         When("^i collect mpid of selections$", () -> {
+            header = new HeaderPage();
             liabilityPage = header.navigateToF5();
-            List<String> mpids = liabilityPage.getMarketPriceIds();
+            //Todo - get product id dynamically
+            List<ArrayList> selections = liabilityPage.getSelections("280");
         });
 
     }
