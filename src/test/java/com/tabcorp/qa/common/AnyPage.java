@@ -57,10 +57,4 @@ public class AnyPage {
         driver.manage().window().setSize(new org.openqa.selenium.Dimension(width,height));
     }
 
-    public Object noNullKey(Map map, Object key){
-        Assertions.assertThat(map.get(key))
-                .withFailMessage("Map key='%s' does not exist in: %s", key, map.keySet())
-                .isNotNull();
-        return map.get(key);
-    }
 }

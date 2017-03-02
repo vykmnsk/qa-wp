@@ -6,6 +6,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public class NewEventPage extends AppPage{
         wait.until(ExpectedConditions.visibilityOf(insertEvent));
     }
 
-    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, int runnersCount) {
+    public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, List<String> runners) {
         eventName.sendKeys(eventNameVal);
         (new Select(betInRunType)).selectByVisibleText(betInRunTypeVal);
         createMarket.sendKeys(createMarketVal);
@@ -89,7 +90,6 @@ public class NewEventPage extends AppPage{
         new Select(eventDateTimeHour).selectByValue(format2d(evTime.getHour()));
         new Select(eventDateTimeMin).selectByValue(format2d(evTime.getMinute()));
 
-        List<String> runners = Helpers.generateRunners("Runner_", runnersCount);
         runnersBox.sendKeys(String.join("\n", runners));
         insertEvent.click();
         return new MarketsPage();

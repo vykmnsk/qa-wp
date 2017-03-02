@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,8 +22,9 @@ public class LiabilityPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(liabilityTable));
     }
 
-    public List<ArrayList> getSelections(String productID) {
-        List<ArrayList> selections = new ArrayList<>();
+    public List<List<String>> getSelections(String productID) {
+        //Todo - get product id dynamically
+        List<List<String>> selections = new ArrayList<>();
         marketPrices
                 .stream()
                 .filter(mp -> mp.getAttribute("product_id").equals(productID))

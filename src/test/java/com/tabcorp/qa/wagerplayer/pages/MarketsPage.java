@@ -11,6 +11,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,18 +83,17 @@ public class MarketsPage extends AppPage {
         assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
-    public void enterPrices(int count) {
-        List<String> prices = Helpers.generateRandomPrices(2, 100, count);
+    public void enterPrices(List<BigDecimal> prices) {
         List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
         Integer size0 = sizes.get(0);
         assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
         for (int i = 0; i < positionTxts.size(); i++) {
             WebElement pos = positionTxts.get(i);
             WebElement priceTxt = priceTxts.get(i);
-            String priceVal = prices.get(i);
+            BigDecimal priceVal = prices.get(i);
             pos.sendKeys(String.valueOf(i + 1));
             priceTxt.clear();
-            priceTxt.sendKeys(priceVal);
+            priceTxt.sendKeys(priceVal.toString());
         }
         insertBtn.click();
     }
@@ -106,9 +106,9 @@ public class MarketsPage extends AppPage {
 
     }
 
-    public void updateRaceNumber(String num) {
+    public void updateRaceNumber(int num) {
         raceNumTxt.clear();
-        raceNumTxt.sendKeys(num);
+        raceNumTxt.sendKeys(""+num);
     }
 
     static Map<List<String>, String> productSettingIDs() {
@@ -157,10 +157,11 @@ public class MarketsPage extends AppPage {
         for (List<String> option : settings) {
             setOption(tr, option);
         }
+        updateBtn.click();
     }
 
     private void setOption(WebElement prodRow, List<String> option) {
-        String inputCSS = String.format("input[name$='%s']", noNullKey(productSettingIDs(), option));
+        String inputCSS = String.format("input[name$='%s']", Helpers.noNullGet(productSettingIDs(), option));
         WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");

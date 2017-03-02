@@ -1,12 +1,11 @@
 package com.tabcorp.qa.common;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.assertj.core.api.Assertions;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class Helpers {
@@ -15,12 +14,14 @@ public class Helpers {
         return (new Random()).nextInt(max - min + 1) + min;
     }
 
-    public static List<String> generateRandomPrices(int min, int upTo, int count){
-        List<String> prices = new ArrayList<>();
+    public static List<BigDecimal> generateRandomPrices(int min, int upTo, int count){
+        List<BigDecimal> prices = new ArrayList<>();
         for (int i=0; i < count; i++){
             int dollars = randomBetweenInclusive(min, upTo - 1);
             int cents = randomBetweenInclusive(0, 99);
-            prices.add(String.format("%d.%02d", dollars, cents));
+            String priceText = String.format("%d.%02d", dollars, cents);
+            BigDecimal price = new BigDecimal(priceText);
+            prices.add(price);
         }
         return prices;
     }
@@ -43,4 +44,10 @@ public class Helpers {
 
     }
 
+    public static Object noNullGet(Map map, Object key){
+        Assertions.assertThat(map.get(key))
+                .withFailMessage("Map key='%s' does not exist in: %s", key, map.keySet())
+                .isNotNull();
+        return map.get(key);
+    }
 }

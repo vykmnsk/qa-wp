@@ -3,6 +3,8 @@ package com.tabcorp.qa.common;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 public class HelpersTest {
@@ -17,21 +19,21 @@ public class HelpersTest {
     @Test
     public void canGenerateRandomPricesAsManyAsExpected() {
         final int COUNT = 5;
-        List<String> prices = Helpers.generateRandomPrices(1, 100, COUNT);
+        List<BigDecimal> prices = Helpers.generateRandomPrices(1, 100, COUNT);
         Assertions.assertThat(prices.size()).as("generated prices count").isEqualTo(COUNT);
     }
     @Test
     public void canGenerateRandomPricesContainDecimalPoints() {
-        List<String> prices = Helpers.generateRandomPrices(1, 100, 10);
-        Assertions.assertThat(prices).allMatch(p -> p.contains("."));
+        List<BigDecimal> prices = Helpers.generateRandomPrices(1, 100, 10);
+        Assertions.assertThat(prices).allMatch(p -> p.toString().contains("."));
     }
     @Test
     public void canGenerateRandomPricesBeWithinRange() {
         final int MIN = 10;
         final int UPTO = 100;
-        List<String> prices = Helpers.generateRandomPrices(MIN, UPTO, 10);
-        Assertions.assertThat(prices).as("prices greater than MIN").allMatch(p -> Double.valueOf(p) > MIN);
-        Assertions.assertThat(prices).as("prices less than %d", UPTO).allMatch(p -> Double.valueOf(p) < UPTO);
+        List<BigDecimal> prices = Helpers.generateRandomPrices(MIN, UPTO, 10);
+        Assertions.assertThat(prices).as("prices greater than MIN").allMatch(p -> p.compareTo(new BigDecimal(MIN)) > 0);
+        Assertions.assertThat(prices).as("prices less than %d", UPTO).allMatch(p -> p.compareTo(new BigDecimal(UPTO)) <= 0);
     }
 
     @Test

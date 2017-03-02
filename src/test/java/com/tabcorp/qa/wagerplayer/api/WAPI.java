@@ -75,7 +75,8 @@ public class WAPI {
     }
 
     public static BigDecimal readNewBalance(Object resp){
-        String newBalance = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
-        return new BigDecimal(newBalance);
+        Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
+        BigDecimal newBalance = new BigDecimal(val.toString());
+        return newBalance;
     }
 }
