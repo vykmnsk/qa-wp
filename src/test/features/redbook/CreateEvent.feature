@@ -74,7 +74,8 @@ Feature: Create Event
     Then I can see success status with message "Market display updated"
     And event status is "L"
 
-    When i collect mpid of selections
+    When I collect mpid of selections
+    And I settle race
 
     Examples:
       | NumberOfRunners | RaceType | RaceNumber | PlaceFraction | NoOfPlaces |

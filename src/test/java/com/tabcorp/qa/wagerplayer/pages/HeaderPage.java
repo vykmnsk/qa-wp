@@ -73,6 +73,14 @@ public class HeaderPage extends AppPage {
         return liabilityPage;
     }
 
+    public SettlementPage navigateToF6() {
+        switchToHeaderFrame();
+        f6.click();
+        SettlementPage settlementPage = new SettlementPage();
+        settlementPage.load();
+        return settlementPage;
+    }
+
     private void switchToHeaderFrame() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_top"));
