@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 public class HelpersTest {
@@ -51,7 +50,7 @@ public class HelpersTest {
         for (int i=1; i<=COUNT; i++){
             Assertions.assertThat(runners.get(i-1)).as("runner name").isEqualTo(INITIAL + i);
         }
-
     }
+
 }
 

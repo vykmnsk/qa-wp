@@ -26,8 +26,9 @@ public class REST {
             log.info("REST fields=" + fields);
             throw new RuntimeException(e);
         }
-        assertThat(resp.getStatus()).as("response code").isBetween(200, 300);
+        assertThat(resp.getStatus()).as("response status=" + resp.getStatusText()).isBetween(200, 300);
         String body = resp.getBody();
+        assertThat(body).as("response body").isNotEmpty();
         return Configuration.defaultConfiguration().jsonProvider().parse(body);
     }
 }

@@ -11,15 +11,20 @@ import java.util.stream.Collectors;
 
 public class LiabilityPage extends AppPage {
     @FindBy(css = "table[id^='navigable_market_id'] ")
-    WebElement liabilityTable;
+    private WebElement liabilityTable;
 
     @FindBy(css = "td.data_cell[type='racing_price']")
-    List<WebElement> marketPrices;
+    private List<WebElement> marketPrices;
+
+    @FindBy(id = "f5_eventname_para")
+    private WebElement eventName;
+
 
     public void load() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
         wait.until(ExpectedConditions.visibilityOf(liabilityTable));
+        wait.until(ExpectedConditions.visibilityOf(eventName));
     }
 
     public List<List<String>> getSelections(String productID) {
@@ -37,6 +42,9 @@ public class LiabilityPage extends AppPage {
                                 }}
                         )
                 );
+        log.info("Loaded F5 with event_name=" + eventName.getText());
+        log.info("Got selections=" + selections );
+
         return selections;
     }
 

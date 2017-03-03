@@ -4,6 +4,7 @@ import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
 import com.tabcorp.qa.wagerplayer.pages.LiabilityPage;
 import cucumber.api.java8.En;
+import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,10 +39,10 @@ public class APISteps implements En {
             balanceAfter = WAPI.readNewBalance(response);
         });
 
-        Then("^customer balance is decreased$", () -> {
-            assertThat(balanceAfter).as("balance after bet").isNotNull().isLessThan(balanceBefore);
+        Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
+            BigDecimal diff = new BigDecimal(diffText);
+            assertThat(balanceBefore.subtract(balanceAfter)).isEqualTo(diff);
         });
-
     }
 
     private static List<List<String>> readSelectionDataFromUI(String prodId) {

@@ -1,6 +1,7 @@
+.DS_Store
 env_*.sh
 target/*
-.DS_Store
+**/temp/*
 
 ### IntelliJ IDEA ###
 .idea

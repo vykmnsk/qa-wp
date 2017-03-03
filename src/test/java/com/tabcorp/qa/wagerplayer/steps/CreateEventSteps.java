@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 
 public class CreateEventSteps implements En {
 
-    NewEventPage newEvtPage;
-    MarketsPage marketsPage;
-    HeaderPage header;
-    int raceNumber = 1;
+    private NewEventPage newEvtPage;
+    private MarketsPage marketsPage;
+    private HeaderPage header;
+    private int raceNumber = 1;
 
 
     public CreateEventSteps() {
@@ -35,17 +35,18 @@ public class CreateEventSteps implements En {
         });
 
 
-        When("^I enter event details with (\\d+) horses, current 'show time' and 'event date/time' in (\\d+) minutes with data$",
+        When("^I enter event details with (\\d+) runners, current 'show time' and 'event date/time' in (\\d+) minutes with data$",
                 (Integer numberOfRunners, Integer inMinutes, DataTable table) -> {
                     Map<String, String> evt = table.asMap(String.class, String.class);
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
                     List<String> runners = Helpers.generateRunners("Runner_", numberOfRunners);
-
+                    String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
+                    String evtName = createUniqueName(evtBaseName);
                     marketsPage = newEvtPage.enterEventDetails(
                             inMinutes,
-                            evt.get("event name"),
-                            evt.get("bet in run type"),
-                            evt.get("create market"),
+                            evtName,
+                            (String) Helpers.noNullGet(evt, "bet in run type"),
+                            (String) Helpers.noNullGet(evt, "create market"),
                             runners
                     );
                 });
@@ -99,23 +100,23 @@ public class CreateEventSteps implements En {
               header = new HeaderPage();
               LiabilityPage liabilityPage = header.navigateToF5();
               //Todo - get product id dynamically
-              List<ArrayList> selections = liabilityPage.getSelections("280");
+              List<List<String>> selections = liabilityPage.getSelections("280");
         });
-      
+
         When("^I create a default event with details$", (DataTable table) -> {
-              Map<String, String> evt = table.asMap(String.class, String.class);
-              int inMinutes = 30;
-              String betInRunType = "Both Allowed";
-              String createMarket = "Racing Live";
+            Map<String, String> evt = table.asMap(String.class, String.class);
+            int inMinutes = 30;
+            String betInRunType = "Both Allowed";
+            String createMarket = "Racing Live";
 
-              String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
-              String evtName = String.format("%d: %d - %s", raceNumber, Helpers.randomBetweenInclusive(1000, 9999), evtBaseName);
-              String runnersText = (String) Helpers.noNullGet(evt, "runners");
-              List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
+            String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
+            String evtName = createUniqueName(evtBaseName);
+            String runnersText = (String) Helpers.noNullGet(evt, "runners");
+            List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
 
-              String pricesText = (String) Helpers.noNullGet(evt, "prices");
-              List<String> pricesTokens = Arrays.asList(pricesText.split(",\\s+"));
-              List<BigDecimal> prices = pricesTokens.stream().map(p -> new BigDecimal(p)).collect(Collectors.toList());
+            String pricesText = (String) Helpers.noNullGet(evt, "prices");
+            List<String> pricesTokens = Arrays.asList(pricesText.split(",\\s+"));
+            List<BigDecimal> prices = pricesTokens.stream().map(p -> new BigDecimal(p)).collect(Collectors.toList());
 
               newEvtPage = new NewEventPage();
               newEvtPage.load();
@@ -126,7 +127,7 @@ public class CreateEventSteps implements En {
               marketsPage.showMarketManagement();
               marketsPage.updateRaceNumber(raceNumber);
            });
-      
+
         When("^I settle race$", () -> {
             //Todo can remove arraylist with some dynamic code
             List<String[]> winners = new ArrayList<>();
@@ -138,5 +139,10 @@ public class CreateEventSteps implements En {
         });
 
     }
+
+    static String createUniqueName(String baseName){
+        return String.format("%s %d", baseName, Helpers.randomBetweenInclusive(1000, 9999));
+    }
+
 
 }

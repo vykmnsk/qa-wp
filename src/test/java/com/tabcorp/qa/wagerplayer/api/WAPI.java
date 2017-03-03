@@ -19,7 +19,7 @@ public class WAPI {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response").isEmpty();
+        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
         return resp;
     }
 

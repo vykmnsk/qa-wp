@@ -22,61 +22,62 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MarketsPage extends AppPage {
 
     @FindBy(css = "#main_table tbody tr th")
-    WebElement header;
+    private WebElement header;
     @FindBy(css = "input[src='images/button_insert.gif'")
-    WebElement insertBtn;
+    private WebElement insertBtn;
     @FindBy(css = "input[src='images/button_update.gif'")
-    WebElement updateBtn;
+    private WebElement updateBtn;
 
     @FindBy(css = "#main_table tr[bgcolor='green'")
-    WebElement status;
+    private WebElement status;
 
     @FindBy(css = "td.market_status_cell a[id^='market_status']")
-    WebElement marketStatus;
+    private WebElement marketStatus;
 
     @FindBy(css = ("#market_details"))
-    WebElement marketDetailsSection;
+    private WebElement marketDetailsSection;
     @FindBy(css = "table.inner_table a[href*='market_details']")
-    WebElement showHideMarketDetails;
+    private WebElement showHideMarketDetails;
 
     @FindBy(css = ("#market_settings"))
-    WebElement marketManagementSection;
+    private WebElement marketManagementSection;
     @FindBy(css = "table.inner_table a[href*='market_settings']")
-    WebElement showHideMarketManagement;
+    private WebElement showHideMarketManagement;
 
     @FindBy(css = "input[type='radio'][name='MARKET_TYPE_SET_STATUS'][value='3'")
-    WebElement marketStatusLive;
+    private WebElement marketStatusLive;
     @FindBy(css = "input[type='radio'][name='MARKET_TYPE_SET_STATUS'][value='5'")
-    WebElement marketStatusHeld;
+    private WebElement marketStatusHeld;
 
     @FindBy(css = ("select[name='MARKET_TYPE_SET_ALLOW_WIN']"))
-    WebElement betsAllowedWinSel;
+    private WebElement betsAllowedWinSel;
 
     @FindBy(css = ("select[name='MARKET_TYPE_SET_ALLOW_PLACE']"))
-    WebElement betsAllowedPlaceSel;
+    private WebElement betsAllowedPlaceSel;
 
     @FindBy(css = ("select[id='MARKET_TYPE_SET_EACHWAY_PERCENT']"))
-    WebElement placeFractionSel;
+    private WebElement placeFractionSel;
 
     @FindBy(css = ("select[id='MARKET_TYPE_SET_EACHWAY_SELECTIONS']"))
-    WebElement numOfPlacesSel;
+    private WebElement numOfPlacesSel;
 
     @FindBy(css = ("input[name='MARKET_TYPE_SET_ALLOW_EACHWAY']"))
-    WebElement ewChk;
+    private WebElement ewChk;
 
     @FindBy(css = "#market_settings input[name='race_num']")
     @CacheLookup
-    WebElement raceNumTxt;
+    private WebElement raceNumTxt;
 
     @FindBy(css = "input[name^='position[']")
-    List<WebElement> positionTxts;
+    private List<WebElement> positionTxts;
     @FindBy(css = "input[type=text][id^=price_][onkeyup^=calculate_selection_percent")
-    List<WebElement> priceTxts;
+    private List<WebElement> priceTxts;
 
     @FindBy(css = "#bet_types_content_body table.product_options tbody tr")
-    @CacheLookup
-    public List<WebElement> productRows;
+    private List<WebElement> productRows;
 
+    @FindBy(css = "input[type=hidden][name=event_id]")
+    private WebElement eventId;
 
     public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
@@ -198,7 +199,7 @@ public class MarketsPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(status));
         String statusMsg = status.getText();
         Assertions.assertThat(statusMsg).as("market status").contains("SUCCESS");
-        Assertions.assertThat(statusMsg).as("market status message").contains(msg);
+        Assertions.assertThat(statusMsg).as("market status message").containsIgnoringCase(msg);
     }
 
     public void verifyMarketStatus(String expectedStatus) {
@@ -208,4 +209,7 @@ public class MarketsPage extends AppPage {
                 .isEqualTo(expectedStatus);
     }
 
+    public String readEventID(){
+        return eventId.getAttribute("value");
+    }
 }

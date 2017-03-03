@@ -1,25 +1,24 @@
 @redbook
-Feature: Create Event
+Feature: Create Redbook Event
 
   Background:
     Given I am logged in and on Home Page
 
   Scenario Outline: Create Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    And I see New Event page is loaded
-    And I enter event details with <NumberOfRunners> horses, current 'show time' and 'event date/time' in 30 minutes with data
-      | event name      | <RaceNumber>. TEST RACE 0<RaceNumber> <RaceType> |
-      | bet in run type | Both Allowed                                     |
-      | create market   | Racing Live                                      |
+    Then I see New Event page is loaded
+
+    When I enter event details with <NumberOfRunners> runners, current 'show time' and 'event date/time' in 30 minutes with data
+      | base name       | <RaceNumber>: TEST RACE |
+      | bet in run type | Both Allowed            |
+      | create market   | Racing Live             |
     Then I see Create Market page
+    And I can see success status with message "Event Created"
 
     When I enter random prices matching <NumberOfRunners>
     Then I can see success status with message "Market Created"
 
     When I update race number to "<RaceNumber>"
-
-#  Luxbook DVP Fixed
-#  NSW Daily Double
 
     And I enable "Luxbook DVP Fixed" product settings
       | Betting   | Display Price   | Fluc        |
@@ -66,7 +65,7 @@ Feature: Create Event
 
     And I enter market details
       | Market Status      | Live            |
-      | Bets Allowed       | WIN No          |
+      | Bets Allowed       | WIN Yes         |
       | Bets Allowed Place | PLACE Fraction  |
       | Place Fraction     | <PlaceFraction> |
       | No of Places       | <NoOfPlaces>    |
@@ -74,11 +73,8 @@ Feature: Create Event
     Then I can see success status with message "Market display updated"
     And event status is "L"
 
-    When I collect mpid of selections
-    And I settle race
-
     Examples:
-      | NumberOfRunners | RaceType | RaceNumber | PlaceFraction | NoOfPlaces |
-      | 24              | HANDICAP | 1          | 1/4           | 4          |
-      | 15              | Auto     | 2          | 1/5           | 3          |
-      | 8               | Auto     | 3          | 1/5           | 3          |
+      | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
+#      | 24              | 1          | 1/4           | 4          |
+#      | 15              | 2          | 1/5           | 3          |
+      | 8               | 3          | 1/5           | 3          |
