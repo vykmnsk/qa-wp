@@ -15,10 +15,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class REST {
     public static Logger log = LoggerFactory.getLogger(REST.class);
 
+    private static void verifyResponse(HttpResponse<String> response) {
+        assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
+        assertThat(response.getBody()).as("response body").isNotEmpty();
+
+    }
+
     public static Object post(String url, Map<String, Object> fields) {
-        HttpResponse<String> resp = null;
+        HttpResponse<String> response;
         try {
-            resp = Unirest.post(url)
+            response = Unirest.post(url)
                     .fields(fields)
                     .asString();
         } catch (UnirestException e) {
@@ -26,9 +32,29 @@ public class REST {
             log.info("REST fields=" + fields);
             throw new RuntimeException(e);
         }
-        assertThat(resp.getStatus()).as("response status=" + resp.getStatusText()).isBetween(200, 300);
-        String body = resp.getBody();
-        assertThat(body).as("response body").isNotEmpty();
-        return Configuration.defaultConfiguration().jsonProvider().parse(body);
+        verifyResponse(response);
+        return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
     }
+
+    public static Object put(String url, String reqJSON) {
+        log.info("PUT Request : " + reqJSON);
+
+        HttpResponse<String> response;
+        try {
+            response = Unirest.put(url)
+                    .header("accept", "application/json")
+                    .body(reqJSON)
+                    .asString();
+        } catch (UnirestException e) {
+            log.info("REST URL for PUT=" + url);
+            log.info("PUT Request JSON=" + reqJSON);
+            throw new RuntimeException(e);
+        }
+
+        verifyResponse(response);
+
+        log.info("PUT Response : " + response.getBody());
+        return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
+    }
+
 }
