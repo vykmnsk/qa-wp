@@ -1,6 +1,8 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.Storage.KEY;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -92,7 +94,12 @@ public class NewEventPage extends AppPage{
 
         runnersBox.sendKeys(String.join("\n", runners));
         insertEvent.click();
-        return new MarketsPage();
+        MarketsPage mp = new MarketsPage();
+        String evtId = mp.readEventID();
+        Storage.put(KEY.EVENT_ID, evtId);
+        //TODO read product ID from somewhere in UI (or Cuke)
+        Storage.put(KEY.PRODUCT_ID, "280");
+        return mp;
     }
 
     private String format2d(int val){

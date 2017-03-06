@@ -13,7 +13,20 @@ import java.util.Map;
 
 public class WAPI {
 
-    static String URL = Config.wapiURL();
+    private static String URL = Config.wapiURL();
+
+    private static Map<String, Object> wapiAuthFields(){
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("wapi_client_user", Config.wapiUsername());
+        fields.put("wapi_client_pass", Config.wapiPassword());
+        return fields;
+    }
+
+    private static Map<String, Object> wapiAuthFields(String sessionId){
+        Map<String, Object> fields = wapiAuthFields();
+        fields.put("session_id", sessionId);
+        return fields;
+    }
 
     static Object post(Map<String, Object> fields) {
         fields.put("output_type", "json");
@@ -61,22 +74,44 @@ public class WAPI {
         return post(fields);
     }
 
-    static Map<String, Object> wapiAuthFields(){
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("wapi_client_user", Config.wapiUsername());
-        fields.put("wapi_client_pass", Config.wapiPassword());
-        return fields;
-    }
-
-    static Map<String, Object> wapiAuthFields(String sessionId){
-        Map<String, Object> fields = wapiAuthFields();
-        fields.put("session_id", sessionId);
-        return fields;
-    }
-
     public static BigDecimal readNewBalance(Object resp){
         Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
+    }
+
+    public static Object getEventMarkets(String sessionId, String evtId){
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "site_get_markets");
+        fields.put("eid", evtId);
+        fields.put("show_held", false);
+        return post(fields);
+    }
+
+    public enum KEY {
+        MPID,
+        PRICE
+    }
+
+    public static Map<KEY, String> readSelection(Object resp, String selName, String prodId, String betTypeName){
+        HashMap<KEY, String> sel = new HashMap<>();
+        String selPath = "$.RSP.markets.market[0].selections.selection" + jfilter("name", selName);
+        String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId) + jfilter("bet_type_name", betTypeName);
+
+        JSONArray mpids = JsonPath.read(resp, pricePath + ".mpid");
+        Assertions.assertThat(mpids.size()).as("expect to find one mpid at path=" + pricePath).isEqualTo(1);
+        String mpid = mpids.get(0).toString();
+
+        JSONArray prices = JsonPath.read(resp, pricePath + ".precise_price");
+        Assertions.assertThat(prices.size()).as("expect to find one price at path=" + pricePath).isEqualTo(1);
+        Double price = (Double) prices.get(0);
+
+        sel.put(KEY.MPID, mpid);
+        sel.put(KEY.PRICE, price.toString());
+        return sel;
+    }
+
+    private static String jfilter(String attr, String value){
+        return String.format("[?(@.%s == '%s')]", attr, value);
     }
 }

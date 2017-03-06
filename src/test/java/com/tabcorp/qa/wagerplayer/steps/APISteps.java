@@ -1,13 +1,16 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.Storage.KEY;
+
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
 import com.tabcorp.qa.wagerplayer.pages.LiabilityPage;
 import cucumber.api.java8.En;
-import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,15 +32,17 @@ public class APISteps implements En {
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
-        When("^I place a single Win bet on the first runner for \\$(\\d+\\.\\d+)$", (BigDecimal stake) -> {
-            //TODO fix hardcoding
-            String prodId = "280";
-            List<String> selection = readSelectionDataFromUI(prodId).get(0);
-            String mpid = selection.get(0);
-            String winPrice = selection.get(1);
-            Object response = WAPI.placeBetSingleWin(wapiSessionId, prodId, mpid, winPrice, stake);
+        When("^I place a single \"(Win|Place)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d+)$", (String betTypeName, String runner, BigDecimal stake) -> {
+            Object resp = WAPI.getEventMarkets(wapiSessionId, Storage.get(KEY.EVENT_ID));
+            Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, Storage.get(KEY.PRODUCT_ID), betTypeName);
+            Object response = WAPI.placeBetSingleWin(wapiSessionId,
+                    Storage.get(KEY.PRODUCT_ID),
+                    sel.get(WAPI.KEY.MPID),
+                    sel.get(WAPI.KEY.PRICE),
+                    stake);
             balanceAfter = WAPI.readNewBalance(response);
         });
+
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
             BigDecimal diff = new BigDecimal(diffText);
@@ -45,9 +50,4 @@ public class APISteps implements En {
         });
     }
 
-    private static List<List<String>> readSelectionDataFromUI(String prodId) {
-        HeaderPage header = new HeaderPage();
-        LiabilityPage liabilityPage = header.navigateToF5();
-        return liabilityPage.getSelections(prodId);
-    }
 }
