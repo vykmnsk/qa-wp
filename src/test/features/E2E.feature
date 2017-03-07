@@ -19,6 +19,11 @@ Feature: End 2 End
     When I place a single "Win" bet on the runner "Runner01" for $2.50
     Then customer balance is decreased by $2.50
 
+    When I collect mpid of selections
+    When I settle race with the runners and positions
+      | Runner01  | 1        |
+      | Runner02  | 2        |
+
   @luxbet
     Examples:
       | ProductName       |

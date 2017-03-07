@@ -8,7 +8,6 @@ import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +17,9 @@ public class CreateEventSteps implements En {
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
     private HeaderPage header;
+    private String category = null;
+    private String subcategory = null;
+    private String eventName = null;
     private int raceNumber = 1;
 
 
@@ -30,8 +32,10 @@ public class CreateEventSteps implements En {
             hp.verifyLoaded();
         });
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
+            this.subcategory = subcategory;
+            this.category = category;
             header = new HeaderPage();
-            header.pickCategories(category, subcategory);
+            header.navigateToF3(category, subcategory);
         });
 
 
@@ -41,10 +45,10 @@ public class CreateEventSteps implements En {
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
                     List<String> runners = Helpers.generateRunners("Runner_", numberOfRunners);
                     String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
-                    String evtName = createUniqueName(evtBaseName);
+                    eventName = createUniqueName(evtBaseName);
                     marketsPage = newEvtPage.enterEventDetails(
                             inMinutes,
-                            evtName,
+                            eventName,
                             (String) Helpers.noNullGet(evt, "bet in run type"),
                             (String) Helpers.noNullGet(evt, "create market"),
                             runners
@@ -110,7 +114,7 @@ public class CreateEventSteps implements En {
             String createMarket = "Racing Live";
 
             String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
-            String evtName = createUniqueName(evtBaseName);
+            eventName = createUniqueName(evtBaseName);
             String runnersText = (String) Helpers.noNullGet(evt, "runners");
             List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
 
@@ -120,7 +124,7 @@ public class CreateEventSteps implements En {
 
               newEvtPage = new NewEventPage();
               newEvtPage.load();
-              marketsPage = newEvtPage.enterEventDetails(inMinutes, evtName, betInRunType, createMarket, runners);
+              marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
               marketsPage.verifyLoaded();
               marketsPage.enterPrices(prices);
               marketsPage.verifySuccessStatus("Market Created");
@@ -128,12 +132,10 @@ public class CreateEventSteps implements En {
               marketsPage.updateRaceNumber(raceNumber);
            });
 
-        When("^I settle race$", () -> {
-            //Todo can remove arraylist with some dynamic code
-            List<String[]> winners = new ArrayList<>();
-            winners.add(new String[]{"1", "1 Runner_1"});
-            winners.add(new String[]{"2", "2 Runner_2"});
+        When("^I settle race with the runners and positions$", (DataTable table) -> {
+            Map<String, String> winners = table.asMap(String.class, String.class);
             header = new HeaderPage();
+            header.pickEvent(category, subcategory, eventName);
             SettlementPage settlementPage = header.navigateToF6();
             settlementPage.settleRace(winners);
         });

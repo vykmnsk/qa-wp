@@ -62,6 +62,17 @@ public class HeaderPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(subcategory));
         wait.until(ExpectedConditions.textToBePresentInElement(subcategory, subcatVal));
         (new Select(subcategory)).selectByVisibleText(subcatVal);
+    }
+
+    public void pickEvent(String catVal, String subcatVal, String eventVal) {
+        pickCategories(catVal, subcatVal);
+        wait.until(ExpectedConditions.visibilityOf(event));
+        wait.until(ExpectedConditions.textToBePresentInElement(event, eventVal));
+        (new Select(event)).selectByVisibleText(eventVal);
+    }
+
+    public void navigateToF3(String catVal, String subcatVal) {
+        pickCategories(catVal, subcatVal);
         f3.click();
     }
 

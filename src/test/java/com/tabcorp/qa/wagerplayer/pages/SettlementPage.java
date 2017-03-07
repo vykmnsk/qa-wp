@@ -1,11 +1,13 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.common.Helpers;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
+import java.util.Map;
 
 public class SettlementPage extends AppPage {
     @FindBy(css = "table[id^='results_table_']")
@@ -35,21 +37,27 @@ public class SettlementPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(resultsTable));
     }
 
-    public void settleRace(List<String[]> winners) {
+    public void settleRace(Map<String, String> winners) {
         int count = 0;
         winnerCheck.click();
-        for (String[] winner : winners) {
-                    Select position = new Select(resultPositions.get(count));
-                    Select result = new Select(resultRunners.get(count));
-                    position.selectByVisibleText(winner[0]);
-                    result.selectByVisibleText(winner[1]);
-                    count++;
+        for (Map.Entry<String, String> winner : winners.entrySet()) {
+            Select position = new Select(resultPositions.get(count));
+            String winnerName = winner.getValue() + " " + Helpers.toTitleCase(winner.getKey());
+            Select result = new Select(resultRunners.get(count));
+            position.selectByVisibleText(winner.getValue());
+            //example name is 1 Runner_1, cucumber is sending only 1
+            result.selectByVisibleText(winnerName);
+            count++;
         }
 
         result.click();
+
         load();
+        wait.until(ExpectedConditions.visibilityOf(accept));
         accept.click();
+
         load();
+        wait.until(ExpectedConditions.visibilityOf(settle));
         settle.click();
 
     }
