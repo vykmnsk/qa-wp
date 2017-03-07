@@ -23,6 +23,7 @@ Feature: End 2 End
     When I settle race with the runners and positions
       | Runner01  | 1        |
       | Runner02  | 2        |
+    Then customer balance is increased by $2.75
 
   @luxbet
     Examples:

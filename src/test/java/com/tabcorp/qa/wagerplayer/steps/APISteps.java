@@ -4,12 +4,9 @@ import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
 
 import com.tabcorp.qa.wagerplayer.api.WAPI;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.LiabilityPage;
 import cucumber.api.java8.En;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +16,7 @@ public class APISteps implements En {
 
     private String wapiSessionId = null;
     private BigDecimal balanceBefore = null;
-    private BigDecimal balanceAfter = null;
+    private BigDecimal balanceAfterBet = null;
 
     public APISteps() {
         Given("^I am logged in WAPI$", () -> {
@@ -40,13 +37,19 @@ public class APISteps implements En {
                     sel.get(WAPI.KEY.MPID),
                     sel.get(WAPI.KEY.PRICE),
                     stake);
-            balanceAfter = WAPI.readNewBalance(response);
+            balanceAfterBet = WAPI.readNewBalance(response);
         });
 
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
             BigDecimal diff = new BigDecimal(diffText);
-            assertThat(balanceBefore.subtract(balanceAfter)).isEqualTo(diff);
+            assertThat(balanceBefore.subtract(balanceAfterBet)).isEqualTo(diff);
+        });
+
+        Then("^customer balance is increased by \\$(\\d+.\\d\\d)$", (String payoutText) -> {
+            BigDecimal payout = new BigDecimal(payoutText);
+            BigDecimal balanceAfterSettle = WAPI.getBalance(wapiSessionId);
+            assertThat(balanceAfterSettle.subtract(balanceAfterBet)).isEqualTo(payout);
         });
     }
 
