@@ -4,6 +4,7 @@ import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
 
 import com.tabcorp.qa.wagerplayer.api.WAPI;
+import cucumber.api.PendingException;
 import cucumber.api.java8.En;
 
 import java.math.BigDecimal;
@@ -50,6 +51,11 @@ public class APISteps implements En {
             BigDecimal payout = new BigDecimal(payoutText);
             BigDecimal balanceAfterSettle = WAPI.getBalance(wapiSessionId);
             assertThat(balanceAfterSettle.subtract(balanceAfterBet)).isEqualTo(payout);
+        });
+
+        Then("^customer balance is not changed$", () -> {
+            BigDecimal balanceAfterSettle = WAPI.getBalance(wapiSessionId);
+            assertThat(balanceAfterSettle.stripTrailingZeros()).isEqualTo(balanceAfterBet.stripTrailingZeros());
         });
     }
 
