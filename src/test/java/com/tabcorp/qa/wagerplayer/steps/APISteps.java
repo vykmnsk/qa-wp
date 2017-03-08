@@ -31,10 +31,11 @@ public class APISteps implements En {
         });
 
         When("^I place a single \"(Win|Place)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d+)$", (String betTypeName, String runner, BigDecimal stake) -> {
-            Object resp = WAPI.getEventMarkets(wapiSessionId, Storage.get(KEY.EVENT_ID));
-            Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, Storage.get(KEY.PRODUCT_ID), betTypeName);
+            Integer prodId = (Integer) Storage.get(KEY.PRODUCT_ID);
+            Object resp = WAPI.getEventMarkets(wapiSessionId, (String) Storage.get(KEY.EVENT_ID));
+            Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId, betTypeName);
             Object response = WAPI.placeBetSingleWin(wapiSessionId,
-                    Storage.get(KEY.PRODUCT_ID),
+                    prodId,
                     sel.get(WAPI.KEY.MPID),
                     sel.get(WAPI.KEY.PRICE),
                     stake);

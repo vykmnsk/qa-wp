@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class AnyPage {
     public WebDriver driver;

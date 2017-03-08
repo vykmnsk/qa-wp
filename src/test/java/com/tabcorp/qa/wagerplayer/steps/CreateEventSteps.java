@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
@@ -100,13 +101,6 @@ public class CreateEventSteps implements En {
 
         });
 
-        When("^I collect mpid of selections$", () -> {
-              header = new HeaderPage();
-              LiabilityPage liabilityPage = header.navigateToF5();
-              //Todo - get product id dynamically
-              List<List<String>> selections = liabilityPage.getSelections("280");
-        });
-
         When("^I create a default event with details$", (DataTable table) -> {
             Map<String, String> evt = table.asMap(String.class, String.class);
             int inMinutes = 30;
@@ -120,7 +114,7 @@ public class CreateEventSteps implements En {
 
             String pricesText = (String) Helpers.noNullGet(evt, "prices");
             List<String> pricesTokens = Arrays.asList(pricesText.split(",\\s+"));
-            List<BigDecimal> prices = pricesTokens.stream().map(p -> new BigDecimal(p)).collect(Collectors.toList());
+            List<BigDecimal> prices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
 
               newEvtPage = new NewEventPage();
               newEvtPage.load();

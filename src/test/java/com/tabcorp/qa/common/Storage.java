@@ -19,12 +19,9 @@ public class Storage {
         map.put(key, value);
     }
 
-    public static String get(KEY key){
-        return (String) Helpers.noNullGet(map, key);
-    }
-
-    public static Object getObj(KEY key){
+    public static Object get(KEY key){
         return Helpers.noNullGet(map, key);
     }
+
 
 }

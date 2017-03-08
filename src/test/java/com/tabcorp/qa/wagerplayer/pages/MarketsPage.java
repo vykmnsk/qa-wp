@@ -2,18 +2,24 @@ package com.tabcorp.qa.wagerplayer.pages;
 
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,38 +85,7 @@ public class MarketsPage extends AppPage {
     @FindBy(css = "input[type=hidden][name=event_id]")
     private WebElement eventId;
 
-    public void verifyLoaded() {
-        wait.until(ExpectedConditions.visibilityOf(header));
-        assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
-    }
-
-    public void enterPrices(List<BigDecimal> prices) {
-        List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
-        Integer size0 = sizes.get(0);
-        assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
-        for (int i = 0; i < positionTxts.size(); i++) {
-            WebElement pos = positionTxts.get(i);
-            WebElement priceTxt = priceTxts.get(i);
-            BigDecimal priceVal = prices.get(i);
-            pos.sendKeys(String.valueOf(i + 1));
-            priceTxt.clear();
-            priceTxt.sendKeys(priceVal.toString());
-        }
-        insertBtn.click();
-    }
-
-    public void showMarketManagement() {
-        if (!marketManagementSection.isDisplayed()) {
-            showHideMarketManagement.click();
-        }
-        wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
-
-    }
-
-    public void updateRaceNumber(int num) {
-        raceNumTxt.clear();
-        raceNumTxt.sendKeys(""+num);
-    }
+    public static Logger log = LoggerFactory.getLogger(MarketsPage.class);
 
     static Map<List<String>, String> productSettingIDs() {
         return Collections.unmodifiableMap(Stream.of(
@@ -151,14 +126,60 @@ public class MarketsPage extends AppPage {
         ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
 
+    public void verifyLoaded() {
+        wait.until(ExpectedConditions.visibilityOf(header));
+        assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
+    }
+
+    public void enterPrices(List<BigDecimal> prices) {
+        List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
+        Integer size0 = sizes.get(0);
+        assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
+        for (int i = 0; i < positionTxts.size(); i++) {
+            WebElement pos = positionTxts.get(i);
+            WebElement priceTxt = priceTxts.get(i);
+            BigDecimal priceVal = prices.get(i);
+            pos.sendKeys(String.valueOf(i + 1));
+            priceTxt.clear();
+            priceTxt.sendKeys(priceVal.toString());
+        }
+        insertBtn.click();
+    }
+
+    public void showMarketManagement() {
+        if (!marketManagementSection.isDisplayed()) {
+            showHideMarketManagement.click();
+        }
+        wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+
+    }
+
+    public void updateRaceNumber(int num) {
+        raceNumTxt.clear();
+        raceNumTxt.sendKeys(""+num);
+    }
+
     public void enableProductSettings(String prodName, List<List<String>> settings) {
         showMarketManagement();
         WebElement tr = productRows.stream().filter(p -> p.getText().contains(prodName)).findFirst().orElse(null);
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
+
+        Storage.put(Storage.KEY.PRODUCT_ID, findProductID(tr));
+        log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
+
         for (List<String> option : settings) {
             setOption(tr, option);
         }
         updateBtn.click();
+    }
+
+    private Integer findProductID(WebElement tr){
+        String firstCheckboxName = tr.findElement(By.cssSelector("input[type=hidden]")).getAttribute("name");
+        Pattern p = Pattern.compile("products\\[(\\d+)\\].*");
+        Matcher m = p.matcher(firstCheckboxName);
+        Assertions.assertThat(m.find()).as("Found product ID in UI").isTrue();
+        String prodIdText = m.group(1);
+        return Integer.parseInt(prodIdText);
     }
 
     private void setOption(WebElement prodRow, List<String> option) {

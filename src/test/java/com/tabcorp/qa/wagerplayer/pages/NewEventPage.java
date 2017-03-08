@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.common.AnyPage;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
@@ -7,6 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -69,6 +72,8 @@ public class NewEventPage extends AppPage{
     @FindBy(css = "#filter_table input[src='images/button_insert.gif']")
     public WebElement insertEvent;
 
+    public static Logger log = LoggerFactory.getLogger(NewEventPage.class);
+
     public void load() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
@@ -79,6 +84,8 @@ public class NewEventPage extends AppPage{
 
     public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, List<String> runners) {
         eventName.sendKeys(eventNameVal);
+        log.info("Event Name=" + eventNameVal);
+
         (new Select(betInRunType)).selectByVisibleText(betInRunTypeVal);
         createMarket.sendKeys(createMarketVal);
 
@@ -94,11 +101,11 @@ public class NewEventPage extends AppPage{
 
         runnersBox.sendKeys(String.join("\n", runners));
         insertEvent.click();
+
         MarketsPage mp = new MarketsPage();
         String evtId = mp.readEventID();
         Storage.put(KEY.EVENT_ID, evtId);
-        //TODO read product ID from somewhere in UI (or Cuke)
-        Storage.put(KEY.PRODUCT_ID, "280");
+        log.info("storing Event ID=" + Storage.get(KEY.EVENT_ID));
         return mp;
     }
 

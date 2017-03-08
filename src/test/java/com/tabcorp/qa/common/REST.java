@@ -24,12 +24,12 @@ public class REST {
     public static Object post(String url, Map<String, Object> fields) {
         HttpResponse<String> response;
         try {
+            log.info("sending REST fields=" + fields);
             response = Unirest.post(url)
                     .fields(fields)
                     .asString();
         } catch (UnirestException e) {
             log.info("REST URL=" + url);
-            log.info("REST fields=" + fields);
             throw new RuntimeException(e);
         }
         verifyResponse(response);

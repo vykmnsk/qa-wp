@@ -53,7 +53,7 @@ public class WAPI {
         return new BigDecimal(balance);
     }
 
-    public static Object placeBetSingleWin(String sessionId, String productId, String mpid, String winPrice, BigDecimal stake) {
+    public static Object placeBetSingleWin(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
@@ -63,7 +63,7 @@ public class WAPI {
         return post(fields);
     }
 
-    public static Object placeBetSingleEW(String sessionId, String productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
+    public static Object placeBetSingleEW(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
@@ -93,21 +93,26 @@ public class WAPI {
         PRICE
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, String prodId, String betTypeName){
+    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId, String betTypeName){
         HashMap<KEY, String> sel = new HashMap<>();
+
         String selPath = "$.RSP.markets.market[0].selections.selection" + jfilter("name", selName);
-        String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId) + jfilter("bet_type_name", betTypeName);
+        String pricePath = selPath + ".prices.price" +
+                jfilter("product_id", prodId.toString()) +
+                jfilter("bet_type_name", betTypeName);
 
         JSONArray mpids = JsonPath.read(resp, pricePath + ".mpid");
         Assertions.assertThat(mpids.size()).as("expect to find one mpid at path=" + pricePath).isEqualTo(1);
-        String mpid = mpids.get(0).toString();
+        String mpid = String.valueOf(mpids.get(0));
+        Assertions.assertThat(mpid).as("market price id from API").isNotEmpty();
 
         JSONArray prices = JsonPath.read(resp, pricePath + ".precise_price");
         Assertions.assertThat(prices.size()).as("expect to find one price at path=" + pricePath).isEqualTo(1);
-        Double price = (Double) prices.get(0);
+        String price = String.valueOf(prices.get(0));
+        Assertions.assertThat(price).as("price from API").isNotEmpty();
 
         sel.put(KEY.MPID, mpid);
-        sel.put(KEY.PRICE, price.toString());
+        sel.put(KEY.PRICE, price);
         return sel;
     }
 

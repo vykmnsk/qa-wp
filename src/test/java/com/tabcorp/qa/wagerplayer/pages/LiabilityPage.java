@@ -27,25 +27,4 @@ public class LiabilityPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(eventName));
     }
 
-    public List<List<String>> getSelections(String productID) {
-        //Todo - get product id dynamically
-        List<List<String>> selections = new ArrayList<>();
-        marketPrices
-                .stream()
-                .filter(mp -> mp.getAttribute("product_id").equals(productID))
-                .collect(Collectors.toList())
-                .forEach(mp ->
-                        selections.add(
-                                new ArrayList<String>() {{
-                                    add(mp.getAttribute("market_prices_id"));
-                                    add(mp.getText());
-                                }}
-                        )
-                );
-        log.info("Loaded F5 with event_name=" + eventName.getText());
-        log.info("Got selections=" + selections );
-
-        return selections;
-    }
-
 }
