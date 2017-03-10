@@ -26,7 +26,7 @@ public class CreateEventSteps implements En {
 
     public CreateEventSteps() {
 
-        Given("^I am logged in and on Home Page$", () -> {
+        Given("^I am logged into WP UI and on Home Page$", () -> {
             LoginPage lp = new LoginPage();
             lp.load();
             HomePage hp = lp.enterValidCredentials();
@@ -77,14 +77,14 @@ public class CreateEventSteps implements En {
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
             marketsPage.showMarketDetails();
-            boolean isLive = mkt.get("Market Status").equals("Live");
+            boolean isLive = Helpers.noNullGet(mkt, "Market Status").equals("Live");
             boolean isEW = mkt.get("E/W").equals("yes");
             marketsPage.enterMarketDetail(
                     isLive,
-                    mkt.get("Bets Allowed"),
-                    mkt.get("Bets Allowed Place"),
-                    mkt.get("Place Fraction"),
-                    mkt.get("No of Places"),
+                    (String) Helpers.noNullGet(mkt, "Bets Allowed"),
+                    (String) Helpers.noNullGet(mkt, "Bets Allowed Place"),
+                    (String) Helpers.noNullGet(mkt, "Place Fraction"),
+                    (String) Helpers.noNullGet(mkt, "No of Places"),
                     isEW);
         });
 

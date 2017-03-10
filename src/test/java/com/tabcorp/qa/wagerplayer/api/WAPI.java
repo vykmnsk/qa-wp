@@ -56,6 +56,7 @@ public class WAPI {
     public static Object placeBetSingleWin(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
+        fields.put("bet_type", "1");
         fields.put("product_id", productId);
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
@@ -63,9 +64,21 @@ public class WAPI {
         return post(fields);
     }
 
+    public static Object placeBetSinglePlace(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("bet_type", "2");
+        fields.put("product_id", productId);
+        fields.put("mpid", mpid);
+        fields.put("place_price", placePrice);
+        fields.put("amount", stake);
+        return post(fields);
+    }
+
     public static Object placeBetSingleEW(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
+        fields.put("bet_type", "3");
         fields.put("product_id", productId);
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
@@ -90,30 +103,30 @@ public class WAPI {
 
     public enum KEY {
         MPID,
-        PRICE
+        WIN_PRICE,
+        PLACE_PRICE
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId, String betTypeName){
-        HashMap<KEY, String> sel = new HashMap<>();
-
+    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId){
         String selPath = "$.RSP.markets.market[0].selections.selection" + jfilter("name", selName);
-        String pricePath = selPath + ".prices.price" +
-                jfilter("product_id", prodId.toString()) +
-                jfilter("bet_type_name", betTypeName);
+        String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId.toString());
 
-        JSONArray mpids = JsonPath.read(resp, pricePath + ".mpid");
-        Assertions.assertThat(mpids.size()).as("expect to find one mpid at path=" + pricePath).isEqualTo(1);
-        String mpid = String.valueOf(mpids.get(0));
-        Assertions.assertThat(mpid).as("market price id from API").isNotEmpty();
-
-        JSONArray prices = JsonPath.read(resp, pricePath + ".precise_price");
-        Assertions.assertThat(prices.size()).as("expect to find one price at path=" + pricePath).isEqualTo(1);
-        String price = String.valueOf(prices.get(0));
-        Assertions.assertThat(price).as("price from API").isNotEmpty();
-
-        sel.put(KEY.MPID, mpid);
-        sel.put(KEY.PRICE, price);
+        HashMap<KEY, String> sel = new HashMap<>();
+        sel.put(KEY.MPID, readPriceAttr(resp, pricePath,"Win", "mpid"));
+        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, pricePath,"Win", "precise_price"));
+        sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, pricePath,"Place", "precise_price"));
         return sel;
+    }
+
+    private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName){
+        String path = pricePath + jfilter("bet_type_name", betTypeName);
+        JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
+        Assertions.assertThat(attrs.size())
+                .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, pricePath))
+                .isEqualTo(1);
+        String attr = String.valueOf(attrs.get(0));
+        Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
+        return attr;
     }
 
     private static String jfilter(String attr, String value){

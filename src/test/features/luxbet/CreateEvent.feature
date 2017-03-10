@@ -1,8 +1,8 @@
-@luxbet
+@ui @luxbet
 Feature: Create Luxbet Event
 
   Background:
-    Given I am logged in and on Home Page
+    Given I am logged into WP UI and on Home Page
 
   Scenario Outline: Create Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"

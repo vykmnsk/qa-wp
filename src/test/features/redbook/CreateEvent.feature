@@ -1,8 +1,8 @@
-@redbook
+@ui @redbook
 Feature: Create Redbook Event
 
   Background:
-    Given I am logged in and on Home Page
+    Given I am logged into WP UI and on Home Page
 
   Scenario Outline: Create Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
@@ -38,7 +38,7 @@ Feature: Create Redbook Event
       | Liability | Cash Out        | Multi Win   |
       | Liability | Cash Out        | Multi Place |
 
-    And I enable "PA SP" product settings
+    And I enable "SP" product settings
       | Betting   | Enabled        | On    |
       | Betting   | Enabled        | Auto  |
       | Betting   | Display Price  | Win   |

@@ -20,7 +20,7 @@ public class APISteps implements En {
     private BigDecimal balanceAfterBet = null;
 
     public APISteps() {
-        Given("^I am logged in WAPI$", () -> {
+        Given("^I am logged into WP API$", () -> {
             wapiSessionId = WAPI.login();
             assertThat(wapiSessionId).as("session ID").isNotEmpty();
         });
@@ -30,17 +30,31 @@ public class APISteps implements En {
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
-        When("^I place a single \"(Win|Place)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d+)$", (String betTypeName, String runner, BigDecimal stake) -> {
-            Integer prodId = (Integer) Storage.get(KEY.PRODUCT_ID);
-            Object resp = WAPI.getEventMarkets(wapiSessionId, (String) Storage.get(KEY.EVENT_ID));
-            Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId, betTypeName);
-            Object response = WAPI.placeBetSingleWin(wapiSessionId,
-                    prodId,
-                    sel.get(WAPI.KEY.MPID),
-                    sel.get(WAPI.KEY.PRICE),
-                    stake);
-            balanceAfterBet = WAPI.readNewBalance(response);
-        });
+        When("^I place a single \"(Win|Place|EachWay)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d+)$",
+                (String betTypeName, String runner, BigDecimal stake) -> {
+                    Integer prodId = (Integer) Storage.get(KEY.PRODUCT_ID);
+                    Object resp = WAPI.getEventMarkets(wapiSessionId, (String) Storage.get(KEY.EVENT_ID));
+                    Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
+
+                    Object response;
+                    switch (betTypeName) {
+                        case "Win":
+                            response = WAPI.placeBetSingleWin(wapiSessionId, prodId,
+                                    sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), stake);
+                            break;
+                        case "Place":
+                            response = WAPI.placeBetSinglePlace(wapiSessionId, prodId,
+                                    sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.PLACE_PRICE), stake);
+                            break;
+                        case "EachWay":
+                            response = WAPI.placeBetSingleEW(wapiSessionId, prodId,
+                                    sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), sel.get(WAPI.KEY.PLACE_PRICE), stake);
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                    }
+                    balanceAfterBet = WAPI.readNewBalance(response);
+                });
 
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
