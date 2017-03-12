@@ -10,13 +10,13 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 public class HomePage extends AppPage {
     @FindBy(css = ("frame[id='frame_top']"))
-    public WebElement frameTop;
+    private WebElement frameTop;
 
     @FindBy(css = ("frame[name='frame_bottom']"))
-    public WebElement frameBottom;
+    private WebElement frameBottom;
 
     @FindBy(css = ("frame[name='frame_ticker']"))
-    public WebElement frameTicker;
+    private WebElement frameTicker;
 
     public  void verifyLoaded() {
         wait.until(visibilityOf(frameTop));

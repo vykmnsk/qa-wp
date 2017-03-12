@@ -54,4 +54,8 @@ public class Helpers {
                 .isNotNull();
         return map.get(key);
     }
+
+    public static String createUniqueName(String baseName){
+        return String.format("%s %d", baseName, randomBetweenInclusive(1000, 9999));
+    }
 }

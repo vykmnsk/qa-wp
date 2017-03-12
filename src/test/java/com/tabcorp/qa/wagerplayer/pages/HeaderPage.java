@@ -8,52 +8,52 @@ import org.openqa.selenium.support.ui.Select;
 public class HeaderPage extends AppPage {
 
     @FindBy(css = "#cat")
-    public WebElement category;
+    private WebElement category;
 
     @FindBy(css = "#subcat")
-    public WebElement subcategory;
+    private WebElement subcategory;
 
     @FindBy(css = "#event_id")
-    public WebElement event;
+    private WebElement event;
 
     @FindBy(css = "#button_settled")
-    public WebElement buttonSettled;
+    private WebElement buttonSettled;
 
     @FindBy(css = "input[value='2 Betting']")
-    public WebElement f2;
+    private WebElement f2;
 
     @FindBy(css = "input[value='3 Events']")
-    public WebElement f3;
+    private WebElement f3;
 
     @FindBy(css = "input[value='4 Markets']")
-    public WebElement f4;
+    private WebElement f4;
 
     @FindBy(css = "input[value='5 Liability']")
-    public WebElement f5;
+    private WebElement f5;
 
     @FindBy(css = "input[value='6 Settle']")
-    public WebElement f6;
+    private WebElement f6;
 
     @FindBy(css = "input[value='7 Config']")
-    public WebElement f7;
+    private WebElement f7;
 
     @FindBy(css = "input[value='8 Selection']")
-    public WebElement f8;
+    private WebElement f8;
 
     @FindBy(css = "input[value='9 BetData']")
-    public WebElement f9;
+    private WebElement f9;
 
     @FindBy(css = "input[value='10 Account']")
-    public WebElement f10;
+    private WebElement f10;
 
     @FindBy(css = "input[value='11 Cust']")
-    public WebElement f11;
+    private WebElement f11;
 
     @FindBy(css = "input[value='12 Agents']")
-    public WebElement f12;
+    private WebElement f12;
 
     @FindBy(css = "#header_table > tbody > tr:nth-child(2) > td:nth-child(3) > input:nth-child(1)")
-    public WebElement reloadPage;
+    private WebElement reloadPage;
 
     public void pickCategories(String catVal, String subcatVal) {
         switchToHeaderFrame();

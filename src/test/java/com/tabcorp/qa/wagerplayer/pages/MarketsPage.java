@@ -85,7 +85,7 @@ public class MarketsPage extends AppPage {
     @FindBy(css = "input[type=hidden][name=event_id]")
     private WebElement eventId;
 
-    public static Logger log = LoggerFactory.getLogger(MarketsPage.class);
+    private static Logger log = LoggerFactory.getLogger(MarketsPage.class);
 
     static Map<List<String>, String> productSettingIDs() {
         return Collections.unmodifiableMap(Stream.of(

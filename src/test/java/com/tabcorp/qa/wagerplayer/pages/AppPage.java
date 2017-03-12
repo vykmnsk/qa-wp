@@ -11,10 +11,10 @@ import java.util.List;
 
 public class AppPage extends AnyPage{
 
-    String appName;
-    String baseUrl;
+    public String appName;
+    private String baseUrl;
 
-    public AppPage(){
+    AppPage(){
         appName = Config.appName();
         baseUrl = Config.baseUrl();
         PageFactory.initElements(driver, this);
@@ -25,11 +25,11 @@ public class AppPage extends AnyPage{
         driver.get(baseUrl);
     }
 
-    public WebElement findEither(By loc1, By loc2) {
+    WebElement findEither(By loc1, By loc2) {
         return findOne(Arrays.asList(loc1, loc2));
     }
 
-    public List<WebElement> findBoth(By loc1, By loc2) {
+    List<WebElement> findBoth(By loc1, By loc2) {
         return findAll(Arrays.asList(loc1, loc2));
     }
 

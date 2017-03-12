@@ -19,60 +19,60 @@ import java.util.List;
 
 public class NewEventPage extends AppPage{
     @FindBy(css = "textarea[name=add_selections]")
-    public WebElement addSelections;
+    private WebElement addSelections;
 
     @FindBy(css = "#filter_table_inner img[src='images/button_new_event.gif']")
-    public WebElement newEvent;
+    private WebElement newEvent;
 
     @FindBy(css = "#filter_table_inner input[name='event_name']")
-    public WebElement eventName;
+    private WebElement eventName;
 
     @FindBy(css = "#filter_table_inner select[name='AlivetbSelMonth']")
-    public WebElement showTimeMonth;
+    private WebElement showTimeMonth;
 
     @FindBy(css = "#filter_table_inner select[name='AlivetbSelDay']")
-    public WebElement showTimeDay;
+    private WebElement showTimeDay;
 
     @FindBy(css = "#filter_table_inner select[name='AlivetbSelYear']")
-    public WebElement showTimeYear;
+    private WebElement showTimeYear;
 
     @FindBy(css = "#filter_table_inner select[name='Aliveeventhour']")
-    public WebElement showTimeHour;
+    private WebElement showTimeHour;
 
     @FindBy(css = "#filter_table_inner select[name='Aliveeventmin']")
-    public WebElement showTimeMin;
+    private WebElement showTimeMin;
 
     @FindBy(css = "#filter_table_inner select[name='tbSelMonth']")
-    public WebElement eventDateTimeMonth;
+    private WebElement eventDateTimeMonth;
 
     @FindBy(css = "#filter_table_inner select[name='tbSelDay']")
-    public WebElement eventDateTimeDay;
+    private WebElement eventDateTimeDay;
 
     @FindBy(css = "#filter_table_inner select[name='tbSelYear']")
-    public WebElement eventDateTimeYear;
+    private WebElement eventDateTimeYear;
 
     @FindBy(css = "#filter_table_inner select[name='eventhour']")
-    public WebElement eventDateTimeHour;
+    private WebElement eventDateTimeHour;
 
     @FindBy(css = "#filter_table_inner select[name='eventmin']")
-    public WebElement eventDateTimeMin;
+    private WebElement eventDateTimeMin;
 
     @FindBy(css = "#filter_table_inner select[name='zone']")
-    public WebElement eventDateTimeZone;
+    private WebElement eventDateTimeZone;
 
     @FindBy(css = "textarea[name='add_selections'")
-    WebElement runnersBox;
+    private WebElement runnersBox;
 
     @FindBy(css = "#filter_table_inner select[name='bet_run']")
-    public WebElement betInRunType;
+    private WebElement betInRunType;
 
     @FindBy(css = "#filter_table_inner select[name='event_market_type']")
-    public WebElement createMarket;
+    private WebElement createMarket;
 
     @FindBy(css = "#filter_table input[src='images/button_insert.gif']")
-    public WebElement insertEvent;
+    private WebElement insertEvent;
 
-    public static Logger log = LoggerFactory.getLogger(NewEventPage.class);
+    private static Logger log = LoggerFactory.getLogger(NewEventPage.class);
 
     public void load() {
         driver.switchTo().defaultContent();

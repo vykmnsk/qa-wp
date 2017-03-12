@@ -5,8 +5,8 @@ import com.tabcorp.qa.wagerplayer.pages.LoginPage;
 import cucumber.api.java8.En;
 
     public class LoginSteps implements En {
-        LoginPage loginPage;
-        HomePage homePage;
+        private LoginPage loginPage;
+        private HomePage homePage;
 
         public LoginSteps() {
 

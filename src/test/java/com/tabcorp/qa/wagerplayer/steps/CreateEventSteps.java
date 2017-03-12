@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
@@ -46,7 +45,7 @@ public class CreateEventSteps implements En {
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
                     List<String> runners = Helpers.generateRunners("Runner_", numberOfRunners);
                     String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
-                    eventName = createUniqueName(evtBaseName);
+                    eventName = Helpers.createUniqueName(evtBaseName);
                     marketsPage = newEvtPage.enterEventDetails(
                             inMinutes,
                             eventName,
@@ -108,7 +107,7 @@ public class CreateEventSteps implements En {
             String createMarket = "Racing Live";
 
             String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
-            eventName = createUniqueName(evtBaseName);
+            eventName = Helpers.createUniqueName(evtBaseName);
             String runnersText = (String) Helpers.noNullGet(evt, "runners");
             List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
 
@@ -134,10 +133,6 @@ public class CreateEventSteps implements En {
             settlementPage.settleRace(winners);
         });
 
-    }
-
-    static String createUniqueName(String baseName){
-        return String.format("%s %d", baseName, Helpers.randomBetweenInclusive(1000, 9999));
     }
 
 
