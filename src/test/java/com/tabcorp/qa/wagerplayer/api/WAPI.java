@@ -38,11 +38,11 @@ public class WAPI {
 
     public static String login() {
         Map<String, Object> fields = wapiAuthFields();
-        fields.put("action", "bet_customer_login");
-        fields.put("username", Config.customerUsername());
-        fields.put("password", Config.customerPassword());
+        fields.put("action", "account_login");
+        fields.put("customer_username", Config.customerUsername());
+        fields.put("customer_password", Config.customerPassword());
         Object resp = post(fields);
-        return JsonPath.read(resp, "$.RSP.login[0].session");
+        return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }
 
     public static BigDecimal getBalance(String sessionId) {
