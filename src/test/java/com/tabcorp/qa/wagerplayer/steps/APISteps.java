@@ -3,9 +3,7 @@ package com.tabcorp.qa.wagerplayer.steps;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
 
-import com.tabcorp.qa.wagerplayer.api.WAPI;
-import cucumber.api.PendingException;
-import cucumber.api.java8.En;
+import com.tabcorp.qa.wagerplayer.api.WAPI;import cucumber.api.java8.En;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -30,7 +28,7 @@ public class APISteps implements En {
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
-        When("^I place a single \"(Win|Place|EachWay)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d+)$",
+        When("^I place a single \"(WIN|PLACE|EACHWAY)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(KEY.PRODUCT_ID);
                     Object resp = WAPI.getEventMarkets(wapiSessionId, (String) Storage.get(KEY.EVENT_ID));
@@ -38,15 +36,15 @@ public class APISteps implements En {
 
                     Object response;
                     switch (betTypeName) {
-                        case "Win":
+                        case "WIN":
                             response = WAPI.placeBetSingleWin(wapiSessionId, prodId,
                                     sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), stake);
                             break;
-                        case "Place":
+                        case "PLACE":
                             response = WAPI.placeBetSinglePlace(wapiSessionId, prodId,
                                     sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.PLACE_PRICE), stake);
                             break;
-                        case "EachWay":
+                        case "EACHWAY":
                             response = WAPI.placeBetSingleEW(wapiSessionId, prodId,
                                     sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), sel.get(WAPI.KEY.PLACE_PRICE), stake);
                             break;

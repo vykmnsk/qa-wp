@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
@@ -17,6 +18,7 @@ public class CreateEventSteps implements En {
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
     private HeaderPage header;
+    private SettlementPage settlementPage;
     private String category = null;
     private String subcategory = null;
     private String eventName = null;
@@ -125,14 +127,21 @@ public class CreateEventSteps implements En {
               marketsPage.updateRaceNumber(raceNumber);
            });
 
-        When("^I settle race with the runners and positions$", (DataTable table) -> {
+        When("^I result race with the runners and positions$", (DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
             header = new HeaderPage();
             header.pickEvent(category, subcategory, eventName);
-            SettlementPage settlementPage = header.navigateToF6();
-            settlementPage.settleRace(winners);
+            settlementPage = header.navigateToF6();
+            settlementPage.resultRace(winners);
         });
 
+        And("^I settle race with prices$", (DataTable table) -> {
+            Map<String, String> winnerPrices = table.asMap(String.class, String.class);
+            Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+            settlementPage.updateSettlePrices(winnerPrices, prodId);
+            settlementPage.accept();
+            settlementPage.settle();
+        });
     }
 
 

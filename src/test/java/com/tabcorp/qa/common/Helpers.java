@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Helpers {
@@ -57,5 +58,10 @@ public class Helpers {
 
     public static String createUniqueName(String baseName){
         return String.format("%s %d", baseName, randomBetweenInclusive(1000, 9999));
+    }
+
+    public static List<BigDecimal> extractCSVPrices(String winnerPriceCSV) {
+        List<String> pricesTxts = Arrays.asList(winnerPriceCSV.split(",(\\s)*"));
+        return pricesTxts.stream().map(BigDecimal::new).collect(Collectors.toList());
     }
 }
