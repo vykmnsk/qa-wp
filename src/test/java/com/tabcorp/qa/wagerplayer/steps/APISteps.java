@@ -24,7 +24,7 @@ public class APISteps implements En {
         });
 
         Given("^customer balance is at least \\$(\\d+.\\d\\d)$", (BigDecimal minBalance) -> {
-            balanceBefore = WAPI.getBalance(accessToken);
+            balanceBefore = Config.getAPI().getBalance(accessToken);
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
@@ -62,12 +62,12 @@ public class APISteps implements En {
 
         Then("^customer balance is increased by \\$(\\d+.\\d\\d)$", (String payoutText) -> {
             BigDecimal payout = new BigDecimal(payoutText);
-            BigDecimal balanceAfterSettle = WAPI.getBalance(accessToken);
+            BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
             assertThat(balanceAfterSettle.subtract(balanceAfterBet)).isEqualTo(payout);
         });
 
         Then("^customer balance is not changed$", () -> {
-            BigDecimal balanceAfterSettle = WAPI.getBalance(accessToken);
+            BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
             assertThat(balanceAfterSettle.stripTrailingZeros()).isEqualTo(balanceAfterBet.stripTrailingZeros());
         });
     }

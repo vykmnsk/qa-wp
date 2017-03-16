@@ -45,7 +45,7 @@ public class WAPI implements WagerPlayerAPI {
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }
 
-    public static BigDecimal getBalance(String sessionId) {
+    public BigDecimal getBalance(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
         Object resp = post(fields);

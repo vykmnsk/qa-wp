@@ -13,12 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class REST {
-    public static Logger log = LoggerFactory.getLogger(REST.class);
+    private static Logger log = LoggerFactory.getLogger(REST.class);
 
-    private static void verifyResponse(HttpResponse<String> response) {
+    private static Object verifyAndParseResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
         assertThat(response.getBody()).as("response body").isNotEmpty();
-
+        return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
     }
 
     public static Object post(String url, Map<String, Object> fields) {
@@ -32,8 +32,7 @@ public class REST {
             log.info("REST URL=" + url);
             throw new RuntimeException(e);
         }
-        verifyResponse(response);
-        return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
+        return verifyAndParseResponse(response);
     }
 
     public static Object put(String url, String reqJSON) {
@@ -50,11 +49,21 @@ public class REST {
             log.info("PUT Request JSON=" + reqJSON);
             throw new RuntimeException(e);
         }
+        return verifyAndParseResponse(response);
+    }
 
-        verifyResponse(response);
-
-        log.info("PUT Response : " + response.getBody());
-        return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
+    public static Object get(String url,Map<String,Object> queryParams){
+        HttpResponse<String> response;
+        try {
+            log.info("sending GET queryPrams=" + queryParams);
+            response = Unirest.get(url)
+                    .queryString(queryParams)
+                    .asString();
+        } catch (UnirestException e) {
+            log.info("GET URL=" + url);
+            throw new RuntimeException(e);
+        }
+        return verifyAndParseResponse(response);
     }
 
 }

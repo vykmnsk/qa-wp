@@ -89,7 +89,6 @@ public class Config {
     private static final String ENV_MOBI_V2_URL = "WAGERPLAYER_MOBIV2_URL";
     private static final String ENV_MOBI_V2_USERNAME = "WAGERPLAYER_MOBIV2_USERNAME";
     private static final String ENV_MOBI_V2_PASSWORD = "WAGERPLAYER_MOBIV2_PASSWORD";
-    private static  final  String ENV_MOBI_V2_BETSLIPCHECKOUT_URL = "WAGERPLAYER_MOBIV2_BETSLIPCHECKOUT_URL";
 
     public static String moby_V2_URL() {
         return readVerify(ENV_MOBI_V2_URL);
@@ -103,9 +102,6 @@ public class Config {
         return readVerify(ENV_MOBI_V2_PASSWORD);
     }
 
-    public static  String moby_V2_betSlipCheckOutURL() {
-        return  readVerify(ENV_MOBI_V2_BETSLIPCHECKOUT_URL);
-    }
 // ------------------------------------------------
 
     private static WagerPlayerAPI apiObj;
