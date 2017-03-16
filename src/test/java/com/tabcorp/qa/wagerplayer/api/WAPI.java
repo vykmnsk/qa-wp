@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class WAPI {
+public class WAPI implements WagerPlayerAPI {
 
     private static String URL = Config.wapiURL();
 
@@ -36,11 +36,11 @@ public class WAPI {
         return resp;
     }
 
-    public static String login() {
+    public String getAccessToken(String username,String password) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_login");
-        fields.put("customer_username", Config.customerUsername());
-        fields.put("customer_password", Config.customerPassword());
+        fields.put("customer_username", username);
+        fields.put("customer_password", password);
         Object resp = post(fields);
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }

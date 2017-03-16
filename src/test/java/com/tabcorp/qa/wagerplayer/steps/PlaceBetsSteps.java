@@ -16,7 +16,7 @@ public class PlaceBetsSteps implements En {
 
     public PlaceBetsSteps() {
         Given("^I am a Sunbets customer$", () -> {
-            userAccessToken = MOBI_V2.getAccessToken(Config.moby_V2_USERNAME(),Config.moby_V2_Password());
+            userAccessToken = Config.getAPI().getAccessToken(Config.moby_V2_USERNAME(),Config.moby_V2_Password());
         });
 
         When("^I place a single Win bet for \\$(\\d+.\\d\\d)$", (BigDecimal betPrice) -> {

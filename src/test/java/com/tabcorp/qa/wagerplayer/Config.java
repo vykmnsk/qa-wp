@@ -1,8 +1,15 @@
 package com.tabcorp.qa.wagerplayer;
 
+import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
+import com.tabcorp.qa.wagerplayer.api.WAPI;
+import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Config {
+
+    public static Logger log = LoggerFactory.getLogger(Config.class);
 
     private static final String ENV_APP_NAME = "WAGERPLAYER_APP_NAME";
     private static final String ENV_BASE_URL = "WAGERPLAYER_BASE_URL";
@@ -99,4 +106,17 @@ public class Config {
     public static  String moby_V2_betSlipCheckOutURL() {
         return  readVerify(ENV_MOBI_V2_BETSLIPCHECKOUT_URL);
     }
+// ------------------------------------------------
+
+    private static WagerPlayerAPI apiObj;
+
+    public static WagerPlayerAPI getAPI(){
+
+        if( apiObj == null) {
+            apiObj = Config.appName().equals("redbook")? new MOBI_V2() : new WAPI() ;
+        }
+        log.info("using " + apiObj.getClass().getSimpleName() + " api");
+        return apiObj ;
+    }
+
 }

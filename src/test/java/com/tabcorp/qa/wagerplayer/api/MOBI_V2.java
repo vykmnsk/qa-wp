@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MOBI_V2 {
+public class MOBI_V2 implements WagerPlayerAPI {
 
-    public static String getAccessToken(String username, String password) {
+    public String getAccessToken(String username, String password) {
         String URL = Config.moby_V2_URL();
         Map<String, Object> fields = new HashMap();
         fields.put("output_type", "json");
