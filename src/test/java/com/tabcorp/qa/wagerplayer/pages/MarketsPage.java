@@ -7,7 +7,6 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -183,7 +182,7 @@ public class MarketsPage extends AppPage {
     }
 
     private void setOption(WebElement prodRow, List<String> option) {
-        String inputCSS = String.format("input[name$='%s']", Helpers.noNullGet(productSettingIDs(), option));
+        String inputCSS = String.format("input[name$='%s']", Helpers.nonNullGet(productSettingIDs(), option));
         WebElement hiddenChk = prodRow.findElement(By.cssSelector(inputCSS));
         WebElement cell = findParent(hiddenChk);
         String imageFile = cell.findElement(By.tagName("img")).getAttribute("src");

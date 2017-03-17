@@ -20,7 +20,7 @@ public class Storage {
     }
 
     public static Object get(KEY key){
-        return Helpers.noNullGet(map, key);
+        return Helpers.nonNullGet(map, key);
     }
 
 

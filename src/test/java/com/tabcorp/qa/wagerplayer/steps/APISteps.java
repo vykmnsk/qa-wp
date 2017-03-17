@@ -28,14 +28,14 @@ public class APISteps implements En {
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
-        When("^I place a single \"(WIN|PLACE|EACHWAY)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+        When("^I place a single \"([^\"]*)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(KEY.PRODUCT_ID);
                     Object resp = WAPI.getEventMarkets(accessToken, (String) Storage.get(KEY.EVENT_ID));
                     Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
 
                     Object response;
-                    switch (betTypeName) {
+                    switch (betTypeName.toUpperCase()) {
                         case "WIN":
                             response = WAPI.placeBetSingleWin(accessToken, prodId,
                                     sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), stake);

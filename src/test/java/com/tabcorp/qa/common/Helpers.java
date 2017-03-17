@@ -49,7 +49,7 @@ public class Helpers {
 
     }
 
-    public static Object noNullGet(Map map, Object key){
+    public static Object nonNullGet(Map map, Object key){
         Assertions.assertThat(map.get(key))
                 .withFailMessage("Map key='%s' does not exist in: %s", key, map.keySet())
                 .isNotNull();

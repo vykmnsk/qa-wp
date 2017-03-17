@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
+import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
@@ -56,7 +57,7 @@ public class WAPI implements WagerPlayerAPI {
     public static Object placeBetSingleWin(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
-        fields.put("bet_type", "1");
+        fields.put("bet_type", BetType.Win.id);
         fields.put("product_id", productId);
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
@@ -67,7 +68,7 @@ public class WAPI implements WagerPlayerAPI {
     public static Object placeBetSinglePlace(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
-        fields.put("bet_type", "2");
+        fields.put("bet_type", BetType.Place.id);
         fields.put("product_id", productId);
         fields.put("mpid", mpid);
         fields.put("place_price", placePrice);
@@ -78,7 +79,7 @@ public class WAPI implements WagerPlayerAPI {
     public static Object placeBetSingleEW(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
-        fields.put("bet_type", "3");
+        fields.put("bet_type", BetType.EachWay.id);
         fields.put("product_id", productId);
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
@@ -112,9 +113,9 @@ public class WAPI implements WagerPlayerAPI {
         String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId.toString());
 
         HashMap<KEY, String> sel = new HashMap<>();
-        sel.put(KEY.MPID, readPriceAttr(resp, pricePath,"Win", "mpid"));
-        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, pricePath,"Win", "precise_price"));
-        sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, pricePath,"Place", "precise_price"));
+        sel.put(KEY.MPID, readPriceAttr(resp, pricePath, BetType.Win.name(), "mpid"));
+        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, pricePath, BetType.Win.name(), "precise_price"));
+        sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, pricePath, BetType.Place.name(), "precise_price"));
         return sel;
     }
 

@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.*;
@@ -46,13 +47,13 @@ public class CreateEventSteps implements En {
                     Map<String, String> evt = table.asMap(String.class, String.class);
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
                     List<String> runners = Helpers.generateRunners("Runner_", numberOfRunners);
-                    String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
+                    String evtBaseName = (String) Helpers.nonNullGet(evt, "base name");
                     eventName = Helpers.createUniqueName(evtBaseName);
                     marketsPage = newEvtPage.enterEventDetails(
                             inMinutes,
                             eventName,
-                            (String) Helpers.noNullGet(evt, "bet in run type"),
-                            (String) Helpers.noNullGet(evt, "create market"),
+                            (String) Helpers.nonNullGet(evt, "bet in run type"),
+                            (String) Helpers.nonNullGet(evt, "create market"),
                             runners
                     );
                 });
@@ -78,14 +79,14 @@ public class CreateEventSteps implements En {
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
             marketsPage.showMarketDetails();
-            boolean isLive = Helpers.noNullGet(mkt, "Market Status").equals("Live");
+            boolean isLive = Helpers.nonNullGet(mkt, "Market Status").equals("Live");
             boolean isEW = mkt.get("E/W").equals("yes");
             marketsPage.enterMarketDetail(
                     isLive,
-                    (String) Helpers.noNullGet(mkt, "Bets Allowed"),
-                    (String) Helpers.noNullGet(mkt, "Bets Allowed Place"),
-                    (String) Helpers.noNullGet(mkt, "Place Fraction"),
-                    (String) Helpers.noNullGet(mkt, "No of Places"),
+                    (String) Helpers.nonNullGet(mkt, "Bets Allowed"),
+                    (String) Helpers.nonNullGet(mkt, "Bets Allowed Place"),
+                    (String) Helpers.nonNullGet(mkt, "Place Fraction"),
+                    (String) Helpers.nonNullGet(mkt, "No of Places"),
                     isEW);
         });
 
@@ -108,12 +109,12 @@ public class CreateEventSteps implements En {
             String betInRunType = "Both Allowed";
             String createMarket = "Racing Live";
 
-            String evtBaseName = (String) Helpers.noNullGet(evt, "base name");
+            String evtBaseName = (String) Helpers.nonNullGet(evt, "base name");
             eventName = Helpers.createUniqueName(evtBaseName);
-            String runnersText = (String) Helpers.noNullGet(evt, "runners");
+            String runnersText = (String) Helpers.nonNullGet(evt, "runners");
             List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
 
-            String pricesText = (String) Helpers.noNullGet(evt, "prices");
+            String pricesText = (String) Helpers.nonNullGet(evt, "prices");
             List<String> pricesTokens = Arrays.asList(pricesText.split(",\\s+"));
             List<BigDecimal> prices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
 
@@ -135,10 +136,17 @@ public class CreateEventSteps implements En {
             settlementPage.resultRace(winners);
         });
 
+
         And("^I settle race with prices$", (DataTable table) -> {
-            Map<String, String> winnerPrices = table.asMap(String.class, String.class);
+            Map<String, String> pricesInput = table.asMap(String.class, String.class);
             Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-            settlementPage.updateSettlePrices(winnerPrices, prodId);
+            BetType [] betTypes = {BetType.Win, BetType.Place};
+            for (BetType betType: betTypes){
+                String pricesCSV = (String) Helpers.nonNullGet(pricesInput, betType.name());
+                List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCSV);
+                Assertions.assertThat(prices).as(betType.name() + " prices cucumber input").isNotEmpty();
+                settlementPage.updateSettlePrices(prodId, betType.id, prices);
+            }
             settlementPage.accept();
             settlementPage.settle();
         });

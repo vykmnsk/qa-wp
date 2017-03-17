@@ -1,7 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -37,8 +37,8 @@ public class SettlementPage extends AppPage {
     @FindBy(id = "settle")
     WebElement settle;
 
-    @FindBy(css = ".f6_settle_live_products input[id='precise_price']")
-    List<WebElement> settlePrices;
+    @FindBy(css = ".f6_settle_live_products input[type=hidden][id='precise_price']")
+    List<WebElement> hiddenSettlePrices;
 
     private By priceSelector = By.cssSelector("input[id^='price']");
 
@@ -77,47 +77,37 @@ public class SettlementPage extends AppPage {
         settle.click();
     }
 
-    public void updateSettlePrices(Map<String, String> winnerPrices, Integer productId) {
-        winnerPrices.entrySet().forEach(winnerPrice -> {
-                    List<BigDecimal> prices = Helpers.extractCSVPrices(winnerPrice.getValue());
-                    int betypeId = winnerPrice.getKey().equalsIgnoreCase("win") ? BetType.WIN.id : BetType.PLACE.id;
-                    List<WebElement> matchingPriceHiddenFields = getMatchingPrices(productId, betypeId);
-                    setPrices(prices, matchingPriceHiddenFields);
-                }
-        );
+
+    public void updateSettlePrices(Integer productId, Integer betTypeId, List<BigDecimal> prices){
+        List<WebElement> hiddenSettlePricesToUpdate = filterWithIds(hiddenSettlePrices, productId, betTypeId);
+        List<WebElement> priceInputs = findCorrespondingPriceInputs(hiddenSettlePricesToUpdate, priceSelector);
+        inputPrices(priceInputs, prices);
     }
 
-    private List<WebElement> getMatchingPrices(int productId, int betypeId) {
-        Predicate<WebElement> priceFilter = getProductPriceFilter(productId, betypeId);
-        return settlePrices
-                .stream()
-                .filter(settlePrice -> priceFilter.test(settlePrice))
+    private List<WebElement> filterWithIds(List<WebElement> elems, Integer prodId, Integer betTypeId){
+        return elems.stream()
+                .filter(el -> nameContainsId(el, prodId) && nameContainsId(el, betTypeId))
                 .collect(Collectors.toList());
-
     }
 
-    private void setPrices(List<BigDecimal> prices, List<WebElement> pricesHiddenFields) {
-        int size = Math.min(prices.size(), pricesHiddenFields.size());
-        IntStream.range(0, size)
-                .forEach(i -> {
-                                WebElement priceInputField = findParent(pricesHiddenFields.get(i)).findElement(priceSelector);
-                                inputPrice(priceInputField, prices.get(i));
-                        }
-                );
+    private boolean nameContainsId(WebElement el, int id) {
+        return el.getAttribute("name").contains("[" + id + "]");
     }
 
-    private Predicate<WebElement> getProductPriceFilter(Integer productId, int betypeId) {
-        String productFilter = String.format("[%d]", productId);
-        String betTyeFilter = String.format("[%s]", betypeId);
-        Predicate<WebElement> filterPredicate = settlePrice ->
-                settlePrice.getAttribute("name").contains(productFilter) &&
-                        settlePrice.getAttribute("name").contains(betTyeFilter);
-        return filterPredicate;
+    private List<WebElement> findCorrespondingPriceInputs(List<WebElement> hiddenPriceElems, By priceSelector) {
+        return hiddenPriceElems.stream()
+                .map(el -> findParent(el).findElement(priceSelector))
+                .collect(Collectors.toList());
     }
 
-    private void inputPrice(WebElement priceInputField, BigDecimal price) {
-        priceInputField.clear();
-        priceInputField.sendKeys(price.toString());
+    private void inputPrices(List<WebElement> priceInputs, List<BigDecimal> prices) {
+        Assertions.assertThat(prices.size()).as("settle price values should fit into UI price inputs").isLessThanOrEqualTo(priceInputs.size());
+        for(int i = 0; i < prices.size(); i++){
+            WebElement input = priceInputs.get(i);
+            String price = prices.get(i).toString();
+            input.clear();
+            input.sendKeys(price);
+        }
     }
 
 }
