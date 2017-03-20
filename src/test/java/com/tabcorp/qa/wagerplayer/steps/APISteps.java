@@ -1,13 +1,14 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Storage;
-import com.tabcorp.qa.common.Storage.KEY;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
+import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -31,22 +32,22 @@ public class APISteps implements En {
 
         When("^I place a single \"([^\"]*)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
-                    Integer prodId = (Integer) Storage.get(KEY.PRODUCT_ID);
-                    Object resp = wapi.getEventMarkets((String) Storage.get(KEY.EVENT_ID));  // this is always WAPI.
+                    Integer prodId = (Integer) Storage.get(PRODUCT_ID);
+                    Object resp = wapi.getEventMarkets((String) Storage.get(EVENT_ID));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
 
                     switch (betTypeName.toUpperCase()) {
                         case "WIN":
                             Config.getAPI().placeSingleWinBet(accessToken, prodId,
-                                    sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), stake);
+                                    sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), stake);
                             break;
                         case "PLACE":
-                            WAPI.placeBetSinglePlace(accessToken, prodId,
-                                    sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.PLACE_PRICE), stake);
+                            Config.getAPI().placeSinglePlaceBet(accessToken, prodId,
+                                    sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         case "EACHWAY":
                             WAPI.placeBetSingleEW(accessToken, prodId,
-                                    sel.get(WAPI.KEY.MPID), sel.get(WAPI.KEY.WIN_PRICE), sel.get(WAPI.KEY.PLACE_PRICE), stake);
+                                    sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);

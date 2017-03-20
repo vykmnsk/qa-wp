@@ -65,7 +65,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeBetSinglePlace(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
+    public Object placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Place.id);
@@ -101,12 +101,6 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("eid", evtId);
         fields.put("show_held", false);
         return post(fields);
-    }
-
-    public enum KEY {
-        MPID,
-        WIN_PRICE,
-        PLACE_PRICE
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId){

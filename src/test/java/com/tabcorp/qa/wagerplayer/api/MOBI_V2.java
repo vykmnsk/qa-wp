@@ -61,34 +61,48 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     public Object placeSingleWinBet(String accessToken, Integer productId , String mpid, String winPrice, BigDecimal stake) {
-
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
+        //prices
+        JSONObject price = new JSONObject();
+        price.put("win_price", winPrice);
+        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Win.id, price);
+        return MOBI_V2.placeBet(betPayload);
+    }
+
+    public Object placeSinglePlaceBet(String accessToken, Integer productId , String mpid, String placePrice, BigDecimal stake) {
+        //Ignore productID
+        //Added to ensure function signature remains same as to WagerPlayerAPI interface.
+
+        //prices
+        JSONObject price = new JSONObject();
+        price.put("place_price", placePrice);
+
+        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Place.id, price);
+        return MOBI_V2.placeBet(betPayload);
+    }
+
+    private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject)  {
         JSONObject obj = new JSONObject();
+        JSONArray selections = new JSONArray();
+        JSONObject betType = new JSONObject(); //options
+        JSONObject bet = new JSONObject();
+
         obj.put("access_token", accessToken);
 
-        JSONArray list = new JSONArray();
+        betType.put("bet_type", betId);
 
-        JSONObject bet = new JSONObject();
         bet.put("type", "single");
         bet.put("stake", stake.toString());
         bet.put("mpid", mpid);
-        //options
-        JSONObject bet_type = new JSONObject();
-        bet_type.put("bet_type", BetType.Win.id);
-        //prices
-        JSONObject win_price = new JSONObject();
-        win_price.put("win_price", winPrice);
-        JSONObject options = new JSONObject();
-        bet.put("options", bet_type);
-        JSONObject prices = new JSONObject();
-        bet.put("prices", win_price);
-        list.add(bet);
-        obj.put("selections", list);
+        bet.put("options", betType);
+        bet.put("prices", priceObject);
+        selections.add(bet);
 
-        return MOBI_V2.placeBet(obj.toJSONString());
+        obj.put("selections", selections);
 
+        return obj.toJSONString();
     }
-
+    
 }
