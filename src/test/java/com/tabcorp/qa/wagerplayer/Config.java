@@ -7,6 +7,8 @@ import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 public class Config {
 
     public static Logger log = LoggerFactory.getLogger(Config.class);
@@ -19,6 +21,7 @@ public class Config {
     public static String appName() {
         String appName = System.getenv(ENV_APP_NAME);
         verifyExists(appName, ENV_APP_NAME);
+        Assertions.assertThat(appName).as("Application Name").isIn(Arrays.asList("luxbet", "redbook"));
         return appName;
     }
 
@@ -87,19 +90,9 @@ public class Config {
     //----------------------- MYOB V2 ------------------------
 
     private static final String ENV_MOBI_V2_URL = "WAGERPLAYER_MOBIV2_URL";
-    private static final String ENV_MOBI_V2_USERNAME = "WAGERPLAYER_MOBIV2_USERNAME";
-    private static final String ENV_MOBI_V2_PASSWORD = "WAGERPLAYER_MOBIV2_PASSWORD";
-
+    
     public static String moby_V2_URL() {
         return readVerify(ENV_MOBI_V2_URL);
-    }
-
-    public static String moby_V2_USERNAME() {
-        return readVerify(ENV_MOBI_V2_USERNAME);
-    }
-
-    public static String moby_V2_Password() {
-        return readVerify(ENV_MOBI_V2_PASSWORD);
     }
 
 // ------------------------------------------------

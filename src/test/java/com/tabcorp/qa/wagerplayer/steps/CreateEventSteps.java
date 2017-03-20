@@ -6,6 +6,7 @@ import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
@@ -138,7 +139,7 @@ public class CreateEventSteps implements En {
 
 
         And("^I settle race with prices$", (DataTable table) -> {
-            Map<String, String> pricesInput = table.asMap(String.class, String.class);
+            Map<String, String> pricesInput = new CaseInsensitiveMap(table.asMap(String.class, String.class));
             Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
             BetType [] betTypes = {BetType.Win, BetType.Place};
             for (BetType betType: betTypes){

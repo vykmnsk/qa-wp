@@ -17,7 +17,7 @@ public class APISteps implements En {
     private String accessToken = null;
     private BigDecimal balanceBefore = null;
     private BigDecimal balanceAfterBet = null;
-    private WAPI wapi = new WAPI();
+    private WAPI wapi = null;
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
@@ -30,9 +30,10 @@ public class APISteps implements En {
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
-        When("^I place a single \"([^\"]*)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+        When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(PRODUCT_ID);
+                    if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.get(EVENT_ID));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
 
