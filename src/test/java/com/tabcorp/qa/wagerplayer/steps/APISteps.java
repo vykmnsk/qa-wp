@@ -6,6 +6,9 @@ import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
@@ -53,6 +56,37 @@ public class APISteps implements En {
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
                     balanceAfterBet = Config.getAPI().getBalance(accessToken);
+                });
+
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String runner, BigDecimal stake) -> {
+                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
+                    Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
+
+                    List<String> newList = Arrays.asList();
+                    Object response;
+                    switch (betTypeName.toUpperCase()) {
+                        case "NSW Quinella":
+                            response = WAPI.placeBetExoticQuinellaAndExacta(accessToken, prodId,
+                                    newList , sel.get(WAPI.KEY.MARKET_ID), stake);
+                            break;
+//                        case "NSW Exacta":
+//                            response = WAPI.placeBetExoticQuinellaAndExacta(accessToken, prodId,
+//                                    sel.get(WAPI.KEY.SELECTION_ID), sel.get(WAPI.KEY.MARKET_ID), stake);
+//                            break;
+//                        case "NSW Trifecta":
+//                            response = WAPI.placeBetExoticTrifecta(accessToken, prodId,
+//                                    sel.get(WAPI.KEY.SELECTION_ID), sel.get(WAPI.KEY.MARKET_ID), stake);
+//                            break;
+//                        case "NSW First Four":
+//                            response = WAPI.placeBetExoticFirstFour(accessToken, prodId,
+//                                    sel.get(WAPI.KEY.SELECTION_ID), sel.get(WAPI.KEY.MARKET_ID), stake);
+//                            break;
+                        default:
+                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                    }
+                    balanceAfterBet = WAPI.readNewBalance(response);
                 });
 
 

@@ -8,7 +8,7 @@ public class Storage {
 
     public enum KEY {
         EVENT_ID,
-        PRODUCT_ID
+        PRODUCT_ID,
     }
 
     public static void init() {

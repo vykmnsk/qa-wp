@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -16,14 +17,14 @@ public class WAPI implements WagerPlayerAPI {
 
     private static String URL = Config.wapiURL();
 
-    private static Map<String, Object> wapiAuthFields(){
+    private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();
         fields.put("wapi_client_user", Config.wapiUsername());
         fields.put("wapi_client_pass", Config.wapiPassword());
         return fields;
     }
 
-    private static Map<String, Object> wapiAuthFields(String sessionId){
+    private static Map<String, Object> wapiAuthFields(String sessionId) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("session_id", sessionId);
         return fields;
@@ -37,7 +38,7 @@ public class WAPI implements WagerPlayerAPI {
         return resp;
     }
 
-    public String getAccessToken(String username,String password) {
+    public String getAccessToken(String username, String password) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_login");
         fields.put("customer_username", username);
@@ -88,7 +89,43 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static BigDecimal readNewBalance(Object resp){
+    public static Object placeBetExoticQuinellaAndExacta(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        fields.put("slot[1][selection][]", selectionIds.get(0));
+        fields.put("slot[1][selection][]", selectionIds.get(1));
+        fields.put("slot[1][market]", marketId);
+        fields.put("amount", stake);
+        return post(fields);
+    }
+
+    public static Object placeBetExoticTrifecta(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        fields.put("slot[1][selection][]", selectionIds.get(0));
+        fields.put("slot[1][selection][]", selectionIds.get(1));
+        fields.put("slot[1][selection][]", selectionIds.get(2));
+        fields.put("slot[1][market]", marketId);
+        fields.put("amount", stake);
+        return post(fields);
+    }
+
+    public static Object placeBetExoticFirstFour(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        fields.put("slot[1][selection][]", selectionIds.get(0));
+        fields.put("slot[1][selection][]", selectionIds.get(1));
+        fields.put("slot[1][selection][]", selectionIds.get(2));
+        fields.put("slot[1][selection][]", selectionIds.get(3));
+        fields.put("slot[1][market]", marketId);
+        fields.put("amount", stake);
+        return post(fields);
+    }
+
+    public static BigDecimal readNewBalance(Object resp) {
         Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
@@ -103,18 +140,24 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId){
+    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
         String selPath = "$.RSP.markets.market[0].selections.selection" + jfilter("name", selName);
         String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId.toString());
+        String marketIdPath = "$.RSP.markets.market[0]";
+        String selectionIdPath = "$.RSP.markets.market[0].selections.selection.id";
 
         HashMap<KEY, String> sel = new HashMap<>();
         sel.put(KEY.MPID, readPriceAttr(resp, pricePath, BetType.Win.name(), "mpid"));
         sel.put(KEY.WIN_PRICE, readPriceAttr(resp, pricePath, BetType.Win.name(), "precise_price"));
         sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, pricePath, BetType.Place.name(), "precise_price"));
+
+        sel.put(KEY.MARKET_ID, readMarketAttr(resp, marketIdPath, "id"));
+
+        sel.put(KEY.SELECTION_ID, readPriceAttr(resp, selectionIdPath, "", "id"));
         return sel;
     }
 
-    private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName){
+    private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
         JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
         Assertions.assertThat(attrs.size())
@@ -125,7 +168,18 @@ public class WAPI implements WagerPlayerAPI {
         return attr;
     }
 
-    private static String jfilter(String attr, String value){
+    private static String readMarketAttr(Object resp, String marketIdPath, String attrName) {
+        String path = marketIdPath;
+        JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
+        Assertions.assertThat(attrs.size())
+                .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, marketIdPath))
+                .isEqualTo(1);
+        String attr = String.valueOf(attrs.get(0));
+        Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
+        return attr;
+    }
+
+    private static String jfilter(String attr, String value) {
         return String.format("[?(@.%s == '%s')]", attr, value);
     }
 }
