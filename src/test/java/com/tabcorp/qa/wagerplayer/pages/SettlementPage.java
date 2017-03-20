@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.wagerplayer.Config;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,9 +12,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SettlementPage extends AppPage {
     @FindBy(css = "table[id^='results_table_']")
@@ -37,9 +36,11 @@ public class SettlementPage extends AppPage {
     @FindBy(id = "settle")
     WebElement settle;
 
+    @FindBy(css = "input[name^=product_prices]")
+    List<WebElement> luxbetSettlePrices;
+
     @FindBy(css = ".f6_settle_live_products input[type=hidden][id='precise_price']")
     List<WebElement> hiddenSettlePrices;
-
     private By priceSelector = By.cssSelector("input[id^='price']");
 
     public void load() {
@@ -79,9 +80,14 @@ public class SettlementPage extends AppPage {
 
 
     public void updateSettlePrices(Integer productId, Integer betTypeId, List<BigDecimal> prices){
-        List<WebElement> hiddenSettlePricesToUpdate = filterWithIds(hiddenSettlePrices, productId, betTypeId);
-        List<WebElement> priceInputs = findCorrespondingPriceInputs(hiddenSettlePricesToUpdate, priceSelector);
-        inputPrices(priceInputs, prices);
+        List<WebElement> priceInputs;
+        if ("redbook".equals(Config.appName())) {
+            List<WebElement> hiddenSettlePricesToUpdate = filterWithIds(hiddenSettlePrices, productId, betTypeId);
+            priceInputs = findCorrespondingPriceInputs(hiddenSettlePricesToUpdate, priceSelector);
+        } else {
+            priceInputs = filterWithIds(luxbetSettlePrices, productId, betTypeId);
+        }
+        enterPrices(priceInputs, prices);
     }
 
     private List<WebElement> filterWithIds(List<WebElement> elems, Integer prodId, Integer betTypeId){
@@ -100,7 +106,7 @@ public class SettlementPage extends AppPage {
                 .collect(Collectors.toList());
     }
 
-    private void inputPrices(List<WebElement> priceInputs, List<BigDecimal> prices) {
+    private void enterPrices(List<WebElement> priceInputs, List<BigDecimal> prices) {
         Assertions.assertThat(prices.size()).as("settle price values should fit into UI price inputs").isLessThanOrEqualTo(priceInputs.size());
         for(int i = 0; i < prices.size(); i++){
             WebElement input = priceInputs.get(i);
