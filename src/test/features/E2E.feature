@@ -19,19 +19,19 @@ Feature: End 2 End
     And customer balance is at least $20.50
 
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
-    Then customer balance is decreased by $<Fee>
+    Then customer balance is decreased by $<BalanceDeductedBy>
 
     When I result race with the runners and positions
-      | Runner01  | 1        |
-      | Runner02  | 2        |
+      | Runner01 | 1 |
+      | Runner02 | 2 |
     And I settle race with prices
-      | Win   | <WinPrices>     |
-      | Place | <PlacePrices>   |
+      | Win   | <WinPrices>   |
+      | Place | <PlacePrices> |
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | Fee  | Payout | WinPrices | PlacePrices |
-      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50 | 2.75   | 4.20, 4.10| 3.90,1.29   |
-      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50 | 0.00   | 2.20, 5.10| 3.90,1.29   |
-      | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50 | 2.50   | 3.20, 1.10| 3.90,1.29   |
-      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00 | 5.25   | 5.20, 2.10| 3.90,1.29   |
+      | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50              | 2.75   | 4.20, 4.10 | 3.90,1.29   |
+      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50              | 0.00   | 2.20, 5.10 | 3.90,1.29   |
+      | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 2.50   | 3.20, 1.10 | 3.90,1.29   |
+      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 5.25   | 5.20, 2.10 | 3.90,1.29   |

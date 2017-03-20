@@ -54,7 +54,7 @@ public class WAPI implements WagerPlayerAPI {
         return new BigDecimal(balance);
     }
 
-    public static Object placeBetSingleWin(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
+    public Object placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Win.id);
@@ -94,7 +94,8 @@ public class WAPI implements WagerPlayerAPI {
         return newBalance;
     }
 
-    public static Object getEventMarkets(String sessionId, String evtId){
+    public Object getEventMarkets(String evtId){
+        String sessionId = getAccessToken(Config.customerUsername(),Config.customerPassword());
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_markets");
         fields.put("eid", evtId);

@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
+import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 
 public class MOBI_V2 implements WagerPlayerAPI {
+
     private static String mobi_v2_url = Config.moby_V2_URL();
 
     public BigDecimal getBalance(String accessToken) {
@@ -25,7 +27,8 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
         JSONArray errors = JsonPath.read(response, "$..error..error_message");
         Assertions.assertThat(errors).as("errors").isEmpty();
-        return new BigDecimal((Double) JsonPath.read(response, "$.available_balance"));
+        Double balance = Double.parseDouble(JsonPath.read(response, "$.balance"));
+        return new BigDecimal(balance);
     }
 
     public String getAccessToken(String username, String password) {
@@ -41,7 +44,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
         JSONArray access_token_response = JsonPath.read(response, "$..login_data..access_token");
         String access_token = access_token_response.get(0).toString();
-        Assertions.assertThat(access_token).withFailMessage("Access Token should not be empty.").isNotEmpty();
+        Assertions.assertThat(access_token).as("Access Token ").isNotEmpty();
         return access_token;
     }
 
@@ -52,12 +55,15 @@ public class MOBI_V2 implements WagerPlayerAPI {
         List<String> errors = JsonPath.read(response, "$..selections..error_message");
         Assertions.assertThat(errors).withFailMessage("Errors in response: %s", errors).isEmpty();
 
-        List<String> betSlipInfo = JsonPath.read(response, "$.betslip");
-        Assertions.assertThat(betSlipInfo).withFailMessage("BetSlip info should not be empty.").isNotEmpty();
+        JSONArray betId = JsonPath.read(response, "$..selections[0].bet_id");
+        Assertions.assertThat(betId).as("BetId ").isNotEmpty();
         return response;
     }
 
-    public static Object placeSingleWinBet(String accessToken, String type, int betType, String mpid, String winPrice, BigDecimal stake) {
+    public Object placeSingleWinBet(String accessToken, Integer productId , String mpid, String winPrice, BigDecimal stake) {
+
+        //Ignore productID
+        //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
         JSONObject obj = new JSONObject();
         obj.put("access_token", accessToken);
@@ -65,12 +71,12 @@ public class MOBI_V2 implements WagerPlayerAPI {
         JSONArray list = new JSONArray();
 
         JSONObject bet = new JSONObject();
-        bet.put("type", type);
+        bet.put("type", "single");
         bet.put("stake", stake.toString());
         bet.put("mpid", mpid);
         //options
         JSONObject bet_type = new JSONObject();
-        bet_type.put("bet_type", betType);
+        bet_type.put("bet_type", BetType.Win.id);
         //prices
         JSONObject win_price = new JSONObject();
         win_price.put("win_price", winPrice);
