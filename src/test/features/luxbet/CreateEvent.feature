@@ -1,4 +1,3 @@
-@wip
 @ui @luxbet
 Feature: Create Luxbet Event
 
@@ -30,6 +29,12 @@ Feature: Create Luxbet Event
       | Betting  | Display Price | Place |
       | Defaults | Display       | Web   |
       | Defaults | Display       | F2    |
+
+    And I enable Exotics "Tatts Exacta" product settings
+      | Betting | Enabled       | On    |
+      | Betting | Enabled       | Auto  |
+      | Betting | Display Price | Win   |
+      | Betting | Display Price | Place |
 
     And I enter market details
       | Market Status      | Live            |

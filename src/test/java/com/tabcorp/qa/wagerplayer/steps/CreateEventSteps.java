@@ -77,6 +77,11 @@ public class CreateEventSteps implements En {
             marketsPage.enableProductSettings(name, settings);
         });
 
+        When("^I enable Exotics \"([^\"]*)\" product settings$", (String name, DataTable table) -> {
+            List<List<String>> settings = table.raw();
+            marketsPage.enableProductSettings(name, settings, true);
+        });
+
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
             marketsPage.showMarketDetails();
