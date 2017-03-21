@@ -1,3 +1,4 @@
+@wip
 @ui @luxbet
 Feature: Create Luxbet Event
 

@@ -2,8 +2,8 @@
 Feature: End 2 End
 
   Background:
-    Given I am logged into WP UI and on Home Page
-    And I am logged into WP API
+    Given I am logged into WP API
+    And I am logged into WP UI and on Home Page
 
   Scenario Outline: Horse Race Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
@@ -25,8 +25,8 @@ Feature: End 2 End
       | Runner01 | 1 |
       | Runner02 | 2 |
     And I settle race with prices
-      | Win   | <WinPrices>   |
-      | Place | <PlacePrices> |
+      | win   | <WinPrices>   |
+      | place | <PlacePrices> |
     Then customer balance is increased by $<Payout>
 
     Examples:

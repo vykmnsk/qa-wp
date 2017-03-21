@@ -16,47 +16,55 @@ import java.util.Map;
 
 public class MOBI_V2 implements WagerPlayerAPI {
 
-    private static String mobi_v2_url = Config.moby_V2_URL();
+    private static String URL_ROOT = Config.moby_V2_URL();
+
+     static Object get(String url,Map<String,Object> queryParams){
+         Object response = REST.get(URL_ROOT + url, queryParams);
+         JSONArray errors = JsonPath.read(response, "$..error..error_message");
+         Assertions.assertThat(errors).as("errors").isEmpty();
+         return response;
+     }
+
+    static Object post(String url, Map<String, Object> fields) {
+        fields.put("output_type", "json");
+        Object response = REST.post(URL_ROOT + url, fields);
+        JSONArray errors = JsonPath.read(response, "$..error..error_text");
+        Assertions.assertThat(errors).as("Errors in response").isEmpty();
+        return response;
+    }
+
+    static Object put(String url, String reqJSON) {
+        Object response = REST.put(URL_ROOT + url, reqJSON);
+        List<String> errors = JsonPath.read(response, "$..selections..error_message");
+        Assertions.assertThat(errors).withFailMessage("Errors in response: %s", errors).isEmpty();
+        return response;
+    }
 
     public BigDecimal getBalance(String accessToken) {
-        String URL = mobi_v2_url + "/customer/balance" ;
-
-        Map<String, Object> queryParams = new HashMap();
+        Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("access_token", accessToken);
-        Object response = REST.get(URL, queryParams);
-
-        JSONArray errors = JsonPath.read(response, "$..error..error_message");
-        Assertions.assertThat(errors).as("errors").isEmpty();
+        Object response = get("/customer/balance", queryParams);
         Double balance = Double.parseDouble(JsonPath.read(response, "$.balance"));
         return new BigDecimal(balance);
     }
 
     public String getAccessToken(String username, String password) {
-        String URL = mobi_v2_url + "/login";
-        Map<String, Object> fields = new HashMap();
-        fields.put("output_type", "json");
+        Map<String, Object> fields = new HashMap<>();
         fields.put("username", username);
         fields.put("password", password);
+        Object response = post("/login", fields);
 
-        Object response = REST.post(URL, fields);
-        JSONArray errors = JsonPath.read(response, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response").isEmpty();
-
-        JSONArray access_token_response = JsonPath.read(response, "$..login_data..access_token");
-        String access_token = access_token_response.get(0).toString();
-        Assertions.assertThat(access_token).as("Access Token ").isNotEmpty();
-        return access_token;
+        JSONArray accessTokens = JsonPath.read(response, "$..login_data..access_token");
+        Assertions.assertThat(accessTokens).as("Got one token").hasSize(1);
+        String accessToken = accessTokens.get(0).toString();
+        Assertions.assertThat(accessToken).as("Access Token ").isNotEmpty();
+        return accessToken;
     }
 
     private static Object placeBet(String reqJSON) {
-        String URL = mobi_v2_url + "/betslip/checkout" ;
-        Object response = REST.put(URL, reqJSON);
-
-        List<String> errors = JsonPath.read(response, "$..selections..error_message");
-        Assertions.assertThat(errors).withFailMessage("Errors in response: %s", errors).isEmpty();
-
+        Object response = put("/betslip/checkout", reqJSON);
         JSONArray betId = JsonPath.read(response, "$..selections[0].bet_id");
-        Assertions.assertThat(betId).as("BetId ").isNotEmpty();
+        Assertions.assertThat(betId).as("BetId").isNotEmpty();
         return response;
     }
 
