@@ -1,4 +1,4 @@
-@e2e
+@ex2e
 Feature: End 2 End
 
   Background:
@@ -35,7 +35,7 @@ Feature: End 2 End
 
     Examples:
       | ProductName    | BetType        | BetOn                               | Stake | BalanceDeductedBy | Payout | WinPrices | PlacePrices |
-      | NSW Quinella   | NSW Quinella   | Runner01,Runner02                   | 3.00  |                   |        |           |             |
-      | NSW Exacta     | NSW Exacta     | Runner01,Runner02                   | 3.00  |                   |        |           |             |
-      | NSW Trifecta   | NSW Trifecta   | Runner01,Runner02,Runner03          | 3.00  |                   |        |           |             |
-      | NSW First Four | NSW First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  |                   |        |           |             |
+      | NSW Quinella   | NSW Quinella   | Runner01,Runner02                   | 3.00  | 3.00              | 1.50   |           |             |
+      | NSW Exacta     | NSW Exacta     | Runner01,Runner02                   | 3.00  | 3.00              | 1.50   |           |             |
+      | NSW Trifecta   | NSW Trifecta   | Runner01,Runner02,Runner03          | 3.00  | 3.00              | 1.50   |           |             |
+      | NSW First Four | NSW First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | 3.00              | 1.50   |           |             |
