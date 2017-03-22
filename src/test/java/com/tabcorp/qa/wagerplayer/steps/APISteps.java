@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
@@ -62,15 +63,19 @@ public class APISteps implements En {
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
-                    Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
+                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+                    Map<WAPI.KEY, List<String>> sel = WAPI.readSelectionMultiple(resp, runners, prodId);
 
-                    List<String> newList = Arrays.asList();
+                    String marketId = sel.get(WAPI.KEY.MARKET_ID).toString().replaceAll("\\[","").replaceAll("]","");
+                    List<String> selectionIds = sel.get(WAPI.KEY.SELECTION_ID);
+
                     Object response;
                     switch (betTypeName.toUpperCase()) {
-                        case "NSW Quinella":
+                        case "QUINELLA":
                             response = WAPI.placeBetExoticQuinellaAndExacta(accessToken, prodId,
-                                    newList , sel.get(WAPI.KEY.MARKET_ID), stake);
+                                    selectionIds , marketId, stake);
                             break;
 //                        case "NSW Exacta":
 //                            response = WAPI.placeBetExoticQuinellaAndExacta(accessToken, prodId,
