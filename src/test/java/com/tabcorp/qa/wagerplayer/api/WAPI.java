@@ -76,7 +76,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeBetSingleEW(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
+    public Object placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.EachWay.id);

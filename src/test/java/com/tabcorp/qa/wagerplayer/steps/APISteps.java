@@ -47,7 +47,7 @@ public class APISteps implements En {
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         case "EACHWAY":
-                            WAPI.placeBetSingleEW(accessToken, prodId,
+                            Config.getAPI().placeSingleEachwayBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         default:

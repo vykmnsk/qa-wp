@@ -14,4 +14,5 @@ public interface WagerPlayerAPI {
    BigDecimal getBalance(String sessionToken);
    Object placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake);
    Object placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake);
+   Object placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
 }

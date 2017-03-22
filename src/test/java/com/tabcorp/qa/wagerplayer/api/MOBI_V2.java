@@ -76,7 +76,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         JSONObject price = new JSONObject();
         price.put("win_price", winPrice);
         String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Win.id, price);
-        return MOBI_V2.placeBet(betPayload);
+        return placeBet(betPayload);
     }
 
     public Object placeSinglePlaceBet(String accessToken, Integer productId , String mpid, String placePrice, BigDecimal stake) {
@@ -88,7 +88,20 @@ public class MOBI_V2 implements WagerPlayerAPI {
         price.put("place_price", placePrice);
 
         String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Place.id, price);
-        return MOBI_V2.placeBet(betPayload);
+        return placeBet(betPayload);
+    }
+
+    public Object placeSingleEachwayBet(String accessToken, Integer productId , String mpid, String winPrice, String placePrice, BigDecimal stake) {
+        //Ignore productID
+        //Added to ensure function signature remains same as to WagerPlayerAPI interface.
+
+        //prices
+        JSONObject price = new JSONObject();
+        price.put("place_price", placePrice);
+        price.put("win_price", winPrice);
+
+        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.EachWay.id, price);
+        return placeBet(betPayload);
     }
 
     private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject)  {

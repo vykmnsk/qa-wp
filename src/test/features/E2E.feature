@@ -34,4 +34,4 @@ Feature: End 2 End
       | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50              | 2.75   | 4.20, 4.10 | 3.90,1.29   |
       | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50              | 0.00   | 2.20, 5.10 | 3.90,1.29   |
       | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 2.50   | 3.20, 1.10 | 3.90,1.29   |
-      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 5.25   | 5.20, 2.10 | 3.90,1.29   |
+      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 5.50   | 5.20, 2.10 | 3.90,1.29   |
