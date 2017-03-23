@@ -64,4 +64,9 @@ public class Helpers {
         List<String> pricesTxts = Arrays.asList(winnerPriceCSV.split(",(\\s)*"));
         return pricesTxts.stream().map(BigDecimal::new).collect(Collectors.toList());
     }
+
+    public static BigDecimal roundOff(BigDecimal value) {
+        int decimalPlaces = 2;
+        return value.setScale(decimalPlaces,BigDecimal.ROUND_HALF_UP);
+    }
 }
