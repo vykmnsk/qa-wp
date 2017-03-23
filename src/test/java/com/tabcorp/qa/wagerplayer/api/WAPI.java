@@ -115,28 +115,6 @@ public class WAPI implements WagerPlayerAPI {
         return postWithQueryStrings(fields,selectionIds,"slot[1][selection][]");
     }
 
-//    public static Object placeBetExoticTrifecta(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
-//        Map<String, Object> fields = wapiAuthFields(sessionId);
-//        fields.put("action", "bet_place_bet");
-//        fields.put("product_id", productId);
-//        fields.put("slot[1][market]", marketId);
-//        fields.put("amount", stake);
-//        return postWithQueryStrings(fields,selectionIds,"slot[1][selection][]");
-//    }
-//
-//    public static Object placeBetExoticFirstFour(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
-//        Map<String, Object> fields = wapiAuthFields(sessionId);
-//        fields.put("action", "bet_place_bet");
-//        fields.put("product_id", productId);
-//        fields.put("slot[1][selection][]", selectionIds.get(0));
-//        fields.put("slot[1][selection][]", selectionIds.get(1));
-//        fields.put("slot[1][selection][]", selectionIds.get(2));
-//        fields.put("slot[1][selection][]", selectionIds.get(3));
-//        fields.put("slot[1][market]", marketId);
-//        fields.put("amount", stake);
-//        return post(fields);
-//    }
-
     public static BigDecimal readNewBalance(Object resp) {
         Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
