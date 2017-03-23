@@ -1,16 +1,15 @@
 package com.tabcorp.qa.wagerplayer.api;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.jayway.jsonpath.JsonPath;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
-import org.apache.commons.collections4.MultiMap;
-import org.apache.commons.collections4.map.MultiValueMap;
 import org.assertj.core.api.Assertions;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -26,13 +25,28 @@ public class WAPI implements WagerPlayerAPI {
         return fields;
     }
 
+    private static Object postWithQueryStrings(Map<String, Object> fields,List selectionList, String slotSelectionKey) {
+        fields.put("output_type", "json");
+
+        HttpResponse<String> response;
+        try {
+            response = Unirest.post(URL)
+                    .queryString(fields)
+                    .queryString(slotSelectionKey,selectionList)
+                    .asString();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        return REST.verifyAndParseResponse(response);
+    }
+
     private static Map<String, Object> wapiAuthFields(String sessionId) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("session_id", sessionId);
         return fields;
     }
 
-    static Object post(Map<String, Object> fields) {
+    static Object post(Map<String,Object> fields){
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
@@ -91,42 +105,37 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeBetExoticQuinellaAndExacta(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
-        MultiValueMap fields = new MultiValueMap();
-        Map<String, Object> auth = wapiAuthFields(sessionId);
+    public static Object placeExoticBetsOnSingleEvent(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
-        fields.put("slot[1][selection][]", Arrays.asList(selectionIds.get(0),selectionIds.get(1)));
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
-        fields.putAll(auth);
-        return post(fields);
+        return postWithQueryStrings(fields,selectionIds,"slot[1][selection][]");
     }
 
-    public static Object placeBetExoticTrifecta(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
-        Map<String, Object> fields = wapiAuthFields(sessionId);
-        fields.put("action", "bet_place_bet");
-        fields.put("product_id", productId);
-        fields.put("slot[1][selection][]", selectionIds.get(0));
-        fields.put("slot[1][selection][]", selectionIds.get(1));
-        fields.put("slot[1][selection][]", selectionIds.get(2));
-        fields.put("slot[1][market]", marketId);
-        fields.put("amount", stake);
-        return post(fields);
-    }
-
-    public static Object placeBetExoticFirstFour(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
-        Map<String, Object> fields = wapiAuthFields(sessionId);
-        fields.put("action", "bet_place_bet");
-        fields.put("product_id", productId);
-        fields.put("slot[1][selection][]", selectionIds.get(0));
-        fields.put("slot[1][selection][]", selectionIds.get(1));
-        fields.put("slot[1][selection][]", selectionIds.get(2));
-        fields.put("slot[1][selection][]", selectionIds.get(3));
-        fields.put("slot[1][market]", marketId);
-        fields.put("amount", stake);
-        return post(fields);
-    }
+//    public static Object placeBetExoticTrifecta(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+//        Map<String, Object> fields = wapiAuthFields(sessionId);
+//        fields.put("action", "bet_place_bet");
+//        fields.put("product_id", productId);
+//        fields.put("slot[1][market]", marketId);
+//        fields.put("amount", stake);
+//        return postWithQueryStrings(fields,selectionIds,"slot[1][selection][]");
+//    }
+//
+//    public static Object placeBetExoticFirstFour(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+//        Map<String, Object> fields = wapiAuthFields(sessionId);
+//        fields.put("action", "bet_place_bet");
+//        fields.put("product_id", productId);
+//        fields.put("slot[1][selection][]", selectionIds.get(0));
+//        fields.put("slot[1][selection][]", selectionIds.get(1));
+//        fields.put("slot[1][selection][]", selectionIds.get(2));
+//        fields.put("slot[1][selection][]", selectionIds.get(3));
+//        fields.put("slot[1][market]", marketId);
+//        fields.put("amount", stake);
+//        return post(fields);
+//    }
 
     public static BigDecimal readNewBalance(Object resp) {
         Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");

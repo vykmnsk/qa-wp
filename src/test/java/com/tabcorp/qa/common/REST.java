@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class REST {
     private static Logger log = LoggerFactory.getLogger(REST.class);
 
-    private static Object verifyAndParseResponse(HttpResponse<String> response) {
+    public static Object verifyAndParseResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
         assertThat(response.getBody()).as("response body").isNotEmpty();
         return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());

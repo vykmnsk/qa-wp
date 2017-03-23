@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Storage;
-import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
@@ -73,22 +72,13 @@ public class APISteps implements En {
 
                     Object response;
                     switch (betTypeName.toUpperCase()) {
+                        case "FIRST FOUR":
+                        case "TRIFECTA":
+                        case "EXACTA":
                         case "QUINELLA":
-                            response = WAPI.placeBetExoticQuinellaAndExacta(accessToken, prodId,
+                            response = WAPI.placeExoticBetsOnSingleEvent(accessToken, prodId,
                                     selectionIds , marketId, stake);
                             break;
-//                        case "NSW Exacta":
-//                            response = WAPI.placeBetExoticQuinellaAndExacta(accessToken, prodId,
-//                                    sel.get(WAPI.KEY.SELECTION_ID), sel.get(WAPI.KEY.MARKET_ID), stake);
-//                            break;
-//                        case "NSW Trifecta":
-//                            response = WAPI.placeBetExoticTrifecta(accessToken, prodId,
-//                                    sel.get(WAPI.KEY.SELECTION_ID), sel.get(WAPI.KEY.MARKET_ID), stake);
-//                            break;
-//                        case "NSW First Four":
-//                            response = WAPI.placeBetExoticFirstFour(accessToken, prodId,
-//                                    sel.get(WAPI.KEY.SELECTION_ID), sel.get(WAPI.KEY.MARKET_ID), stake);
-//                            break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
