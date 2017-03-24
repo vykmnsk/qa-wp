@@ -1,9 +1,6 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
@@ -12,7 +9,6 @@ import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.*;
-
 
 public class WAPI implements WagerPlayerAPI {
 
@@ -25,30 +21,23 @@ public class WAPI implements WagerPlayerAPI {
         return fields;
     }
 
-    private static Object postWithQueryStrings(Map<String, Object> fields,List selectionList, String slotSelectionKey) {
-        fields.put("output_type", "json");
-
-        HttpResponse<String> response;
-        try {
-            response = Unirest.post(URL)
-                    .queryString(fields)
-                    .queryString(slotSelectionKey,selectionList)
-                    .asString();
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
-        }
-        return REST.verifyAndParseResponse(response);
-    }
-
     private static Map<String, Object> wapiAuthFields(String sessionId) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("session_id", sessionId);
         return fields;
     }
 
-    static Object post(Map<String,Object> fields){
+    static Object post(Map<String, Object> fields) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
+        JSONArray errors = JsonPath.read(resp, "$..error..error_text");
+        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        return resp;
+    }
+
+    static Object postWithQueryStrs(Map<String, Object> fields, List selectionIds, String key) {
+        fields.put("output_type", "json");
+        Object resp = REST.postWithQueryStrings(URL, fields, selectionIds, key);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
         Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
         return resp;
@@ -107,12 +96,11 @@ public class WAPI implements WagerPlayerAPI {
 
     public static Object placeExoticBetsOnSingleEvent(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
-
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
-        return postWithQueryStrings(fields,selectionIds,"slot[1][selection][]");
+        return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
     }
 
     public static BigDecimal readNewBalance(Object resp) {
@@ -121,8 +109,8 @@ public class WAPI implements WagerPlayerAPI {
         return newBalance;
     }
 
-    public Object getEventMarkets(String evtId){
-        String sessionId = getAccessToken(Config.customerUsername(),Config.customerPassword());
+    public Object getEventMarkets(String evtId) {
+        String sessionId = getAccessToken(Config.customerUsername(), Config.customerPassword());
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_markets");
         fields.put("eid", evtId);
@@ -150,7 +138,7 @@ public class WAPI implements WagerPlayerAPI {
 
         for (String selection : selName) {
             String selPath = "$.RSP.markets.market[0].selections.selection";
-            sels.add(Arrays.asList(readIdAttr(resp, selPath, selection, "id")).toString().replaceAll("\\[","").replaceAll("]",""));
+            sels.add(Arrays.asList(readSelectionId(resp, selPath, selection, "id")).toString().replaceAll("\\[","").replaceAll("]",""));
             sel.put(KEY.SELECTION_ID, sels);
         }
         return sel;
@@ -173,7 +161,7 @@ public class WAPI implements WagerPlayerAPI {
         return attr;
     }
 
-    private static String readIdAttr(Object resp, String pricePath, String runnerName, String attrName) {
+    private static String readSelectionId(Object resp, String pricePath, String runnerName, String attrName) {
         String path = pricePath + jfilter("name", runnerName);
         JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
         Assertions.assertThat(attrs.size())
@@ -184,11 +172,11 @@ public class WAPI implements WagerPlayerAPI {
         return attr;
     }
 
-    private static String readMarketAttr(Object resp, String marketIdPath, String attrName) {
+    private static String readMarketAttr(Object resp, String marketIdPath, String marketName) {
         String path = marketIdPath + jfilter("name", "Racing Live");
-        JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
+        JSONArray attrs = JsonPath.read(resp, path + "." + marketName);
         Assertions.assertThat(attrs.size())
-                .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, marketIdPath))
+                .as(String.format("expected to find one attribute '%s' at path='%s'", marketName, marketIdPath))
                 .isEqualTo(1);
         String attr = String.valueOf(attrs.get(0));
         Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();

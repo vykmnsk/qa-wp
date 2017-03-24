@@ -1,4 +1,5 @@
-@ex2e
+@wip
+@exotic-bets
 Feature: Placing and Settling Exotic Bets for a Single Event
 
   Background:
@@ -26,11 +27,11 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result race with the runners and positions
-      | Runner01 | 1 |
-      | Runner02 | 2 |
-    And I settle race with prices
-    Then customer balance is increased by $<Payout>
+#    When I result race with the runners and positions
+#      | Runner01 | 1 |
+#      | Runner02 | 2 |
+#    And I settle race with prices
+#    Then customer balance is increased by $<Payout>
 
     Examples:
       | ProductName    | BetType    | BetOn                               | Stake | BalanceDeductedBy | Payout |
