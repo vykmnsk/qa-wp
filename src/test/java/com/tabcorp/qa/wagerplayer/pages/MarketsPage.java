@@ -85,8 +85,8 @@ public class MarketsPage extends AppPage {
     @FindBy(css = "input[type=hidden][name=event_id]")
     private WebElement eventId;
 
-    @FindBy(css = "table.bet_types_content_table_header.exotics select[name^=add_product_id]")
-    private WebElement exoticsProductSel;
+    @FindBy(css = "select[name='add_product_id[]']")
+    private List<WebElement> addProductElems;
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
     private static Logger log = LoggerFactory.getLogger(MarketsPage.class);
@@ -164,12 +164,8 @@ public class MarketsPage extends AppPage {
     }
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
-        enableProductSettings(prodName, settings, false);
-    }
-
-    public void enableProductSettings(String prodName, List<List<String>> settings, boolean tryAddExoticsProd) {
         showMarketManagement();
-        WebElement tr = enableFindProductRow(prodName, tryAddExoticsProd);
+        WebElement tr = enableFindProductRow(prodName);
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         Storage.put(Storage.KEY.PRODUCT_ID, findProductID(tr));
         log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
@@ -180,17 +176,30 @@ public class MarketsPage extends AppPage {
         updateBtn.click();
     }
 
-    private WebElement enableFindProductRow(String prodName, boolean tryAddExoticsProd){
+    private WebElement enableFindProductRow(String prodName){
         Function<String, WebElement> findProdRow = name -> productRows.stream().filter(p -> p.getText().contains(name)).findFirst().orElse(null);
         WebElement tr = findProdRow.apply(prodName);
-        if (null == tr && tryAddExoticsProd){
-            (new Select(exoticsProductSel)).selectByVisibleText(prodName);
-            WebElement plusBtn = findParent(exoticsProductSel).findElement(addProductBtnCSS);
-            plusBtn.click();
+        if (null == tr){
+            boolean added = addProduct(prodName);
+            assertThat(added).as("Added product " + prodName).isTrue();
             showMarketManagement();
             tr = findProdRow.apply(prodName);
         }
         return tr;
+    }
+
+    private boolean addProduct(String prodName){
+        for(WebElement elem : addProductElems) {
+            Select select = new Select(elem);
+            WebElement prodOption = select.getOptions().stream().filter(o -> prodName.equals(o.getText())).findFirst().orElse(null);
+            if (null != prodOption){
+                select.selectByValue(prodOption.getAttribute("value"));
+                WebElement plusBtn = findParent(elem).findElement(addProductBtnCSS);
+                plusBtn.click();
+                return true;
+            }
+        }
+        return false;
     }
 
     private Integer findProductID(WebElement tr){

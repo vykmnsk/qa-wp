@@ -1,3 +1,4 @@
+@wip
 @ui @redbook
 Feature: Create Redbook Event
 
@@ -62,6 +63,14 @@ Feature: Create Redbook Event
     And I enable "Forecast Fixed" product settings
       | Defaults | Display | Web |
       | Defaults | Display | F2  |
+
+    And I enable "Tricast SP" product settings
+      | Betting   | Enabled        | On    |
+      | Betting   | Enabled        | Auto  |
+      | Betting   | Display Price  | Win   |
+      | Betting   | Display Price  | Place |
+      | Defaults  | Display        | Web   |
+      | Defaults  | Display        | F2    |
 
     And I enter market details
       | Market Status      | Live            |

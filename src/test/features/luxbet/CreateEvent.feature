@@ -30,7 +30,7 @@ Feature: Create Luxbet Event
       | Defaults | Display       | Web   |
       | Defaults | Display       | F2    |
 
-    And I enable Exotics "Tatts Exacta" product settings
+    And I enable "Tatts Exacta" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
