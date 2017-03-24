@@ -94,7 +94,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeExoticBets(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
@@ -134,7 +134,8 @@ public class WAPI implements WagerPlayerAPI {
         ArrayList<String> sels = new ArrayList<>();
 
         String marketIdPath = "$.RSP.markets.market[0]";
-        sel.put(KEY.MARKET_ID, Arrays.asList(readMarketAttr(resp, marketIdPath, "id").toString().replaceAll("\\[]","").replaceAll("]","")));
+        String market = readMarketId(resp, marketIdPath, "id").toString();
+        sel.put(KEY.MARKET_ID, Arrays.asList(stripBrackets(market));
 
         for (String selection : selName) {
             String selPath = "$.RSP.markets.market[0].selections.selection";
@@ -142,6 +143,11 @@ public class WAPI implements WagerPlayerAPI {
             sel.put(KEY.SELECTION_ID, sels);
         }
         return sel;
+    }
+
+    private static String stripBrackets(String stringWithBrackets) {
+        stringWithBrackets.replaceAll("\\[]","").replaceAll("]","");
+        return stringWithBrackets;
     }
 
     private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
@@ -172,7 +178,7 @@ public class WAPI implements WagerPlayerAPI {
         return attr;
     }
 
-    private static String readMarketAttr(Object resp, String marketIdPath, String marketName) {
+    private static String readMarketId(Object resp, String marketIdPath, String marketName) {
         String path = marketIdPath + jfilter("name", "Racing Live");
         JSONArray attrs = JsonPath.read(resp, path + "." + marketName);
         Assertions.assertThat(attrs.size())

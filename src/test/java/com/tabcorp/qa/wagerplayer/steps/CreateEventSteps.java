@@ -134,6 +134,31 @@ public class CreateEventSteps implements En {
               marketsPage.updateRaceNumber(raceNumber);
            });
 
+        When("^I create a default event with \"([^\"]*)\", \"([^\"]*)\" and \"([^\"]*)\" details$", (String basename, String runnerInfo, String priceInfo, DataTable table) -> {
+            Map<String, String> evt = table.asMap(String.class, String.class);
+            int inMinutes = 30;
+            String betInRunType = "Both Allowed";
+            String createMarket = "Racing Live";
+
+            String evtBaseName = (String) Helpers.nonNullGet(evt, "base name");
+            eventName = Helpers.createUniqueName(evtBaseName);
+            String runnersText = (String) Helpers.nonNullGet(evt, "Runners");
+            List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
+
+            String pricesText = (String) Helpers.nonNullGet(evt, "Prices");
+            List<String> pricesTokens = Arrays.asList(pricesText.split(",\\s+"));
+            List<BigDecimal> prices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
+
+            newEvtPage = new NewEventPage();
+            newEvtPage.load();
+            marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
+            marketsPage.verifyLoaded();
+            marketsPage.enterPrices(prices);
+            marketsPage.verifySuccessStatus("Market Created");
+            marketsPage.showMarketManagement();
+            marketsPage.updateRaceNumber(raceNumber);
+        });
+
         When("^I result race with the runners and positions$", (DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
             header = new HeaderPage();

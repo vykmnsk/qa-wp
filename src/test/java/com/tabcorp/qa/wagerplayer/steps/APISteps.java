@@ -77,7 +77,7 @@ public class APISteps implements En {
                         case "TRIFECTA":
                         case "EXACTA":
                         case "QUINELLA":
-                            response = WAPI.placeExoticBets(accessToken, prodId,
+                            response = WAPI.placeExoticBet(accessToken, prodId,
                                     selectionIds , marketId, stake);
                             break;
                         default:
