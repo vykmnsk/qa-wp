@@ -146,7 +146,6 @@ public class WAPI implements WagerPlayerAPI {
         ArrayList<String> sels = new ArrayList<>();
 
         String marketIdPath = "$.RSP.markets.market[0]";
-        //String marketID = readMarketAttr(resp, marketIdPath, "id").replaceAll("\\[", "").replaceAll("]", "");
         sel.put(KEY.MARKET_ID, Arrays.asList(readMarketAttr(resp, marketIdPath, "id").toString().replaceAll("\\[]","").replaceAll("]","")));
 
         for (String selection : selName) {
