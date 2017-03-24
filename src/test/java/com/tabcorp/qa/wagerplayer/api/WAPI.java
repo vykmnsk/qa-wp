@@ -133,7 +133,7 @@ public class WAPI implements WagerPlayerAPI {
         HashMap<KEY, List<String>> sel = new HashMap<>();
         ArrayList<String> sels = new ArrayList<>();
 
-        String marketIdPath = "$.RSP.markets.market[0]";
+        String marketIdPath = "$.RSP.markets.market[*][?(@.name == 'Racing Live')]";
         String market = readMarketId(resp, marketIdPath, "id").toString();
         sel.put(KEY.MARKET_ID, Arrays.asList(stripBrackets(market)));
 
