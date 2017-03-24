@@ -135,7 +135,7 @@ public class WAPI implements WagerPlayerAPI {
 
         String marketIdPath = "$.RSP.markets.market[0]";
         String market = readMarketId(resp, marketIdPath, "id").toString();
-        sel.put(KEY.MARKET_ID, Arrays.asList(stripBrackets(market));
+        sel.put(KEY.MARKET_ID, Arrays.asList(stripBrackets(market)));
 
         for (String selection : selName) {
             String selPath = "$.RSP.markets.market[0].selections.selection";
