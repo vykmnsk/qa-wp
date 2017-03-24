@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
@@ -50,7 +51,7 @@ public class APISteps implements En {
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         case "EACHWAY":
-                            WAPI.placeBetSingleEW(accessToken, prodId,
+                            Config.getAPI().placeSingleEachwayBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         default:
@@ -88,18 +89,18 @@ public class APISteps implements En {
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
             BigDecimal diff = new BigDecimal(diffText);
-            assertThat(balanceBefore.subtract(balanceAfterBet).stripTrailingZeros()).isEqualTo(diff.stripTrailingZeros());
+            assertThat(Helpers.roundOff(balanceBefore.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
         });
 
         Then("^customer balance is increased by \\$(\\d+.\\d\\d)$", (String payoutText) -> {
             BigDecimal payout = new BigDecimal(payoutText);
             BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
-            assertThat(balanceAfterSettle.subtract(balanceAfterBet).stripTrailingZeros()).isEqualTo(payout.stripTrailingZeros());
+            assertThat(Helpers.roundOff(balanceAfterSettle.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(payout));
         });
 
         Then("^customer balance is not changed$", () -> {
             BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
-            assertThat(balanceAfterSettle.stripTrailingZeros()).isEqualTo(balanceAfterBet.stripTrailingZeros());
+            assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
         });
     }
 

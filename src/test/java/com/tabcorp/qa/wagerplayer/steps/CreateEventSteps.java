@@ -156,6 +156,11 @@ public class CreateEventSteps implements En {
             settlementPage.accept();
             settlementPage.settle();
         });
+
+        And("^I settle race", () -> {
+            settlementPage.accept();
+            settlementPage.settle();
+        });
     }
 
 
