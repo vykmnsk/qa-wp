@@ -1,5 +1,5 @@
 @ex2e
-Feature: End 2 End
+Feature: Placing and Settling Exotic Bets for a Single Event
 
   Background:
     Given I am logged into WP UI and on Home Page
@@ -35,6 +35,6 @@ Feature: End 2 End
     Examples:
       | ProductName    | BetType    | BetOn                               | Stake | BalanceDeductedBy | Payout |
       | NSW Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | 3.00              | 1.50   |
-      | NSW Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | 3.00              | 1.50   |
-      | NSW Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | 3.00              | 1.50   |
-      | NSW First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | 3.00              | 1.50   |
+      | NSW Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | 6.00              | 1.50   |
+      | NSW Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | 18.00             | 1.50   |
+#      | NSW First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | 3.00              | 1.50   |
