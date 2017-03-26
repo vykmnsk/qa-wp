@@ -153,7 +153,7 @@ public class CreateEventSteps implements En {
             settlementPage.settle();
         });
 
-        And("^I settle race", () -> {
+        And("^I settle race$", () -> {
             settlementPage.accept();
             settlementPage.settle();
         });
