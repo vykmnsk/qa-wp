@@ -66,7 +66,7 @@ public class APISteps implements En {
                     if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
-                    Map<WAPI.KEY, List<String>> sel = WAPI.readSelectionMultiple(resp, runners, prodId);
+                    Map<WAPI.KEY, List<String>> sel = WAPI.readSelectionMultiple(resp, runners);
 
                     String marketId = sel.get(WAPI.KEY.MARKET_ID).toString().replaceAll("\\[","").replaceAll("]","");
                     List<String> selectionIds = sel.get(WAPI.KEY.SELECTION_ID);

@@ -10,6 +10,8 @@ import org.assertj.core.api.Assertions;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static com.tabcorp.qa.common.Helpers.stripBrackets;
+
 public class WAPI implements WagerPlayerAPI {
 
     private static String URL = Config.wapiURL();
@@ -129,25 +131,21 @@ public class WAPI implements WagerPlayerAPI {
         return sel;
     }
 
-    public static Map<KEY, List<String>> readSelectionMultiple(Object resp, List<String> selName, Integer prodId) {
+    public static Map<KEY, List<String>> readSelectionMultiple(Object resp, List<String> selName) {
         HashMap<KEY, List<String>> sel = new HashMap<>();
         ArrayList<String> sels = new ArrayList<>();
 
         String marketIdPath = "$.RSP.markets.market[*][?(@.name == 'Racing Live')]";
-        String market = readMarketId(resp, marketIdPath, "id").toString();
+        String market = readMarketId(resp, marketIdPath, "id");
         sel.put(KEY.MARKET_ID, Arrays.asList(stripBrackets(market)));
 
         for (String selection : selName) {
             String selPath = "$.RSP.markets.market[0].selections.selection";
-            sels.add(Arrays.asList(readSelectionId(resp, selPath, selection, "id")).toString().replaceAll("\\[","").replaceAll("]",""));
+            String selectionId = readSelectionId(resp, selPath, selection, "id");
+            sels.add(stripBrackets(selectionId));
             sel.put(KEY.SELECTION_ID, sels);
         }
         return sel;
-    }
-
-    private static String stripBrackets(String stringWithBrackets) {
-        stringWithBrackets.replaceAll("\\[]","").replaceAll("]","");
-        return stringWithBrackets;
     }
 
     private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
