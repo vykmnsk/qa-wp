@@ -9,10 +9,12 @@ import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WAPI implements WagerPlayerAPI {
 
-    private static String URL = Config.wapiURL();
+    private static final String URL = Config.wapiURL();
+    private static final String RESP_ROOT_PATH = "$.RSP";
 
     private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();
@@ -119,25 +121,47 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
-        String selPath = "$.RSP.markets.market[0].selections.selection" + jfilter("name", selName);
-        String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId.toString());
+        String mktPath = ".markets.market[0]";
+        String selPath = ".selections.selection" + jfilter("name", selName);
+        String pricePath = ".prices.price" + jfilter("product_id", prodId.toString());
+        String path = mktPath + selPath + pricePath;
 
         HashMap<KEY, String> sel = new HashMap<>();
-        sel.put(KEY.MPID, readPriceAttr(resp, pricePath, BetType.Win.name(), "mpid"));
-        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, pricePath, BetType.Win.name(), "precise_price"));
-        sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, pricePath, BetType.Place.name(), "precise_price"));
+        sel.put(KEY.MPID, readPriceAttr(resp, path, BetType.Win.name(), "mpid"));
+        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, path, BetType.Win.name(), "precise_price"));
+        sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, path, BetType.Place.name(), "precise_price"));
         return sel;
     }
 
     private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
-        JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
 
         //TODO hack to bypass broken WAPI for Redbook
+        JSONArray attrs = JsonPath.read(resp, RESP_ROOT_PATH + path + "." + attrName);
         if (attrs.size() != 1 && BetType.Place.name().equals(betTypeName)) {
             return "1";
         }
+        return readOneAttr(resp, path, attrName);
+    }
 
+    public static String readMarketId(Object resp, String mktName) {
+        String mktPath = ".markets.market" + jfilter("name", mktName);
+        return readOneAttr(resp, mktPath, "id");
+    }
+
+    public static List<String> readSelectionIds(Object resp, String marketId, List<String> selectionNames) {
+        return selectionNames.stream().map(sn -> readSelectionId(resp, marketId, sn)).collect(Collectors.toList());
+    }
+
+    private static String readSelectionId(Object resp, String marketId, String selectionName) {
+        String mktPath = ".markets.market" + jfilter("id", marketId);
+        String selPath = ".selections.selection" + jfilter("name", selectionName);
+        return readOneAttr(resp, mktPath + selPath, "id");
+    }
+
+    private static String readOneAttr(Object resp, String basePath, String attrName) {
+        String path = RESP_ROOT_PATH + basePath + "." + attrName;
+        JSONArray attrs = JsonPath.read(resp, path);
         Assertions.assertThat(attrs.size())
                 .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, path))
                 .isEqualTo(1);
@@ -145,35 +169,6 @@ public class WAPI implements WagerPlayerAPI {
         Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
         return attr;
     }
-
-    public static String readFirstMarketId(Object resp) {
-        String path = "$.RSP.markets.market[0].id";
-        String id = JsonPath.read(resp, path);
-        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
-        return id;
-    }
-
-    public static List<String> readSelectionIds(Object resp, List<String> selNames) {
-        List<String> selIds = new ArrayList<>();
-        for (String name : selNames) {
-            String id = readSelectionId(resp, name);
-            selIds.add(id);
-        }
-        return selIds;
-    }
-
-    private static String readSelectionId(Object resp, String runnerName) {
-        String selPath = "$.RSP.markets.market[0].selections.selection";
-        String path = selPath + jfilter("name", runnerName);
-        JSONArray ids = JsonPath.read(resp, path + ".id");
-        Assertions.assertThat(ids.size())
-                .as(String.format(String.format("expected to find one attribute '%s' at path='%s'", "id", path)))
-                .isEqualTo(1);
-        String id = String.valueOf(ids.get(0));
-        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
-        return id;
-    }
-
 
     private static String jfilter(String attr, String value) {
         return String.format("[?(@.%s == '%s')]", attr, value);

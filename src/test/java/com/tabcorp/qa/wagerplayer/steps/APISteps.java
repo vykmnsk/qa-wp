@@ -68,8 +68,8 @@ public class APISteps implements En {
                     if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
 
-                    String marketId = WAPI.readFirstMarketId(resp);
-                    List<String> selectionIds = WAPI.readSelectionIds(resp, runners);
+                    String marketId = WAPI.readMarketId(resp, "Racing Live");
+                    List<String> selectionIds = WAPI.readSelectionIds(resp, marketId, runners);
 
                     Object response;
                     switch (betTypeName.toUpperCase()) {
