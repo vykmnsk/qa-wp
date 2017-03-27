@@ -1,7 +1,5 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.common.AnyPage;
-import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
 import org.openqa.selenium.WebElement;
@@ -11,10 +9,8 @@ import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 
 public class NewEventPage extends AppPage{

@@ -7,6 +7,9 @@ import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
@@ -55,6 +58,31 @@ public class APISteps implements En {
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
                     balanceAfterBet = Config.getAPI().getBalance(accessToken);
+                });
+
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String runner, BigDecimal stake) -> {
+                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+
+                    if (null == wapi) wapi = new WAPI();
+                    Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
+
+                    String marketId = WAPI.readFirstMarketId(resp);
+                    List<String> selectionIds = WAPI.readSelectionIds(resp, runners);
+
+                    Object response;
+                    switch (betTypeName.toUpperCase()) {
+                        case "TRIFECTA":
+                        case "EXACTA":
+                        case "QUINELLA":
+                            response = WAPI.placeExoticBet(accessToken, prodId,
+                                    selectionIds , marketId, stake);
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                    }
+                    balanceAfterBet = WAPI.readNewBalance(response);
                 });
 
 

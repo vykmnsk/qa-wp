@@ -8,22 +8,20 @@ import net.minidev.json.JSONArray;
 import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.*;
 
 public class WAPI implements WagerPlayerAPI {
 
     private static String URL = Config.wapiURL();
 
-    private static Map<String, Object> wapiAuthFields(){
+    private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();
         fields.put("wapi_client_user", Config.wapiUsername());
         fields.put("wapi_client_pass", Config.wapiPassword());
         return fields;
     }
 
-    private static Map<String, Object> wapiAuthFields(String sessionId){
+    private static Map<String, Object> wapiAuthFields(String sessionId) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("session_id", sessionId);
         return fields;
@@ -37,7 +35,15 @@ public class WAPI implements WagerPlayerAPI {
         return resp;
     }
 
-    public String getAccessToken(String username,String password) {
+    static Object postWithQueryStrs(Map<String, Object> fields, List selectionIds, String key) {
+        fields.put("output_type", "json");
+        Object resp = REST.postWithQueryStrings(URL, fields, selectionIds, key);
+        JSONArray errors = JsonPath.read(resp, "$..error..error_text");
+        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        return resp;
+    }
+
+    public String getAccessToken(String username, String password) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_login");
         fields.put("customer_username", username);
@@ -88,14 +94,23 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static BigDecimal readNewBalance(Object resp){
+    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        fields.put("slot[1][market]", marketId);
+        fields.put("amount", stake);
+        return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
+    }
+
+    public static BigDecimal readNewBalance(Object resp) {
         Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
     }
 
-    public Object getEventMarkets(String evtId){
-        String sessionId = getAccessToken(Config.customerUsername(),Config.customerPassword());
+    public Object getEventMarkets(String evtId) {
+        String sessionId = getAccessToken(Config.customerUsername(), Config.customerPassword());
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_markets");
         fields.put("eid", evtId);
@@ -103,7 +118,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId){
+    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
         String selPath = "$.RSP.markets.market[0].selections.selection" + jfilter("name", selName);
         String pricePath = selPath + ".prices.price" + jfilter("product_id", prodId.toString());
 
@@ -114,7 +129,7 @@ public class WAPI implements WagerPlayerAPI {
         return sel;
     }
 
-    private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName){
+    private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
         JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
 
@@ -131,7 +146,37 @@ public class WAPI implements WagerPlayerAPI {
         return attr;
     }
 
-    private static String jfilter(String attr, String value){
+    public static String readFirstMarketId(Object resp) {
+        String path = "$.RSP.markets.market[0].id";
+        String id = JsonPath.read(resp, path);
+        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        return id;
+    }
+
+    public static List<String> readSelectionIds(Object resp, List<String> selNames) {
+        List<String> selIds = new ArrayList<>();
+        for (String name : selNames) {
+            String id = readSelectionId(resp, name);
+            selIds.add(id);
+        }
+        return selIds;
+    }
+
+    private static String readSelectionId(Object resp, String runnerName) {
+        String selPath = "$.RSP.markets.market[0].selections.selection";
+        String path = selPath + jfilter("name", runnerName);
+        JSONArray ids = JsonPath.read(resp, path + ".id");
+        Assertions.assertThat(ids.size())
+                .as(String.format(String.format("expected to find one attribute '%s' at path='%s'", "id", path)))
+                .isEqualTo(1);
+        String id = String.valueOf(ids.get(0));
+        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        return id;
+    }
+
+
+    private static String jfilter(String attr, String value) {
         return String.format("[?(@.%s == '%s')]", attr, value);
     }
+
 }

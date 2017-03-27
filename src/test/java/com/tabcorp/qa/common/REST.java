@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class REST {
     private static Logger log = LoggerFactory.getLogger(REST.class);
 
-    private static Object verifyAndParseResponse(HttpResponse<String> response) {
+    public static Object verifyAndParseResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
         assertThat(response.getBody()).as("response body").isNotEmpty();
         return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
@@ -33,6 +34,21 @@ public class REST {
             throw new RuntimeException(e);
         }
         return verifyAndParseResponse(response);
+    }
+
+    public static Object postWithQueryStrings(String url, Map<String, Object> fields, List selectionList, String slotSelectionKey) {
+        fields.put("output_type", "json");
+
+        HttpResponse<String> response;
+        try {
+            response = Unirest.post(url)
+                    .queryString(fields)
+                    .queryString(slotSelectionKey,selectionList)
+                    .asString();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+        return REST.verifyAndParseResponse(response);
     }
 
     public static Object put(String url, String reqJSON) {

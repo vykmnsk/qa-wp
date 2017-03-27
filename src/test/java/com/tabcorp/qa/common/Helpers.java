@@ -69,4 +69,5 @@ public class Helpers {
         int decimalPlaces = 2;
         return value.setScale(decimalPlaces,BigDecimal.ROUND_HALF_UP);
     }
+
 }
