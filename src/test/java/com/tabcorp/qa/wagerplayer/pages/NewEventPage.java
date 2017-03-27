@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-public class NewEventPage extends AppPage{
+public class NewEventPage extends AppPage {
     @FindBy(css = "textarea[name=add_selections]")
     private WebElement addSelections;
 
@@ -105,7 +105,7 @@ public class NewEventPage extends AppPage{
         return mp;
     }
 
-    private String format2d(int val){
+    private String format2d(int val) {
         return String.format("%02d", val);
     }
 

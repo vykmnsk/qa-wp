@@ -94,13 +94,37 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, String flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
+        fields.put("flexi", flexi);
         return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
+    }
+
+    public static Object placeExoticBetOnMultipleEvents(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, String flexi) {
+        int i = 1;
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        for (String selId : selectionIds) {
+            if (selId != "") {
+                fields.put("slot["+i+"][selection][]", selectionIds.get(i-1));
+                i++;
+            }
+        }
+        i = 1;
+        for (String marketId : marketIds) {
+            if (marketId != "") {
+                fields.put("slot["+i+"][market]", marketIds.get(i-1));
+                i++;
+            }
+        }
+        fields.put("amount", stake);
+        fields.put("flexi", flexi);
+        return post(fields);
     }
 
     public static BigDecimal readNewBalance(Object resp) {
@@ -162,7 +186,7 @@ public class WAPI implements WagerPlayerAPI {
         return selIds;
     }
 
-    private static String readSelectionId(Object resp, String runnerName) {
+    public static String readSelectionId(Object resp, String runnerName) {
         String selPath = "$.RSP.markets.market[0].selections.selection";
         String path = selPath + jfilter("name", runnerName);
         JSONArray ids = JsonPath.read(resp, path + ".id");

@@ -102,7 +102,6 @@ public class CreateEventSteps implements En {
         });
         Then("^event status is \"([^\"]*)\"$", (String expectedStatus) -> {
             marketsPage.verifyMarketStatus(expectedStatus);
-
         });
 
         When("^I create a default event with details$", (DataTable table) -> {

@@ -2,6 +2,7 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
@@ -60,8 +61,8 @@ public class APISteps implements En {
                     balanceAfterBet = Config.getAPI().getBalance(accessToken);
                 });
 
-        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
-                (String betTypeName, String runner, BigDecimal stake) -> {
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
 
@@ -73,18 +74,51 @@ public class APISteps implements En {
 
                     Object response;
                     switch (betTypeName.toUpperCase()) {
+                        case "FIRST FOUR":
                         case "TRIFECTA":
                         case "EXACTA":
                         case "QUINELLA":
                             response = WAPI.placeExoticBet(accessToken, prodId,
-                                    selectionIds , marketId, stake);
+                                    selectionIds , marketId, stake, flexi);
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                    }
+                    balanceAfterBet = WAPI.readNewBalance(response);
+        });
+
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
+                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+
+                    List<String> marketIds = new ArrayList();
+                    List<String> selectionIds = new ArrayList();
+
+                    if (null == wapi) wapi = new WAPI();
+
+                    for (String singleRunner : runners) {
+                        Object resp = wapi.getEventMarkets((String) Storage.get(EVENT_ID));
+
+                        String marketId = WAPI.readFirstMarketId(resp);
+                        marketIds.add(marketId);
+                        String selId = WAPI.readSelectionId(resp, singleRunner);
+                        selectionIds.add(selId);
+                    }
+
+                    Object response;
+                    switch (betTypeName.toUpperCase()) {
+                        case "DAILY DOUBLE":
+                        case "RUNNING DOUBLE":
+                        case "QUADDIE":
+                            response = WAPI.placeExoticBetOnMultipleEvents(accessToken, prodId,
+                                    selectionIds , marketIds, stake, flexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
                     balanceAfterBet = WAPI.readNewBalance(response);
                 });
-
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
             BigDecimal diff = new BigDecimal(diffText);
