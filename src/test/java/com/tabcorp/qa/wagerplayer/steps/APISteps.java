@@ -63,17 +63,16 @@ public class APISteps implements En {
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+
                     if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
-                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
-                    Map<WAPI.KEY, List<String>> sel = WAPI.readSelectionMultiple(resp, runners);
 
-                    String marketId = sel.get(WAPI.KEY.MARKET_ID).toString().replaceAll("\\[","").replaceAll("]","");
-                    List<String> selectionIds = sel.get(WAPI.KEY.SELECTION_ID);
+                    String marketId = WAPI.readFirstMarketId(resp);
+                    List<String> selectionIds = WAPI.readSelectionIds(resp, runners);
 
                     Object response;
                     switch (betTypeName.toUpperCase()) {
-                        case "FIRST FOUR":
                         case "TRIFECTA":
                         case "EXACTA":
                         case "QUINELLA":

@@ -10,8 +10,6 @@ import org.assertj.core.api.Assertions;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.tabcorp.qa.common.Helpers.stripBrackets;
-
 public class WAPI implements WagerPlayerAPI {
 
     private static String URL = Config.wapiURL();
@@ -131,23 +129,6 @@ public class WAPI implements WagerPlayerAPI {
         return sel;
     }
 
-    public static Map<KEY, List<String>> readSelectionMultiple(Object resp, List<String> selName) {
-        HashMap<KEY, List<String>> sel = new HashMap<>();
-        ArrayList<String> sels = new ArrayList<>();
-
-        String marketIdPath = "$.RSP.markets.market[*][?(@.name == 'Racing Live')]";
-        String market = readMarketId(resp, marketIdPath, "id");
-        sel.put(KEY.MARKET_ID, Arrays.asList(stripBrackets(market)));
-
-        for (String selection : selName) {
-            String selPath = "$.RSP.markets.market[0].selections.selection";
-            String selectionId = readSelectionId(resp, selPath, selection, "id");
-            sels.add(stripBrackets(selectionId));
-            sel.put(KEY.SELECTION_ID, sels);
-        }
-        return sel;
-    }
-
     private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
         JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
@@ -165,29 +146,37 @@ public class WAPI implements WagerPlayerAPI {
         return attr;
     }
 
-    private static String readSelectionId(Object resp, String pricePath, String runnerName, String attrName) {
-        String path = pricePath + jfilter("name", runnerName);
-        JSONArray attrs = JsonPath.read(resp, path + "." + attrName);
-        Assertions.assertThat(attrs.size())
-                .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, pricePath))
-                .isEqualTo(1);
-        String attr = String.valueOf(attrs.get(0));
-        Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
-        return attr;
+    public static String readFirstMarketId(Object resp) {
+        String path = "$.RSP.markets.market[0].id";
+        String id = JsonPath.read(resp, path);
+        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        return id;
     }
 
-    private static String readMarketId(Object resp, String marketIdPath, String marketName) {
-        String path = marketIdPath + jfilter("name", "Racing Live");
-        JSONArray attrs = JsonPath.read(resp, path + "." + marketName);
-        Assertions.assertThat(attrs.size())
-                .as(String.format("expected to find one attribute '%s' at path='%s'", marketName, marketIdPath))
-                .isEqualTo(1);
-        String attr = String.valueOf(attrs.get(0));
-        Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
-        return attr;
+    public static List<String> readSelectionIds(Object resp, List<String> selNames) {
+        List<String> selIds = new ArrayList<>();
+        for (String name : selNames) {
+            String id = readSelectionId(resp, name);
+            selIds.add(id);
+        }
+        return selIds;
     }
+
+    private static String readSelectionId(Object resp, String runnerName) {
+        String selPath = "$.RSP.markets.market[0].selections.selection";
+        String path = selPath + jfilter("name", runnerName);
+        JSONArray ids = JsonPath.read(resp, path + ".id");
+        Assertions.assertThat(ids.size())
+                .as(String.format(String.format("expected to find one attribute '%s' at path='%s'", "id", path)))
+                .isEqualTo(1);
+        String id = String.valueOf(ids.get(0));
+        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        return id;
+    }
+
 
     private static String jfilter(String attr, String value) {
         return String.format("[?(@.%s == '%s')]", attr, value);
     }
+
 }
