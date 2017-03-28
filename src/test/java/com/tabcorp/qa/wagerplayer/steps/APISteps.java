@@ -2,7 +2,6 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
-import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
@@ -70,8 +69,8 @@ public class APISteps implements En {
                     if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.getLast(Storage.KEY.EVENT_IDS));
 
-                    String marketId = WAPI.readFirstMarketId(resp);
-                    List<String> selectionIds = WAPI.readSelectionIds(resp, runners);
+                    String marketId = wapi.readMarketId(resp, "Racing Live");
+                    List<String> selectionIds = wapi.readSelectionIds(resp, marketId, runners);
 
                     Object response;
                     switch (betTypeName.toUpperCase()) {
@@ -79,13 +78,14 @@ public class APISteps implements En {
                         case "TRIFECTA":
                         case "EXACTA":
                         case "QUINELLA":
-                            response = WAPI.placeExoticBet(accessToken, prodId,
-                                    selectionIds , marketId, stake, isFlexi); 
+                        case "EXOTIC":
+                            response = Config.getAPI().placeExoticBet(accessToken, prodId,
+                                    selectionIds , marketId, stake, isFlexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = WAPI.readNewBalance(response);
+                    balanceAfterBet = Config.getAPI().readNewBalance(response);
         });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
@@ -101,9 +101,9 @@ public class APISteps implements En {
                     for (String singleRunner : runners) {
                         Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));
 
-                        String marketId = WAPI.readFirstMarketId(resp);
+                        String marketId = wapi.readMarketId(resp, "Racing Live");
                         marketIds.add(marketId);
-                        String selId = WAPI.readSelectionId(resp, singleRunner);
+                        String selId = wapi.readSelectionId(resp, marketId, singleRunner);
                         selectionIds.add(selId);
                     }
 
@@ -112,13 +112,13 @@ public class APISteps implements En {
                         case "DAILY DOUBLE":
                         case "RUNNING DOUBLE":
                         case "QUADDIE":
-                            response = WAPI.placeExoticBetOnMultipleEvents(accessToken, prodId,
+                            response = wapi.placeExoticBetOnMultipleEvents(accessToken, prodId,
                                     selectionIds , marketIds, stake, flexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = WAPI.readNewBalance(response);
+                    balanceAfterBet = Config.getAPI().readNewBalance(response);
                 });
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {

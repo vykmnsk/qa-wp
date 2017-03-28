@@ -1,4 +1,4 @@
-@single-bets @luxbet @multiplebets
+@single-bets @luxbet
 Feature: End 2 End
 
   Background:
