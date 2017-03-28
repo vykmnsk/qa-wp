@@ -77,6 +77,10 @@ public class CreateEventSteps implements En {
             marketsPage.enableProductSettings(name, settings);
         });
 
+        When("^I enable \"([^\"]*)\" from Cross Race Exotics table$", (String crossRaceProduct) -> {
+            marketsPage.enableCrossRaceProduct(crossRaceProduct);
+        });
+
 
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);

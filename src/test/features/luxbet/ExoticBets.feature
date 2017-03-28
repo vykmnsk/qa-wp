@@ -74,7 +74,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
 #      | STAB Trifecta  | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |       | 18.00             | 1.50   |
 
 
-@wip
+  @wip
   Scenario Outline: Horse Race Exotic Daily Double bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
@@ -91,6 +91,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
+    And I enable "STAB Daily Double" from Cross Race Exotics table
 
     And I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
@@ -107,6 +108,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
+    And I enable "STAB Daily Double" from Cross Race Exotics table
 
     And customer balance is at least $20.50
 

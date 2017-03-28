@@ -155,7 +155,17 @@ public class MarketsPage extends AppPage {
             showHideMarketManagement.click();
         }
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
+    }
 
+    public void enableCrossRaceProduct(String crossRaceProduct) {
+        showMarketManagement();
+        WebElement tr = enableFindProductRow(crossRaceProduct);
+        assertThat(tr).as("Product %s is not found on Market Page", crossRaceProduct).isNotNull();
+
+        log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
+
+        //setOption(tr, "");
+        updateBtn.click();
     }
 
     public void updateRaceNumber(int num) {
