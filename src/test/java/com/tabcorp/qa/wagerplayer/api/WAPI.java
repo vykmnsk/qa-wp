@@ -96,7 +96,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+    public Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
@@ -105,7 +105,7 @@ public class WAPI implements WagerPlayerAPI {
         return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
     }
 
-    public static BigDecimal readNewBalance(Object resp) {
+    public BigDecimal readNewBalance(Object resp) {
         Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;

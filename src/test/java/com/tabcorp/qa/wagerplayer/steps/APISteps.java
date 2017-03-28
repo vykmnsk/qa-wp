@@ -76,13 +76,17 @@ public class APISteps implements En {
                         case "TRIFECTA":
                         case "EXACTA":
                         case "QUINELLA":
-                            response = WAPI.placeExoticBet(accessToken, prodId,
+                            response = Config.getAPI().placeExoticBet(accessToken, prodId,
                                     selectionIds , marketId, stake);
+                            break;
+                        case "EXOTIC":
+                            response = Config.getAPI().placeExoticBet(accessToken, prodId,
+                                        selectionIds , marketId, stake);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = WAPI.readNewBalance(response);
+                    balanceAfterBet = Config.getAPI().readNewBalance(response);
                 });
 
 

@@ -2,6 +2,7 @@ package com.tabcorp.qa.wagerplayer.api;
 
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface WagerPlayerAPI {
    enum KEY {
@@ -17,4 +18,6 @@ public interface WagerPlayerAPI {
    Object placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake);
    Object placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake);
    Object placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
+   Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake);
+   BigDecimal readNewBalance(Object resp);
 }
