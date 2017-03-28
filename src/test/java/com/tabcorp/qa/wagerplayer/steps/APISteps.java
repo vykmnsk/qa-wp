@@ -25,7 +25,7 @@ public class APISteps implements En {
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
-            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(),Config.customerPassword());
+            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(), Config.customerPassword());
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
         });
 
@@ -90,11 +90,13 @@ public class APISteps implements En {
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
+                    int i = 0;
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
 
                     List<String> marketIds = new ArrayList();
                     List<String> selectionIds = new ArrayList();
+                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
 
                     if (null == wapi) wapi = new WAPI();
 
@@ -105,6 +107,7 @@ public class APISteps implements En {
                         marketIds.add(marketId);
                         String selId = wapi.readSelectionId(resp, marketId, singleRunner);
                         selectionIds.add(selId);
+                        i++;
                     }
 
                     Object response;
