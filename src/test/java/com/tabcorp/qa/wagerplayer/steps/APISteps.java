@@ -7,6 +7,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +27,7 @@ public class APISteps implements En {
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
-            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(),Config.customerPassword());
+            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(), Config.customerPassword());
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
         });
 
@@ -80,31 +81,34 @@ public class APISteps implements En {
                         case "EXACTA":
                         case "QUINELLA":
                             response = WAPI.placeExoticBet(accessToken, prodId,
-                                    selectionIds , marketId, stake, isFlexi); 
+                                    selectionIds, marketId, stake, isFlexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
                     balanceAfterBet = WAPI.readNewBalance(response);
-        });
+                });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
+                    int i = 0;
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
 
                     List<String> marketIds = new ArrayList();
                     List<String> selectionIds = new ArrayList();
+                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
 
                     if (null == wapi) wapi = new WAPI();
 
                     for (String singleRunner : runners) {
-                        Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));
+                        Object resp = wapi.getEventMarkets(eventIds.get(i));
 
                         String marketId = WAPI.readFirstMarketId(resp);
                         marketIds.add(marketId);
                         String selId = WAPI.readSelectionId(resp, singleRunner);
                         selectionIds.add(selId);
+                        i++;
                     }
 
                     Object response;
@@ -113,7 +117,7 @@ public class APISteps implements En {
                         case "RUNNING DOUBLE":
                         case "QUADDIE":
                             response = WAPI.placeExoticBetOnMultipleEvents(accessToken, prodId,
-                                    selectionIds , marketIds, stake, flexi);
+                                    selectionIds, marketIds, stake, flexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
