@@ -94,13 +94,13 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, String flexi) {
+    public static Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
-        fields.put("flexi", flexi);
+        if (flexi) fields.put("flexi", "y");
         return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
     }
 
@@ -111,14 +111,14 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("product_id", productId);
         for (String selId : selectionIds) {
             if (selId != "") {
-                fields.put("slot["+i+"][selection][]", selectionIds.get(i-1));
+                fields.put("slot[" + i + "][selection][]", selectionIds.get(i - 1));
                 i++;
             }
         }
         i = 1;
         for (String marketId : marketIds) {
             if (marketId != "") {
-                fields.put("slot["+i+"][market]", marketIds.get(i-1));
+                fields.put("slot[" + i + "][market]", marketIds.get(i - 1));
                 i++;
             }
         }

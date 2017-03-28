@@ -39,7 +39,7 @@ public class APISteps implements En {
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(PRODUCT_ID);
                     if (null == wapi) wapi = new WAPI();
-                    Object resp = wapi.getEventMarkets((String) Storage.get(EVENT_ID));  // this is always WAPI.
+                    Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
 
                     switch (betTypeName.toUpperCase()) {
@@ -65,9 +65,10 @@ public class APISteps implements En {
                 (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
 
                     if (null == wapi) wapi = new WAPI();
-                    Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
+                    Object resp = wapi.getEventMarkets((String) Storage.getLast(Storage.KEY.EVENT_IDS));
 
                     String marketId = WAPI.readFirstMarketId(resp);
                     List<String> selectionIds = WAPI.readSelectionIds(resp, runners);
@@ -79,7 +80,7 @@ public class APISteps implements En {
                         case "EXACTA":
                         case "QUINELLA":
                             response = WAPI.placeExoticBet(accessToken, prodId,
-                                    selectionIds , marketId, stake, flexi);
+                                    selectionIds , marketId, stake, isFlexi); 
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
@@ -98,7 +99,7 @@ public class APISteps implements En {
                     if (null == wapi) wapi = new WAPI();
 
                     for (String singleRunner : runners) {
-                        Object resp = wapi.getEventMarkets((String) Storage.get(EVENT_ID));
+                        Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));
 
                         String marketId = WAPI.readFirstMarketId(resp);
                         marketIds.add(marketId);

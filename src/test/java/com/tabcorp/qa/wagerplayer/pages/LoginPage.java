@@ -27,7 +27,7 @@ public class LoginPage extends AppPage {
     private By errorLuxbet = By.cssSelector("tbody td b i");
     private By errorRedbook = By.cssSelector("div[class='login-error']");
 
-    public void load(){
+    public void load() {
         super.load();
         wait.until(visibilityOf(username));
         Assertions.assertThat(username.isDisplayed())
@@ -35,7 +35,7 @@ public class LoginPage extends AppPage {
                 .isTrue();
     }
 
-    public HomePage enterValidCredentials(){
+    public HomePage enterValidCredentials() {
         username.sendKeys(Config.username());
         password.sendKeys(Config.password());
 
@@ -49,7 +49,7 @@ public class LoginPage extends AppPage {
         return new HomePage();
     }
 
-    public LoginPage enterInvalidCredentials(){
+    public LoginPage enterInvalidCredentials() {
         username.sendKeys("invalid username");
         password.sendKeys("invalid passowrd");
         WebElement submit = findEither(submitLuxbet, submitRedbook);
@@ -57,11 +57,11 @@ public class LoginPage extends AppPage {
         return this;
     }
 
-    public void verifyErrorMessage(String msg){
+    public void verifyErrorMessage(String msg) {
         String actualMsg = findEither(errorLuxbet, errorRedbook).getText();
         Assertions.assertThat(actualMsg)
-            .withFailMessage(String.format("Expected %s, but got %s", msg, actualMsg))
-            .contains(msg);
+                .withFailMessage(String.format("Expected %s, but got %s", msg, actualMsg))
+                .contains(msg);
     }
 
 }

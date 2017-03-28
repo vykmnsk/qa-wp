@@ -43,7 +43,7 @@ public class REST {
         try {
             response = Unirest.post(url)
                     .queryString(fields)
-                    .queryString(slotSelectionKey,selectionList)
+                    .queryString(slotSelectionKey, selectionList)
                     .asString();
         } catch (UnirestException e) {
             throw new RuntimeException(e);
@@ -68,7 +68,7 @@ public class REST {
         return verifyAndParseResponse(response);
     }
 
-    public static Object get(String url,Map<String,Object> queryParams){
+    public static Object get(String url, Map<String, Object> queryParams) {
         HttpResponse<String> response;
         try {
             log.info("sending GET queryPrams=" + queryParams);

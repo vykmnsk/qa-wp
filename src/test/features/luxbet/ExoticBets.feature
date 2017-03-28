@@ -1,4 +1,3 @@
-@wip
 @exotic-bets @luxbet
 Feature: Placing and Settling Exotic Bets for a Single Event
 
@@ -74,6 +73,8 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | NSW Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |       | 18.00             | 1.50   |
       | STAB Trifecta  | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |       | 18.00             | 1.50   |
 
+
+@wip
   Scenario Outline: Horse Race Exotic Daily Double bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
@@ -90,6 +91,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
+
     And I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | base name | TEST RACE                                                                      |
@@ -105,6 +107,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
+
     And customer balance is at least $20.50
 
     When I place an exotic "<BetType>" bet on the runners "<BetOn>" across multiple events for $<Stake> with flexi as "<Flexi>"

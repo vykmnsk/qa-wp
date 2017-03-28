@@ -1,4 +1,3 @@
-@wip
 @ui @redbook
 Feature: Create Redbook Event
 
