@@ -4,7 +4,6 @@ Feature: Create Luxbet Customer
   Background: Given I am logged into WP UI and on Home Page
 
   Scenario Outline: Create Luxbet South Australian Customer on UI
-    Given I am logged into WP UI and on Home Page
     When I enter specifics to create new customer through wagerplayer
       | title                      | "<title>"                      |
       | firstname                  | "<firstname>"                  |
@@ -51,7 +50,7 @@ Feature: Create Luxbet Customer
       | timezone                   | "<timezone>"                   |
     Then I see new customer created
 
-  Examples:
-  | title | firstname | lastname | date_of_birth | phonenumber | email_address      | address                                    | country   | username          | telephone_password | telephone_password_confirm | internet_password   | internet_password_confirm | security_question       | customer_answer   | currency          | timezone         |
-  | Ms    | Keli      | Cowey    | 1952-03-25    | 0463254781  | random@test.com.au | 13a Alan Ave,SEAFORTH,New South Wales,2092 | Australia | #RANDOM_USERNAME# | #TELE_PASSWORD#    | #TELE_PASSWORD#            | #INTERNET_PASSWORD# | #INTERNET_PASSWORD#       | Favourite Holiday Spot? | #CHALLENGEANSWER# | Australian Dollar | Australia/Sydney |
+    Examples:
+      | title | firstname | lastname | date_of_birth | phonenumber | email_address      | address                                    | country   | username          | telephone_password | telephone_password_confirm | internet_password   | internet_password_confirm | security_question       | customer_answer   | currency          | timezone         |
+      | Ms    | Keli      | Cowey    | 1952-03-25    | 0463254781  | random@test.com.au | 13a Alan Ave,SEAFORTH,New South Wales,2092 | Australia | #RANDOM_USERNAME# | #TELE_PASSWORD#    | #TELE_PASSWORD#            | #INTERNET_PASSWORD# | #INTERNET_PASSWORD#       | Favourite Holiday Spot? | #CHALLENGEANSWER# | Australian Dollar | Australia/Sydney |
 
