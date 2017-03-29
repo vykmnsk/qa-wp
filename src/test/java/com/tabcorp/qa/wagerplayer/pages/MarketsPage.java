@@ -74,12 +74,6 @@ public class MarketsPage extends AppPage {
     @CacheLookup
     private WebElement raceNumTxt;
 
-    @FindBy(css = ("div[id=cross_race_exotics_content_body] table[class$='product_options'] tbody tr td[class^=product_name]"))
-    private List<WebElement> crossRaceExoticsProduct;
-
-    @FindBy(css = ("input[type=checkbox][name^='enable_product[']"))
-    private List<WebElement> crossRaceExoticsCheckbox;
-
     @FindBy(css = "input[name^='position[']")
     private List<WebElement> positionTxts;
     @FindBy(css = "input[type=text][id^=price_][onkeyup^=calculate_selection_percent")
@@ -87,6 +81,10 @@ public class MarketsPage extends AppPage {
 
     @FindBy(css = "#bet_types_content_body table.product_options tbody tr")
     private List<WebElement> productRows;
+
+    @FindBy(css = ("div[id=cross_race_exotics_content_body] table[class$='product_options'] tr"))
+    private List<WebElement> crossRaceExoticsProductRows;
+    private By crossRaceExoticsCheckbox = By.cssSelector("input[type=checkbox][name^='enable_product[']");
 
     @FindBy(css = "input[type=hidden][name=event_id]")
     private WebElement eventId;
@@ -156,38 +154,16 @@ public class MarketsPage extends AppPage {
         insertBtn.click();
     }
 
+    public void updateRaceNumber(int num) {
+        raceNumTxt.clear();
+        raceNumTxt.sendKeys("" + num);
+    }
+
     public void showMarketManagement() {
         if (!marketManagementSection.isDisplayed()) {
             showHideMarketManagement.click();
         }
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
-    }
-
-    public void enableCrossRaceProduct(String crossRaceProduct) {
-        showMarketManagement();
-        log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
-
-        checkCrossProduct(crossRaceProduct);
-        updateBtn.click();
-    }
-
-    private void checkCrossProduct(String crossRaceProduct) {
-        int i = 0;
-        List<WebElement> exoticProducts = crossRaceExoticsProduct;
-        List<WebElement> exoticProductCheckboxes = crossRaceExoticsCheckbox;
-
-        for (WebElement crossRaceProd : exoticProducts) {
-            if (crossRaceProd.getText().equals(crossRaceProduct)) {
-                exoticProductCheckboxes.get(i).click();
-                break;
-            }
-            i++;
-        }
-    }
-
-    public void updateRaceNumber(int num) {
-        raceNumTxt.clear();
-        raceNumTxt.sendKeys("" + num);
     }
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
@@ -227,6 +203,19 @@ public class MarketsPage extends AppPage {
             }
         }
         return false;
+    }
+
+    public void enableCrossRaceProduct(String prodName) {
+        showMarketManagement();
+        log.info("Trying to enable Cross Race Product =" + prodName);
+        WebElement prodRow = crossRaceExoticsProductRows.stream().filter(tr -> tr.getText().contains(prodName)).findFirst().orElse(null);
+        assertThat(prodRow).as("Product %s is not found in Cross Race section on Market Page", prodName).isNotNull();
+        WebElement chk = prodRow.findElement(crossRaceExoticsCheckbox);
+        assertThat(chk.getAttribute("disabled")).as("Cross Race Product checkbox is disabled").isNull();
+        String checked = chk.getAttribute("checked");
+        if (null == checked) chk.click();
+        assertThat(checked).as("Checked Cross Race Product " + prodName).isEqualTo("checked");
+        updateBtn.click();
     }
 
     private Integer findProductID(WebElement tr) {
