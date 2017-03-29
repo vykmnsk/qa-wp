@@ -121,11 +121,11 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | base name | TEST RACE                                                                      |
       | runners   | Runner21, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices    | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
-#    And I enable "Luxbook DVP Fixed" product settings
-#      | Betting | Enabled       | On    |
-#      | Betting | Enable Single | Win   |
-#      | Betting | Enable Single | Place |
-#      | Betting | Enable Single | EW    |
+    And I enable "Luxbook DVP Fixed" product settings
+      | Betting | Enabled       | On    |
+      | Betting | Enable Single | Win   |
+      | Betting | Enable Single | Place |
+      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -137,11 +137,11 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | base name | TEST RACE                                                                      |
       | runners   | Runner09, Runner10, Runner11, Runner12, Runner13, Runner14, Runner15, Runner16 |
       | prices    | 1.20, 2.40, 1.30, 2.60, 1.40, 2.80, 1.50, 3.00                                 |
-#    And I enable "Luxbook DVP Fixed" product settings
-#      | Betting | Enabled       | On    |
-#      | Betting | Enable Single | Win   |
-#      | Betting | Enable Single | Place |
-#      | Betting | Enable Single | EW    |
+    And I enable "Luxbook DVP Fixed" product settings
+      | Betting | Enabled       | On    |
+      | Betting | Enable Single | Win   |
+      | Betting | Enable Single | Place |
+      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -153,11 +153,11 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | base name | TEST RACE                                                                      |
       | runners   | Runner31, Runner10, Runner11, Runner12, Runner13, Runner14, Runner15, Runner16 |
       | prices    | 1.20, 2.40, 1.30, 2.60, 1.40, 2.80, 1.50, 3.00                                 |
-#    And I enable "Luxbook DVP Fixed" product settings
-#      | Betting | Enabled       | On    |
-#      | Betting | Enable Single | Win   |
-#      | Betting | Enable Single | Place |
-#      | Betting | Enable Single | EW    |
+    And I enable "Luxbook DVP Fixed" product settings
+      | Betting | Enabled       | On    |
+      | Betting | Enable Single | Win   |
+      | Betting | Enable Single | Place |
+      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -169,11 +169,11 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | base name | TEST RACE                                                                      |
       | runners   | Runner41, Runner10, Runner11, Runner12, Runner13, Runner14, Runner15, Runner16 |
       | prices    | 1.20, 2.40, 1.30, 2.60, 1.40, 2.80, 1.50, 3.00                                 |
-#    And I enable "Luxbook DVP Fixed" product settings
-#      | Betting | Enabled       | On    |
-#      | Betting | Enable Single | Win   |
-#      | Betting | Enable Single | Place |
-#      | Betting | Enable Single | EW    |
+    And I enable "Luxbook DVP Fixed" product settings
+      | Betting | Enabled       | On    |
+      | Betting | Enable Single | Win   |
+      | Betting | Enable Single | Place |
+      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
