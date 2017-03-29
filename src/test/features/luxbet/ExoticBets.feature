@@ -15,7 +15,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -41,7 +40,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  |       | 6.00              | 1.50   |
       | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 1.50   |
 
-    Scenario Outline: Horse Race Exotic bets
+    Scenario Outline: Horse Race Exotic Trifecta bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | base name | TEST RACE                                                                      |
@@ -51,7 +50,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -73,7 +71,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | NSW Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |       | 18.00             | 1.50   |
       | STAB Trifecta  | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |       | 18.00             | 1.50   |
 
-
   Scenario Outline: Horse Race Exotic Daily Double bets
     When I enter specifics category "Horse Racing" and subcategory "YEPPOON"
     And I create a default event with details
@@ -84,7 +81,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -94,13 +90,12 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     And I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | base name | TEST RACE                                                                      |
-      | runners   | Runner09, Runner10, Runner11, Runner12, Runner13, Runner14, Runner15, Runner16 |
+      | runners   | Runner19, Runner10, Runner11, Runner12, Runner13, Runner14, Runner15, Runner16 |
       | prices    | 1.20, 2.40, 1.30, 2.60, 1.40, 2.80, 1.50, 3.00                                 |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -114,7 +109,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
 
     Examples:
       | ProductName       | BetType      | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
-      | STAB Daily Double | Daily Double | Runner21,Runner10 | 3.00  |       | 3.00              | 1.50   |
+      | STAB Daily Double | Daily Double | Runner21,Runner19 | 3.00  |       | 3.00              | 1.50   |
 
   Scenario Outline: Horse Race Exotic Quaddie bets
     When I enter specifics category "Horse Racing" and subcategory "YEPPOON"
@@ -126,7 +121,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -142,7 +136,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -158,7 +151,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |
@@ -174,7 +166,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
     And I enable "<ProductName>" product settings
       | Betting | Enabled       | On    |
       | Betting | Enabled       | Auto  |

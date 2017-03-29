@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class WAPI implements WagerPlayerAPI {
@@ -107,19 +108,17 @@ public class WAPI implements WagerPlayerAPI {
     }
 
        public Object placeExoticBetOnMultipleEvents(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, String flexi) {
-        int i = 1;
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
-        for (String selId : selectionIds) {
-                fields.put("slot[" + i + "][selection][]", selId);
-                i++;
-        }
-        i = 1;
-        for (String marketId : marketIds) {
-                fields.put("slot[" + i + "][market]", marketId);
-                i++;
-        }
+        AtomicInteger atomicIntSel = new AtomicInteger(1);
+           selectionIds.forEach(id -> {
+               fields.put("slot[" + atomicIntSel.getAndIncrement() + "][selection][]", id);
+        });
+        AtomicInteger atomicIntMarket = new AtomicInteger(1);
+           marketIds.forEach(id -> {
+               fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id);
+           });
         fields.put("amount", stake);
         fields.put("flexi", flexi);
         fields.put("output_type", "json");
