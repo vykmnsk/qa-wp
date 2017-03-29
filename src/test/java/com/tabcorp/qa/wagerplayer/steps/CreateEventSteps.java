@@ -77,7 +77,7 @@ public class CreateEventSteps implements En {
             marketsPage.enableProductSettings(name, settings);
         });
 
-        When("^I enable \"([^\"]*)\" from Cross Race Exotics table$", (String crossRaceProduct) -> {
+        When("^I enable \"([^\"]*)\" product from Cross Race Exotics table$", (String crossRaceProduct) -> {
             marketsPage.enableCrossRaceProduct(crossRaceProduct);
         });
 

@@ -101,7 +101,7 @@ public class APISteps implements En {
                     if (null == wapi) wapi = new WAPI();
 
                     for (String singleRunner : runners) {
-                        Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));
+                        Object resp = wapi.getEventMarkets(eventIds.get(i));
 
                         String marketId = wapi.readMarketId(resp, "Racing Live");
                         marketIds.add(marketId);

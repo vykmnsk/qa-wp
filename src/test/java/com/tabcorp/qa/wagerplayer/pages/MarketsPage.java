@@ -74,6 +74,12 @@ public class MarketsPage extends AppPage {
     @CacheLookup
     private WebElement raceNumTxt;
 
+    @FindBy(css = ("div[id=cross_race_exotics_content_body] table[class$='product_options'] tbody tr td[class^=product_name]"))
+    private List<WebElement> crossRaceExoticsProduct;
+
+    @FindBy(css = ("input[type=checkbox][name^='enable_product[']"))
+    private List<WebElement> crossRaceExoticsCheckbox;
+
     @FindBy(css = "input[name^='position[']")
     private List<WebElement> positionTxts;
     @FindBy(css = "input[type=text][id^=price_][onkeyup^=calculate_selection_percent")
@@ -159,18 +165,29 @@ public class MarketsPage extends AppPage {
 
     public void enableCrossRaceProduct(String crossRaceProduct) {
         showMarketManagement();
-        WebElement tr = enableFindProductRow(crossRaceProduct);
-        assertThat(tr).as("Product %s is not found on Market Page", crossRaceProduct).isNotNull();
-
         log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
 
-        //setOption(tr, "");
+        checkCrossProduct(crossRaceProduct);
         updateBtn.click();
+    }
+
+    private void checkCrossProduct(String crossRaceProduct) {
+        int i = 0;
+        List<WebElement> exoticProducts = crossRaceExoticsProduct;
+        List<WebElement> exoticProductCheckboxes = crossRaceExoticsCheckbox;
+
+        for (WebElement crossRaceProd : exoticProducts) {
+            if (crossRaceProd.getText().equals(crossRaceProduct)) {
+                exoticProductCheckboxes.get(i).click();
+                break;
+            }
+            i++;
+        }
     }
 
     public void updateRaceNumber(int num) {
         raceNumTxt.clear();
-        raceNumTxt.sendKeys(""+num);
+        raceNumTxt.sendKeys("" + num);
     }
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
@@ -186,10 +203,10 @@ public class MarketsPage extends AppPage {
         updateBtn.click();
     }
 
-    private WebElement enableFindProductRow(String prodName){
+    private WebElement enableFindProductRow(String prodName) {
         Function<String, WebElement> findProdRow = name -> productRows.stream().filter(p -> p.getText().contains(name)).findFirst().orElse(null);
         WebElement tr = findProdRow.apply(prodName);
-        if (null == tr){
+        if (null == tr) {
             boolean added = addProduct(prodName);
             assertThat(added).as("Added product " + prodName).isTrue();
             showMarketManagement();
@@ -198,11 +215,11 @@ public class MarketsPage extends AppPage {
         return tr;
     }
 
-    private boolean addProduct(String prodName){
-        for(WebElement elem : addProductElems) {
+    private boolean addProduct(String prodName) {
+        for (WebElement elem : addProductElems) {
             Select select = new Select(elem);
             WebElement prodOption = select.getOptions().stream().filter(o -> prodName.equals(o.getText())).findFirst().orElse(null);
-            if (null != prodOption){
+            if (null != prodOption) {
                 select.selectByValue(prodOption.getAttribute("value"));
                 WebElement plusBtn = findParent(elem).findElement(addProductBtnCSS);
                 plusBtn.click();
@@ -212,7 +229,7 @@ public class MarketsPage extends AppPage {
         return false;
     }
 
-    private Integer findProductID(WebElement tr){
+    private Integer findProductID(WebElement tr) {
         String firstCheckboxName = tr.findElement(By.cssSelector("input[type=hidden]")).getAttribute("name");
         Pattern p = Pattern.compile("products\\[(\\d+)\\].*");
         Matcher m = p.matcher(firstCheckboxName);
@@ -269,7 +286,7 @@ public class MarketsPage extends AppPage {
                 .isEqualTo(expectedStatus);
     }
 
-    public String readEventID(){
+    public String readEventID() {
         return eventId.getAttribute("value");
     }
 }
