@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -176,13 +177,12 @@ public class MarketsPage extends AppPage {
         List<WebElement> exoticProducts = crossRaceExoticsProduct;
         List<WebElement> exoticProductCheckboxes = crossRaceExoticsCheckbox;
 
-        for (WebElement crossRaceProd : exoticProducts) {
+        AtomicInteger atomicInt = new AtomicInteger(1);
+        exoticProducts.forEach(crossRaceProd -> {
             if (crossRaceProd.getText().equals(crossRaceProduct)) {
-                exoticProductCheckboxes.get(i).click();
-                break;
+                exoticProductCheckboxes.get(atomicInt.getAndIncrement()).click();
             }
-            i++;
-        }
+        });
     }
 
     public void updateRaceNumber(int num) {
