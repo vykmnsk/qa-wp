@@ -1,11 +1,11 @@
 @wip
 @ui @redbook
-Feature: Create Redbook Event
+Feature: Creating a Sunbets Event
 
   Background:
     Given I am logged into WP UI and on Home Page
 
-  Scenario Outline: Create Horse Racing event
+  Scenario Outline: Create A Horse Racing event
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     Then I see New Event page is loaded
 
