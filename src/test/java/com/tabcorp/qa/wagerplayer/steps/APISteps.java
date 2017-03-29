@@ -25,7 +25,7 @@ public class APISteps implements En {
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
-            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(),Config.customerPassword());
+            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(), Config.customerPassword());
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
         });
 
@@ -38,7 +38,7 @@ public class APISteps implements En {
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(PRODUCT_ID);
                     if (null == wapi) wapi = new WAPI();
-                    Object resp = wapi.getEventMarkets((String) Storage.get(EVENT_ID));  // this is always WAPI.
+                    Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
 
                     switch (betTypeName.toUpperCase()) {
@@ -60,31 +60,67 @@ public class APISteps implements En {
                     balanceAfterBet = Config.getAPI().getBalance(accessToken);
                 });
 
-        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
-                (String betTypeName, String runner, BigDecimal stake) -> {
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
 
                     if (null == wapi) wapi = new WAPI();
-                    Object resp = wapi.getEventMarkets((String) Storage.get(Storage.KEY.EVENT_ID));
+                    Object resp = wapi.getEventMarkets((String) Storage.getLast(Storage.KEY.EVENT_IDS));
 
-                    String marketId = WAPI.readFirstMarketId(resp);
-                    List<String> selectionIds = WAPI.readSelectionIds(resp, runners);
+                    String marketId = wapi.readMarketId(resp, "Racing Live");
+                    List<String> selectionIds = wapi.readSelectionIds(resp, marketId, runners);
 
                     Object response;
                     switch (betTypeName.toUpperCase()) {
+                        case "FIRST FOUR":
                         case "TRIFECTA":
                         case "EXACTA":
                         case "QUINELLA":
-                            response = WAPI.placeExoticBet(accessToken, prodId,
-                                    selectionIds , marketId, stake);
+                        case "EXOTIC":
+                            response = Config.getAPI().placeExoticBet(accessToken, prodId,
+                                    selectionIds , marketId, stake, isFlexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = WAPI.readNewBalance(response);
-                });
+                    balanceAfterBet = Config.getAPI().readNewBalance(response);
+        });
 
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
+                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+
+                    List<String> marketIds = new ArrayList();
+                    List<String> selectionIds = new ArrayList();
+                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+
+                    if (null == wapi) wapi = new WAPI();
+                    assertThat(eventIds.size()).isEqualTo(runners.size());
+
+                    for (int i = 0; i<runners.size(); i++) {
+                        Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
+                        String marketId = wapi.readMarketId(marketsResponse, "Racing Live");
+                        marketIds.add(marketId);
+                        String selId = wapi.readSelectionId(marketsResponse, marketId, runners.get(i));
+                        selectionIds.add(selId);
+                    }
+
+                    Object betResponse;
+                    switch (betTypeName.toUpperCase()) {
+                        case "DAILY DOUBLE":
+                        case "RUNNING DOUBLE":
+                        case "QUADDIE":
+                            betResponse = wapi.placeExoticBetOnMultipleEvents(accessToken, prodId,
+                                    selectionIds , marketIds, stake, flexi);
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                    }
+                    balanceAfterBet = Config.getAPI().readNewBalance(betResponse);
+                });
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
             BigDecimal diff = new BigDecimal(diffText);

@@ -1,5 +1,6 @@
 @single-bets @redbook @multiplebets
-Feature: End 2 End
+
+Feature: Placing and Settling multiple Single bets on a Sunbets event
 
   Background:
     Given I am logged into WP API

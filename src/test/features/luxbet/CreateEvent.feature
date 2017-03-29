@@ -1,5 +1,5 @@
 @ui @luxbet
-Feature: Create Luxbet Event
+Feature: Create a Luxbet Event
 
   Background:
     Given I am logged into WP UI and on Home Page

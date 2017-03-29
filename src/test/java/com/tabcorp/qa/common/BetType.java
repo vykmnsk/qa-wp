@@ -3,7 +3,8 @@ package com.tabcorp.qa.common;
 public enum BetType {
     Win(1),
     Place(2),
-    EachWay(3);
+    EachWay(3),
+    Exotic(4);
 
     public final int id;
 

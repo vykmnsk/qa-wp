@@ -104,6 +104,40 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return placeBet(betPayload);
     }
 
+    public Object placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi) {
+        JSONObject obj = new JSONObject();
+        JSONObject selectionsData = new JSONObject();
+        JSONArray selections = new JSONArray();
+        JSONObject slots = new JSONObject();
+        JSONObject options = new JSONObject();
+        JSONArray selection;
+        JSONObject slotData;
+
+        options.put("flexi", "0");
+
+        for (int index = 0; index < selectionIds.size(); index++) {
+            selection = new JSONArray();
+            slotData = new JSONObject();
+            selection.add(0, selectionIds.get(index));
+            slotData.put("market", marketId);
+            slotData.put("selection", selection);
+            slots.put(index+1, slotData);
+        }
+
+
+        obj.put("access_token", accessToken);
+        selectionsData.put("type", "exotic");
+        selectionsData.put("stake", stake);
+        selectionsData.put("options", options);
+        selectionsData.put("product_id", productId);
+        selectionsData.put("slots", slots);
+        selections.add(selectionsData);
+
+        obj.put("selections", selections);
+
+        return placeBet(obj.toJSONString());
+    }
+
     private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject)  {
         JSONObject obj = new JSONObject();
         JSONArray selections = new JSONArray();
@@ -124,6 +158,12 @@ public class MOBI_V2 implements WagerPlayerAPI {
         obj.put("selections", selections);
 
         return obj.toJSONString();
+    }
+
+    public BigDecimal readNewBalance(Object resp) {
+        Object val = JsonPath.read(resp, "$.selections[0].new_balance");
+        BigDecimal newBalance = new BigDecimal(val.toString());
+        return newBalance;
     }
     
 }

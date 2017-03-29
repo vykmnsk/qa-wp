@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-public class NewEventPage extends AppPage{
+public class NewEventPage extends AppPage {
     @FindBy(css = "textarea[name=add_selections]")
     private WebElement addSelections;
 
@@ -100,12 +100,12 @@ public class NewEventPage extends AppPage{
 
         MarketsPage mp = new MarketsPage();
         String evtId = mp.readEventID();
-        Storage.put(KEY.EVENT_ID, evtId);
-        log.info("storing Event ID=" + Storage.get(KEY.EVENT_ID));
+        Storage.add(KEY.EVENT_IDS, evtId);
+        log.info("storing Event ID=" + Storage.getLast(KEY.EVENT_IDS));
         return mp;
     }
 
-    private String format2d(int val){
+    private String format2d(int val) {
         return String.format("%02d", val);
     }
 
