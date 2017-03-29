@@ -142,11 +142,10 @@ public class CreateEventSteps implements En {
         And("^I settle race with prices$", (DataTable table) -> {
             Map<String, String> pricesInput = new CaseInsensitiveMap(table.asMap(String.class, String.class));
             Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-            BetType [] betTypes = {BetType.Win, BetType.Place};
-            for (BetType betType: betTypes){
-                String pricesCSV = (String) Helpers.nonNullGet(pricesInput, betType.name());
-                List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCSV);
-                Assertions.assertThat(prices).as(betType.name() + " prices cucumber input").isNotEmpty();
+            for (Map.Entry<String, String> pricesEntry : pricesInput.entrySet()) {
+                BetType betType = BetType.valueOf(Helpers.toTitleCase(pricesEntry.getKey()));
+                List<BigDecimal> prices = Helpers.extractCSVPrices(pricesEntry.getValue());
+                Assertions.assertThat(prices).as(pricesEntry.getKey() + " prices cucumber input").isNotEmpty();
                 settlementPage.updateSettlePrices(prodId, betType.id, prices);
             }
             settlementPage.accept();

@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
 import org.assertj.core.api.Assertions;
@@ -92,7 +93,7 @@ public class SettlementPage extends AppPage {
 
     private List<WebElement> filterWithIds(List<WebElement> elems, Integer prodId, Integer betTypeId){
         return elems.stream()
-                .filter(el -> nameContainsId(el, prodId) && nameContainsId(el, betTypeId))
+                .filter(el -> nameContainsId(el, prodId) && (betTypeId == BetType.Exotic.id || nameContainsId(el, betTypeId) ))
                 .collect(Collectors.toList());
     }
 
