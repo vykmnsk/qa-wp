@@ -90,7 +90,6 @@ public class APISteps implements En {
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
-                    int i = 0;
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
 
@@ -99,29 +98,28 @@ public class APISteps implements En {
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
 
                     if (null == wapi) wapi = new WAPI();
+                    assertThat(eventIds.size()).isEqualTo(runners.size());
 
-                    for (String singleRunner : runners) {
-                        Object resp = wapi.getEventMarkets(eventIds.get(i));
-
-                        String marketId = wapi.readMarketId(resp, "Racing Live");
+                    for (int i = 0; i<runners.size(); i++) {
+                        Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
+                        String marketId = wapi.readMarketId(marketsResponse, "Racing Live");
                         marketIds.add(marketId);
-                        String selId = wapi.readSelectionId(resp, marketId, singleRunner);
+                        String selId = wapi.readSelectionId(marketsResponse, marketId, runners.get(i));
                         selectionIds.add(selId);
-                        i++;
                     }
 
-                    Object response;
+                    Object betResponse;
                     switch (betTypeName.toUpperCase()) {
                         case "DAILY DOUBLE":
                         case "RUNNING DOUBLE":
                         case "QUADDIE":
-                            response = wapi.placeExoticBetOnMultipleEvents(accessToken, prodId,
+                            betResponse = wapi.placeExoticBetOnMultipleEvents(accessToken, prodId,
                                     selectionIds , marketIds, stake, flexi);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = Config.getAPI().readNewBalance(response);
+                    balanceAfterBet = Config.getAPI().readNewBalance(betResponse);
                 });
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {

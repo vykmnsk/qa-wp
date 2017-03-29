@@ -25,11 +25,7 @@ public class Storage {
 
     public static void add(KEY key, Object value) {
         List<Object> entries;
-        if (null == map.get(key)) {
-            entries = new ArrayList<>();
-        } else {
-            entries = (List) map.get(key);
-        }
+        entries = (null == map.get(key)) ? new ArrayList<>() : (List) map.get(key) ;
         entries.add(value);
         map.put(key, entries);
     }
