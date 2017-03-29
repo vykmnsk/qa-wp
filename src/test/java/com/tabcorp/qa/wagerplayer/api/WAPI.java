@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class WAPI implements WagerPlayerAPI {
@@ -96,13 +97,32 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+    public Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
+        if (flexi) fields.put("flexi", "y");
         return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
+    }
+
+       public Object placeExoticBetOnMultipleEvents(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, String flexi) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("product_id", productId);
+        AtomicInteger atomicIntSel = new AtomicInteger(1);
+           selectionIds.forEach(id -> {
+               fields.put("slot[" + atomicIntSel.getAndIncrement() + "][selection][]", id);
+        });
+        AtomicInteger atomicIntMarket = new AtomicInteger(1);
+           marketIds.forEach(id -> {
+               fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id);
+           });
+        fields.put("amount", stake);
+        fields.put("flexi", flexi);
+        fields.put("output_type", "json");
+        return post(fields);
     }
 
     public BigDecimal readNewBalance(Object resp) {
@@ -144,16 +164,23 @@ public class WAPI implements WagerPlayerAPI {
         return readOneAttr(resp, path, attrName);
     }
 
-    public static String readMarketId(Object resp, String mktName) {
+    public String readMarketId(Object resp, String mktName) {
         String mktPath = ".markets.market" + jfilter("name", mktName);
         return readOneAttr(resp, mktPath, "id");
     }
 
-    public static List<String> readSelectionIds(Object resp, String marketId, List<String> selectionNames) {
+    public static String readFirstMarketId(Object resp) {
+        String path = "$.RSP.markets.market[0].id";
+        String id = JsonPath.read(resp, path);
+        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        return id;
+    }
+
+    public List<String> readSelectionIds(Object resp, String marketId, List<String> selectionNames) {
         return selectionNames.stream().map(sn -> readSelectionId(resp, marketId, sn)).collect(Collectors.toList());
     }
 
-    private static String readSelectionId(Object resp, String marketId, String selectionName) {
+    public String readSelectionId(Object resp, String marketId, String selectionName) {
         String mktPath = ".markets.market" + jfilter("id", marketId);
         String selPath = ".selections.selection" + jfilter("name", selectionName);
         return readOneAttr(resp, mktPath + selPath, "id");

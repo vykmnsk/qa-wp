@@ -82,6 +82,10 @@ public class MarketsPage extends AppPage {
     @FindBy(css = "#bet_types_content_body table.product_options tbody tr")
     private List<WebElement> productRows;
 
+    @FindBy(css = ("div[id=cross_race_exotics_content_body] table[class$='product_options'] tr"))
+    private List<WebElement> crossRaceExoticsProductRows;
+    private By crossRaceExoticsCheckbox = By.cssSelector("input[type=checkbox][name^='enable_product[']");
+
     @FindBy(css = "input[type=hidden][name=event_id]")
     private WebElement eventId;
 
@@ -150,17 +154,16 @@ public class MarketsPage extends AppPage {
         insertBtn.click();
     }
 
+    public void updateRaceNumber(int num) {
+        raceNumTxt.clear();
+        raceNumTxt.sendKeys("" + num);
+    }
+
     public void showMarketManagement() {
         if (!marketManagementSection.isDisplayed()) {
             showHideMarketManagement.click();
         }
         wait.until(ExpectedConditions.visibilityOf(marketManagementSection));
-
-    }
-
-    public void updateRaceNumber(int num) {
-        raceNumTxt.clear();
-        raceNumTxt.sendKeys(""+num);
     }
 
     public void enableProductSettings(String prodName, List<List<String>> settings) {
@@ -176,10 +179,10 @@ public class MarketsPage extends AppPage {
         updateBtn.click();
     }
 
-    private WebElement enableFindProductRow(String prodName){
+    private WebElement enableFindProductRow(String prodName) {
         Function<String, WebElement> findProdRow = name -> productRows.stream().filter(p -> p.getText().contains(name)).findFirst().orElse(null);
         WebElement tr = findProdRow.apply(prodName);
-        if (null == tr){
+        if (null == tr) {
             boolean added = addProduct(prodName);
             assertThat(added).as("Added product " + prodName).isTrue();
             showMarketManagement();
@@ -188,11 +191,11 @@ public class MarketsPage extends AppPage {
         return tr;
     }
 
-    private boolean addProduct(String prodName){
-        for(WebElement elem : addProductElems) {
+    private boolean addProduct(String prodName) {
+        for (WebElement elem : addProductElems) {
             Select select = new Select(elem);
             WebElement prodOption = select.getOptions().stream().filter(o -> prodName.equals(o.getText())).findFirst().orElse(null);
-            if (null != prodOption){
+            if (null != prodOption) {
                 select.selectByValue(prodOption.getAttribute("value"));
                 WebElement plusBtn = findParent(elem).findElement(addProductBtnCSS);
                 plusBtn.click();
@@ -202,7 +205,20 @@ public class MarketsPage extends AppPage {
         return false;
     }
 
-    private Integer findProductID(WebElement tr){
+    public void enableCrossRaceProduct(String prodName) {
+        showMarketManagement();
+        log.info("Trying to enable Cross Race Product =" + prodName);
+        WebElement prodRow = crossRaceExoticsProductRows.stream().filter(tr -> tr.getText().contains(prodName)).findFirst().orElse(null);
+        assertThat(prodRow).as("Product %s is not found in Cross Race section on Market Page", prodName).isNotNull();
+        WebElement chk = prodRow.findElement(crossRaceExoticsCheckbox);
+        assertThat(chk.getAttribute("disabled")).as("Cross Race Product checkbox is disabled").isNull();
+        String checked = chk.getAttribute("checked");
+        if (null == checked) chk.click();
+        assertThat(checked).as("Checked Cross Race Product " + prodName).isEqualTo("checked");
+        updateBtn.click();
+    }
+
+    private Integer findProductID(WebElement tr) {
         String firstCheckboxName = tr.findElement(By.cssSelector("input[type=hidden]")).getAttribute("name");
         Pattern p = Pattern.compile("products\\[(\\d+)\\].*");
         Matcher m = p.matcher(firstCheckboxName);
@@ -259,7 +275,7 @@ public class MarketsPage extends AppPage {
                 .isEqualTo(expectedStatus);
     }
 
-    public String readEventID(){
+    public String readEventID() {
         return eventId.getAttribute("value");
     }
 }

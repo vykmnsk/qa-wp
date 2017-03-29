@@ -104,7 +104,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return placeBet(betPayload);
     }
 
-    public Object placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake) {
+    public Object placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi) {
         JSONObject obj = new JSONObject();
         JSONObject selectionsData = new JSONObject();
         JSONArray selections = new JSONArray();

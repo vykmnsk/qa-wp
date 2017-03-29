@@ -1,4 +1,3 @@
-@wip
 @ui @redbook
 Feature: Creating a Sunbets Event
 
