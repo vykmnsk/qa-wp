@@ -52,7 +52,7 @@ public class HeaderPage extends AppPage {
     @FindBy(css = "input[value='12 Agents']")
     private WebElement f12;
 
-    @FindBy(css = "#header_table > tbody > tr:nth-child(2) > td:nth-child(3) > input:nth-child(1)")
+    @FindBy(css = "input[name= button_R]")
     private WebElement reloadPage;
 
     public void pickCategories(String catVal, String subcatVal) {
@@ -92,9 +92,25 @@ public class HeaderPage extends AppPage {
         return settlementPage;
     }
 
+    public CustomerListPage navigateToF11() {
+        switchToHeaderFrame();
+        f11.click();
+        CustomerListPage customerListPage = new CustomerListPage();
+        customerListPage.load();
+        return customerListPage;
+    }
+
     private void switchToHeaderFrame() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_top"));
+    }
+
+    public void refreshPage() {
+        switchToHeaderFrame();
+        wait.until(ExpectedConditions.elementToBeClickable(reloadPage));
+        reloadPage.click();
+        driver.switchTo().defaultContent();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
 }

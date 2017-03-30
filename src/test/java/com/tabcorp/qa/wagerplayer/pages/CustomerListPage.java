@@ -4,12 +4,17 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CustomerListPage extends AppPage{
+
+    @FindBy(css = ("#main_table > tbody > tr:nth-child(1) > th"))
+    public WebElement labelCustomerPage;
 
     @FindBy(css = "table#body_table_inner")
     public WebElement custTable;
 
-    @FindBy(css = "input[class='screen_only wp_button']")
+    @FindBy(css = "input[value=insert]")
     public WebElement newCustomer;
 
     @FindBy(css = "#admin_options_box > a:nth-child(3)")
@@ -25,8 +30,15 @@ public class CustomerListPage extends AppPage{
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
         wait.until(ExpectedConditions.visibilityOf(newCustomer));
+    }
+
+    public void insertNew() {
         newCustomer.click();
-        wait.until(ExpectedConditions.visibilityOf(newCustomer));
+    }
+
+    public void verifyLoaded() {
+        wait.until(ExpectedConditions.visibilityOf(labelCustomerPage));
+        assertThat(labelCustomerPage.getText()).isEqualTo("Customers");
     }
 
 }
