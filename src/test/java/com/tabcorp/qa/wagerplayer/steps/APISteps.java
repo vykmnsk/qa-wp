@@ -5,12 +5,11 @@ import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
+import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +20,7 @@ public class APISteps implements En {
     private String accessToken = null;
     private BigDecimal balanceBefore = null;
     private BigDecimal balanceAfterBet = null;
+    private String customerId = null;
     private WAPI wapi = null;
 
     public APISteps() {
@@ -136,6 +136,48 @@ public class APISteps implements En {
         Then("^customer balance is not changed$", () -> {
             BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
             assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
+        });
+
+        When("^I post customer specifics to create new customer$", (DataTable table) -> {
+            Map<String, String> cust = table.asMap(String.class, String.class);
+
+            String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
+            String username = "AutoUser" + timeStamp;
+            Storage.add(CUSTOMER_ID, username);
+
+            String custTitle = (String) Helpers.nonNullGet(cust, "title");
+            String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
+            String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
+            String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
+            String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
+            String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
+            String[] custAddress = ((String) Helpers.nonNullGet(cust, "address")).split(",");
+            String custCountry = (String) Helpers.nonNullGet(cust, "country");
+            String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
+            String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
+            String custSecurityAnswer = (String) Helpers.nonNullGet(cust, "customer_answer");
+            String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
+            String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
+
+            if (null == wapi) wapi = new WAPI();
+            Object customerResponse = wapi.createNewCustomer(
+                    username,
+                    custTitle,
+                    custFirstName,
+                    custLastName,
+                    custDob,
+                    custTelephoneNo,
+                    custEmail,
+                    custAddress,
+                    custCountry,
+                    custWeeklyLimit,
+                    custSecurityQuestion,
+                    custSecurityAnswer,
+                    currencyValue,
+                    custTimezone
+            );
+            customerId = wapi.readNewCustomerId(customerResponse);
+
         });
     }
 

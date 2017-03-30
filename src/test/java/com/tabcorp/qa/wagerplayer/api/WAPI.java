@@ -55,6 +55,40 @@ public class WAPI implements WagerPlayerAPI {
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }
 
+    public Object createNewCustomer(String username, String custTitle, String custFirstName, String custLastName, String custDob,
+                                    String custPhoneNo, String custEmail, String[] custAddress, String custCountry, String weeklyDepLimit,
+                                    String custSecurityQuestion, String custSecurityAnswer, String currencyValue, String custTimezone) {
+        Map<String, Object> fields = wapiAuthFields();
+        fields.put("action", "account_insert_customer");
+        //fields.put("client_ip", "58.6.129.9");
+        fields.put("username", username);
+        fields.put("telephone_password", "1234567890");
+        fields.put("internet_password", "A1234567890");
+        fields.put("password","abcd123");
+        fields.put("secret_question", custSecurityQuestion);
+        fields.put("secret_answer", custSecurityAnswer);
+        fields.put("salutation", custTitle);
+        fields.put("firstname", custFirstName);
+        fields.put("lastname", custLastName);
+        fields.put("dob", custDob);
+        fields.put("email_address", custEmail);
+//        fields.put("building_number", custAddress[0]);
+        fields.put("street", custAddress[0] + " " + custAddress[1] + " " + custAddress[2]);
+//        fields.put("street_type", "Road");
+//        fields.put("city", custAddress[2]);
+        fields.put("postcode", custAddress[4]);
+        fields.put("country", custCountry);
+        fields.put("telephone", custPhoneNo);
+        fields.put("state", custAddress[3]);
+//        fields.put("residential_street_address", custAddress[0] + " " + custAddress[1]);
+//        fields.put("residential_suburb", custAddress[2]);
+//        fields.put("street_address", custAddress[0] + " " + custAddress[1]);
+        fields.put("suburb", custAddress[2]);
+        fields.put("currency", currencyValue);
+        fields.put("timezone", custTimezone);
+        return post(fields);
+    }
+
     public BigDecimal getBalance(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
@@ -138,6 +172,12 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("eid", evtId);
         fields.put("show_held", false);
         return post(fields);
+    }
+
+    public String readNewCustomerId(Object resp) {
+        Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
+        String custId = val.toString();
+        return custId;
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
