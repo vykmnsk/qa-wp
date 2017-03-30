@@ -156,7 +156,7 @@ public class NewCustomerPage extends AppPage {
         residentialCountry.sendKeys(custCountry);
         new Select(residentialState).selectByVisibleText(custAddress[2]);
 
-        if(weeklyDepLimit != "") weeklyDepositLimit.sendKeys(weeklyDepLimit);
+        if(!weeklyDepLimit.equals("")) { weeklyDepositLimit.sendKeys(weeklyDepLimit); }
 
         new Select(residentialTimezone).selectByValue(custTimezone);
 

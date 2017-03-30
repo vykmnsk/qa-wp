@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class CustomerDetailsPage extends AppPage{
+public class CustomerDetailsPage extends AppPage {
 
     @FindBy(css = ("#main_table > tbody > tr:nth-child(1) > th"))
     public WebElement labelCustomerDetailsPage;
@@ -42,9 +42,10 @@ public class CustomerDetailsPage extends AppPage{
     public void verifyAmlStatus(String amlOne, String amlTwo) {
         WebElement amlStatusValue = null;
         List<WebElement> custDetailLabels = custDetailFields;
-        for(int i = 2; i < custDetailLabels.size(); i++) {
-            if(custDetailLabels.get(i).getText().equals(" AML Status:")) {
-                amlStatusValue = custDetailValue.findElement(By.cssSelector("tr:nth-child("+i+") > td:nth-child(2)"));
+        for (int i = 0; i < custDetailLabels.size(); i++) {
+            if (custDetailLabels.get(i).getText().equals(" AML Status:")) {
+                i+=1;
+                amlStatusValue = custDetailValue.findElement(By.cssSelector("tr:nth-child(" + i + ") > td:nth-child(2)"));
                 break;
             }
         }

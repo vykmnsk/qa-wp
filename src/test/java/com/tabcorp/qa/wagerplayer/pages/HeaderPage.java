@@ -5,6 +5,8 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 public class HeaderPage extends AppPage {
 
     @FindBy(css = "#cat")
@@ -107,7 +109,9 @@ public class HeaderPage extends AppPage {
 
     public void refreshPage() {
         switchToHeaderFrame();
-        wait.until(ExpectedConditions.elementToBeClickable(reloadPage));
+        assertThat(reloadPage.isDisplayed());
+        reloadPage.click();
+        assertThat(reloadPage.isDisplayed());
         reloadPage.click();
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
