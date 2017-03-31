@@ -1,4 +1,4 @@
-@exotic-bets @luxbet @ccbets
+@exotic-bets @luxbet
 Feature: Placing and Settling Exotic Bets for a Single Event
 
   Background:
@@ -8,16 +8,12 @@ Feature: Placing and Settling Exotic Bets for a Single Event
   Scenario Outline: Horse Race Exotic bets on subcategory Ballina
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"
     And I create a default event with details
-      | base name | TEST RACE                                                                      |
       | runners   | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices    | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
     And I enable "<ProductName>" product settings
-      | Betting | Enabled       | On    |
-      | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
     And customer balance is at least $20.50
@@ -41,16 +37,12 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     Scenario Outline: Horse Race Exotic bets on subcategory Wolverhampton
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
-      | base name | TEST RACE                                                                      |
       | runners   | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices    | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
     And I enable "<ProductName>" product settings
-      | Betting | Enabled       | On    |
-      | Betting | Enabled       | Auto  |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
     And customer balance is at least $20.50

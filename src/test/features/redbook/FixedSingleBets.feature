@@ -1,4 +1,4 @@
-@single-bets @redbook @multiplebets
+@single-bets @redbook
 
 Feature: Placing and Settling multiple Single bets on a Sunbets event
 
@@ -9,11 +9,9 @@ Feature: Placing and Settling multiple Single bets on a Sunbets event
   Scenario: Horse Race multiple Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
-      | base name | TEST RACE                                        |
       | runners   | Runner01, Runner02, Runner03, Runner04, Runner05 |
       | prices    | 1.10, 2.20, 2.80, 3.40, 5.20                     |
     And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | EW    |
     And customer balance is at least $20.50

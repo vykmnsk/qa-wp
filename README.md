@@ -19,8 +19,12 @@ mvn test -DforkMode=never
 - WAGERPLAYER_CUSTOMER_PASSWORD
 - WAGERPLAYER_RUN_MODE=[ DOCKER | anything-else ]
 - WAGERPLAYER_MOBIV2_URL
-- WAGERPLAYER_MOBIV2_USERNAME
-- WAGERPLAYER_MOBIV2_PASSWORD
+
+# Info
+
+- The base name for races is :  TEST RACE
+- The "Enabled" setting for "Betting" is enabled by 
+  default. Hence not part of the feature file.
 
 
 #Docker Run

@@ -3,10 +3,10 @@ package com.tabcorp.qa.wagerplayer.steps;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
-import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.assertj.core.api.Assertions;
 
 import java.math.BigDecimal;
@@ -114,7 +114,8 @@ public class CreateEventSteps implements En {
             String betInRunType = "Both Allowed";
             String createMarket = "Racing Live";
 
-            String evtBaseName = (String) Helpers.nonNullGet(evt, "base name");
+            String evtBaseName = evt.get("base name");
+            if (null == evtBaseName) evtBaseName = Config.testEventBaseName();
             eventName = Helpers.createUniqueName(evtBaseName);
             String runnersText = (String) Helpers.nonNullGet(evt, "runners");
             List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
@@ -142,24 +143,32 @@ public class CreateEventSteps implements En {
         });
 
 
-        And("^I settle race with prices$", (DataTable table) -> {
-            Map<String, String> pricesInput = new CaseInsensitiveMap(table.asMap(String.class, String.class));
-            Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-            for (Map.Entry<String, String> pricesEntry : pricesInput.entrySet()) {
-                BetType betType = BetType.valueOf(Helpers.toTitleCase(pricesEntry.getKey()));
-                List<BigDecimal> prices = Helpers.extractCSVPrices(pricesEntry.getValue());
-                Assertions.assertThat(prices).as(pricesEntry.getKey() + " prices cucumber input").isNotEmpty();
-                settlementPage.updateSettlePrices(prodId, betType.id, prices);
-            }
-            settlementPage.accept();
-            settlementPage.settle();
+        And("^I settle race$", () -> {
+            settleRace();
         });
 
-        And("^I settle race$", () -> {
-            settlementPage.accept();
-            settlementPage.settle();
+        When("^I settle race with Exotic prices \"([\\d.,\\s]*)\"$", (String pricesCSV) -> {
+            parseUpdateSettlePrices(pricesCSV, BetType.Exotic);
+            settleRace();
+        });
+
+        When("^I settle the race with Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+            parseUpdateSettlePrices(winPricesCSV, BetType.Win);
+            parseUpdateSettlePrices(placePricesCSV, BetType.Place);
+            settleRace();
         });
     }
 
+    private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {
+        Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+        List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCVS);
+        Assertions.assertThat(prices).as(betType + " prices cucumber input").isNotEmpty();
+        settlementPage.updateSettlePrices(prodId, betType.id, prices);
+    }
+
+    private void settleRace(){
+        settlementPage.accept();
+        settlementPage.settle();
+    }
 
 }

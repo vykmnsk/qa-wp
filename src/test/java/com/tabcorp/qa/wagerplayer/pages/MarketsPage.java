@@ -3,6 +3,7 @@ package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
+import org.apache.commons.collections4.ListUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.openqa.selenium.By;
@@ -134,6 +135,13 @@ public class MarketsPage extends AppPage {
         ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
     }
 
+    private List<List<String>> defaultProductSettings() {
+        List<List<String>> settings = new ArrayList<>();
+        settings.add(Arrays.asList("Betting", "Enabled", "On"));
+        settings.add(Arrays.asList("Betting", "Enabled", "Auto"));
+        return settings;
+    }
+
     public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(header));
         assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
@@ -172,10 +180,7 @@ public class MarketsPage extends AppPage {
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         Storage.put(Storage.KEY.PRODUCT_ID, findProductID(tr));
         log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
-
-        for (List<String> option : settings) {
-            setOption(tr, option);
-        }
+        ListUtils.union(defaultProductSettings(), settings).forEach(s -> setOption(tr, s));
         updateBtn.click();
     }
 
