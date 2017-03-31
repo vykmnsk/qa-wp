@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_ID;
+import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_USERNAME;
 
 public class CreateCustomerSteps implements En {
 
@@ -40,7 +40,7 @@ public class CreateCustomerSteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            Storage.add(CUSTOMER_ID, username);
+            Storage.add(CUSTOMER_USERNAME, username);
 
             String custTitle = (String) Helpers.nonNullGet(cust, "title");
             String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");

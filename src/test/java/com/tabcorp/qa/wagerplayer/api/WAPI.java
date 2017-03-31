@@ -63,16 +63,16 @@ public class WAPI implements WagerPlayerAPI {
 
     public Object createNewCustomer(String username, String custTitle, String custFirstName, String custLastName, String custDob,
                                     String custPhoneNo, String custEmail, String[] custAddress, String custCountry, String weeklyDepLimit,
-                                    String custSecurityQuestion, String custSecurityAnswer, String currencyValue, String custTimezone) {
+                                    String custSecurityQuestion, String clientIp, String currencyValue, String custTimezone) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_insert_customer");
-        fields.put("client_ip", "61.9.192.13");
+        fields.put("client_ip", clientIp);
         fields.put("username", username);
-        fields.put("telephone_password", "1234567890");
-        fields.put("internet_password", "A1234567890");
-        fields.put("password","abcd123");
+        fields.put("telephone_password", Config.password());
+        fields.put("internet_password", Config.customerPassword());
+        fields.put("password",Config.password());
         fields.put("secret_question", custSecurityQuestion);
-        fields.put("secret_answer", custSecurityAnswer);
+        fields.put("secret_answer", Config.customerPassword());
         fields.put("salutation", custTitle);
         fields.put("firstname", custFirstName);
         fields.put("lastname", custLastName);
@@ -175,13 +175,21 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public String readNewCustomerId(Object resp) {
+    public void readNewCustomerId(Object resp) {
         Object val = JsonPath.read(resp, "$.RSP.success.customer_id");
         Object msg = JsonPath.read(resp, "$.RSP.success.message");
         assertThat(msg.toString()).isEqualTo("Customer Created");
         String custId = val.toString();
         log.info("Customer ID=" + custId);
-        return custId;
+    }
+
+    public void verifyAmlStatus(String customerUsername, String amlOne, String amlTwo) {
+        String sessionId = getAccessToken(customerUsername, Config.customerPassword());
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "account_verify_aml");
+        Object resp = post(fields);
+        Object val = JsonPath.read(resp, "$.RSP.account[0].aml_status");
+        assertThat(val.equals(amlOne) || val.equals(amlTwo));
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {

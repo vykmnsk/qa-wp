@@ -143,7 +143,7 @@ public class APISteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            Storage.add(CUSTOMER_ID, username);
+            Storage.add(CUSTOMER_USERNAME, username);
 
             String custTitle = (String) Helpers.nonNullGet(cust, "title");
             String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
@@ -155,7 +155,7 @@ public class APISteps implements En {
             String custCountry = (String) Helpers.nonNullGet(cust, "country");
             String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
             String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
-            String custSecurityAnswer = (String) Helpers.nonNullGet(cust, "customer_answer");
+            String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
             String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
             String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
 
@@ -172,12 +172,17 @@ public class APISteps implements En {
                     custCountry,
                     custWeeklyLimit,
                     custSecurityQuestion,
-                    custSecurityAnswer,
+                    custClientIp,
                     currencyValue,
                     custTimezone
             );
-            customerId = wapi.readNewCustomerId(customerResponse);
-            Storage.add(CUSTOMER_ID, customerId);
+            wapi.readNewCustomerId(customerResponse);
+        });
+
+        Then("^I verify a new customer created with AML status \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
+            if (null == wapi) wapi = new WAPI();
+
+            wapi.verifyAmlStatus(Storage.get(CUSTOMER_USERNAME).toString().replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
         });
     }
 
