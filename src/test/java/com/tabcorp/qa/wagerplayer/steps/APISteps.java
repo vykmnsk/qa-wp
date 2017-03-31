@@ -22,6 +22,7 @@ public class APISteps implements En {
     private BigDecimal balanceAfterBet = null;
     private String customerId = null;
     private WAPI wapi = null;
+    private String customer_username = null;
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
@@ -143,7 +144,7 @@ public class APISteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            Storage.add(CUSTOMER_USERNAME, username);
+            customer_username = username;
 
             if (null == wapi) wapi = new WAPI();
             String successMsg = wapi.createNewCustomer(

@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.wagerplayer.Config;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -124,30 +125,38 @@ public class NewCustomerPage extends AppPage {
 
     private static Logger log = LoggerFactory.getLogger(NewCustomerPage.class);
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     public void verifyLoaded() {
         wait.until(ExpectedConditions.visibilityOf(labelCreateCustomer));
         assertThat(labelCreateCustomer.getText()).isEqualTo("Create Customer");
     }
 
-    public void enterCustomerDetails(String username, String custTitle, String custFirstName, String custLastName, String custDob,
-                                     String custPhoneNo, String custEmail, String[] custAddress, String custCountry, String weeklyDepLimit,
-                                     String custSecurityQuestion, String custSecurityAnswer, String currencyValue, String custTimezone) {
+    public void enterCustomerDetails(String username, LocalDate custDob, Map<String, String> cust) {
         log.info("Customer Username=" + username);
+
+        String custTitle = (String) Helpers.nonNullGet(cust, "title");
+        String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
+        String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
+        String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
+        String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
+        String[] custAddress = ((String) Helpers.nonNullGet(cust, "address")).split(",");
+        String custCountry = (String) Helpers.nonNullGet(cust, "country");
+        String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
+        String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
+        String custSecurityAnswer = (String) Helpers.nonNullGet(cust, "customer_answer");
+        String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
+        String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
 
         new Select(title).selectByValue(custTitle);
         firstName.sendKeys(custFirstName);
         lastName.sendKeys(custLastName);
 
-        LocalDate dob = LocalDate.parse(custDob, DATE_TIME_FORMATTER);
-        doBDay.sendKeys(String.valueOf(dob.getDayOfMonth()));
-        doBMonth.sendKeys(String.valueOf(dob.getMonthValue()));
-        doBYear.sendKeys(String.valueOf(dob.getYear()));
+        doBDay.sendKeys(String.valueOf(custDob.getDayOfMonth()));
+        doBMonth.sendKeys(String.valueOf(custDob.getMonthValue()));
+        doBYear.sendKeys(String.valueOf(custDob.getYear()));
 
         emailID.sendKeys(custEmail);
         new Select(countryCode).selectByVisibleText("+61");
-        custMobileNo.sendKeys(custPhoneNo);
+        custMobileNo.sendKeys(custTelephoneNo);
 
         residentialStreetAddress.sendKeys(custAddress[0]);
         residentialSuburb.sendKeys(custAddress[1]);
@@ -156,7 +165,7 @@ public class NewCustomerPage extends AppPage {
         residentialCountry.sendKeys(custCountry);
         new Select(residentialState).selectByVisibleText(custAddress[2]);
 
-        if(!weeklyDepLimit.equals("")) { weeklyDepositLimit.sendKeys(weeklyDepLimit); }
+        if(!custWeeklyLimit.equals("")) { weeklyDepositLimit.sendKeys(custWeeklyLimit); }
 
         new Select(residentialTimezone).selectByValue(custTimezone);
 
@@ -169,10 +178,10 @@ public class NewCustomerPage extends AppPage {
 
         userName.sendKeys(username);
 
-        telePassword.sendKeys("123456789");
-        telePasswordConfirmation.sendKeys("123456789"); // repeat telepassword
-        internetPassword.sendKeys("A123456789");
-        internetPasswordConfirmation.sendKeys("A123456789");  // repeat internetpasword
+        telePassword.sendKeys(Config.password());
+        telePasswordConfirmation.sendKeys(Config.password());
+        internetPassword.sendKeys(Config.customerPassword());
+        internetPasswordConfirmation.sendKeys(Config.customerPassword());
 
         new Select(challengeQuestion).selectByVisibleText(custSecurityQuestion);
         challengeAnswer.sendKeys(custSecurityAnswer);

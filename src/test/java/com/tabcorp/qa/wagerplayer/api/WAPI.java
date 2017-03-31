@@ -62,7 +62,6 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public String createNewCustomer(String username, Map<String, String> cust) {
-
         Map<String, Object> fields = wapiAuthFields();
 
         String custTitle = (String) Helpers.nonNullGet(cust, "title");

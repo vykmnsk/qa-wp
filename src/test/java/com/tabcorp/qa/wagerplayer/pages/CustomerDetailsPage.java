@@ -39,9 +39,8 @@ public class CustomerDetailsPage extends AppPage {
 
     public void verifyAmlStatus(String amlOne, String amlTwo) {
         WebElement amlStatusValue = null;
-        List<WebElement> custDetailLabels = custDetailFields;
-        for (int i = 0; i < custDetailLabels.size(); i++) {
-            if (custDetailLabels.get(i).getText().equals(" AML Status:")) {
+        for (int i = 0; i < custDetailFields.size(); i++) {
+            if (custDetailFields.get(i).getText().equals(" AML Status:")) {
                 i+=1;
                 amlStatusValue = custDetailValue.findElement(By.cssSelector("tr:nth-child(" + i + ") > td:nth-child(2)"));
                 break;
