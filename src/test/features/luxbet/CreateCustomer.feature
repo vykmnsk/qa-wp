@@ -1,4 +1,4 @@
-@wip @luxbet @cc
+@wip @luxbet
 Feature: Create Luxbet Customer
 
   Background:

@@ -6,13 +6,19 @@ import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class WAPI implements WagerPlayerAPI {
+
+    private static Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static final String URL = Config.wapiURL();
     private static final String RESP_ROOT_PATH = "$.RSP";
@@ -34,7 +40,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
         return resp;
     }
 
@@ -42,7 +48,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("output_type", "json");
         Object resp = REST.postWithQueryStrings(URL, fields, selectionIds, key);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
         return resp;
     }
 
@@ -60,7 +66,7 @@ public class WAPI implements WagerPlayerAPI {
                                     String custSecurityQuestion, String custSecurityAnswer, String currencyValue, String custTimezone) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_insert_customer");
-        //fields.put("client_ip", "58.6.129.9");
+        fields.put("client_ip", "61.9.192.13");
         fields.put("username", username);
         fields.put("telephone_password", "1234567890");
         fields.put("internet_password", "A1234567890");
@@ -72,17 +78,12 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("lastname", custLastName);
         fields.put("dob", custDob);
         fields.put("email_address", custEmail);
-//        fields.put("building_number", custAddress[0]);
+        fields.put("deposit_limit", weeklyDepLimit);
         fields.put("street", custAddress[0] + " " + custAddress[1] + " " + custAddress[2]);
-//        fields.put("street_type", "Road");
-//        fields.put("city", custAddress[2]);
         fields.put("postcode", custAddress[4]);
         fields.put("country", custCountry);
         fields.put("telephone", custPhoneNo);
         fields.put("state", custAddress[3]);
-//        fields.put("residential_street_address", custAddress[0] + " " + custAddress[1]);
-//        fields.put("residential_suburb", custAddress[2]);
-//        fields.put("street_address", custAddress[0] + " " + custAddress[1]);
         fields.put("suburb", custAddress[2]);
         fields.put("currency", currencyValue);
         fields.put("timezone", custTimezone);
@@ -175,8 +176,11 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public String readNewCustomerId(Object resp) {
-        Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
+        Object val = JsonPath.read(resp, "$.RSP.success.customer_id");
+        Object msg = JsonPath.read(resp, "$.RSP.success.message");
+        assertThat(msg.toString()).isEqualTo("Customer Created");
         String custId = val.toString();
+        log.info("Customer ID=" + custId);
         return custId;
     }
 
@@ -212,7 +216,7 @@ public class WAPI implements WagerPlayerAPI {
     public static String readFirstMarketId(Object resp) {
         String path = "$.RSP.markets.market[0].id";
         String id = JsonPath.read(resp, path);
-        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
         return id;
     }
 
@@ -229,11 +233,11 @@ public class WAPI implements WagerPlayerAPI {
     private static String readOneAttr(Object resp, String basePath, String attrName) {
         String path = RESP_ROOT_PATH + basePath + "." + attrName;
         JSONArray attrs = JsonPath.read(resp, path);
-        Assertions.assertThat(attrs.size())
+        assertThat(attrs.size())
                 .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, path))
                 .isEqualTo(1);
         String attr = String.valueOf(attrs.get(0));
-        Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
+        assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
         return attr;
     }
 

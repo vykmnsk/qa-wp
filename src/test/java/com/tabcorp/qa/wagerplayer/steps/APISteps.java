@@ -177,7 +177,6 @@ public class APISteps implements En {
                     custTimezone
             );
             customerId = wapi.readNewCustomerId(customerResponse);
-
         });
     }
 
