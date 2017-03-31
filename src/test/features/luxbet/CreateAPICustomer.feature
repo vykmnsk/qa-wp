@@ -1,7 +1,7 @@
-@wip @ccapi
+@api @luxbet @cccust
 Feature: Create Luxbet API Customer
 
-  Scenario Outline: Create Luxbet Customer on API
+  Scenario Outline: Create Luxbet Customer using API
     When I post customer specifics to create new customer
       | title                | <title>                |
       | firstname            | <firstname>            |

@@ -145,44 +145,19 @@ public class APISteps implements En {
             String username = "AutoUser" + timeStamp;
             Storage.add(CUSTOMER_USERNAME, username);
 
-            String custTitle = (String) Helpers.nonNullGet(cust, "title");
-            String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
-            String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
-            String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
-            String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
-            String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
-            String[] custAddress = ((String) Helpers.nonNullGet(cust, "address")).split(",");
-            String custCountry = (String) Helpers.nonNullGet(cust, "country");
-            String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
-            String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
-            String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
-            String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
-            String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
-
             if (null == wapi) wapi = new WAPI();
-            Object customerResponse = wapi.createNewCustomer(
+            String successMsg = wapi.createNewCustomer(
                     username,
-                    custTitle,
-                    custFirstName,
-                    custLastName,
-                    custDob,
-                    custTelephoneNo,
-                    custEmail,
-                    custAddress,
-                    custCountry,
-                    custWeeklyLimit,
-                    custSecurityQuestion,
-                    custClientIp,
-                    currencyValue,
-                    custTimezone
+                    cust
             );
-            wapi.readNewCustomerId(customerResponse);
+            assertThat(successMsg.toString()).isEqualTo("Customer Created");
         });
 
         Then("^I verify a new customer created with AML status \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
             if (null == wapi) wapi = new WAPI();
 
-            wapi.verifyAmlStatus(Storage.get(CUSTOMER_USERNAME).toString().replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
+            String amlStatus = wapi.verifyAmlStatus(Storage.get(CUSTOMER_USERNAME).toString().replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
+            assertThat(amlStatus).as("AML status").isIn(amlOne, amlTwo);
         });
     }
 

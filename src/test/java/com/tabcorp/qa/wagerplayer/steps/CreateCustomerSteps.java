@@ -35,7 +35,7 @@ public class CreateCustomerSteps implements En {
             newCustPage.verifyLoaded();
         });
 
-        When("^I enter specifics to insert new customer through Wagerplayer$", (DataTable table) -> {
+        When("^I enter the following data on Create New Customer page$", (DataTable table) -> {
             Map<String, String> cust = table.asMap(String.class, String.class);
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());

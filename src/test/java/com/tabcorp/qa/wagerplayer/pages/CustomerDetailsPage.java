@@ -8,8 +8,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CustomerDetailsPage extends AppPage {
 
@@ -49,8 +47,7 @@ public class CustomerDetailsPage extends AppPage {
                 break;
             }
         }
-
-        assertThat(amlStatusValue.getText().equals(amlOne) || amlStatusValue.getText().equals(amlTwo));
+        assertThat(amlStatusValue).as("AML status").isIn(amlOne, amlTwo);
     }
 
 }

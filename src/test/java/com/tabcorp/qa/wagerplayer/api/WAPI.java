@@ -2,10 +2,10 @@ package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
 import com.tabcorp.qa.common.BetType;
+import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
-import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +61,26 @@ public class WAPI implements WagerPlayerAPI {
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }
 
-    public Object createNewCustomer(String username, String custTitle, String custFirstName, String custLastName, String custDob,
-                                    String custPhoneNo, String custEmail, String[] custAddress, String custCountry, String weeklyDepLimit,
-                                    String custSecurityQuestion, String clientIp, String currencyValue, String custTimezone) {
+    public String createNewCustomer(String username, Map<String, String> cust) {
+
         Map<String, Object> fields = wapiAuthFields();
+
+        String custTitle = (String) Helpers.nonNullGet(cust, "title");
+        String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
+        String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
+        String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
+        String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
+        String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
+        String[] custAddress = ((String) Helpers.nonNullGet(cust, "address")).split(",");
+        String custCountry = (String) Helpers.nonNullGet(cust, "country");
+        String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
+        String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
+        String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
+        String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
+        String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
+
         fields.put("action", "account_insert_customer");
-        fields.put("client_ip", clientIp);
+        fields.put("client_ip", custClientIp);
         fields.put("username", username);
         fields.put("telephone_password", Config.password());
         fields.put("internet_password", Config.customerPassword());
@@ -78,16 +92,21 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("lastname", custLastName);
         fields.put("dob", custDob);
         fields.put("email_address", custEmail);
-        fields.put("deposit_limit", weeklyDepLimit);
+        fields.put("deposit_limit", custWeeklyLimit);
         fields.put("street", custAddress[0] + " " + custAddress[1] + " " + custAddress[2]);
         fields.put("postcode", custAddress[4]);
         fields.put("country", custCountry);
-        fields.put("telephone", custPhoneNo);
+        fields.put("telephone", custTelephoneNo);
         fields.put("state", custAddress[3]);
         fields.put("suburb", custAddress[2]);
         fields.put("currency", currencyValue);
         fields.put("timezone", custTimezone);
-        return post(fields);
+
+        Object resp = post(fields);
+        String custId = JsonPath.read(resp, RESP_ROOT_PATH + ".success.customer_id").toString();
+        String msg = JsonPath.read(resp, RESP_ROOT_PATH + ".success.message").toString();
+        log.info("Customer ID=" + custId);
+        return msg;
     }
 
     public BigDecimal getBalance(String sessionId) {
@@ -175,21 +194,13 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public void readNewCustomerId(Object resp) {
-        Object val = JsonPath.read(resp, "$.RSP.success.customer_id");
-        Object msg = JsonPath.read(resp, "$.RSP.success.message");
-        assertThat(msg.toString()).isEqualTo("Customer Created");
-        String custId = val.toString();
-        log.info("Customer ID=" + custId);
-    }
-
-    public void verifyAmlStatus(String customerUsername, String amlOne, String amlTwo) {
+    public String verifyAmlStatus(String customerUsername, String amlOne, String amlTwo) {
         String sessionId = getAccessToken(customerUsername, Config.customerPassword());
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
         Object resp = post(fields);
         Object val = JsonPath.read(resp, "$.RSP.account[0].aml_status");
-        assertThat(val.equals(amlOne) || val.equals(amlTwo));
+        return val.toString();
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {

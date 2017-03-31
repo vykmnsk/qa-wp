@@ -1,12 +1,12 @@
-@wip @luxbet
-Feature: Create Luxbet Customer
+@ui @luxbet
+Feature: Create Luxbet Customer using Wagerplayer
 
   Background:
     Given I am logged into WP UI and on Home Page
 
-  Scenario Outline: Create Luxbet Customer on UI
+  Scenario Outline: Create Luxbet Customer using UI
     When I navigate to customer list page to insert new customer
-    And I enter specifics to insert new customer through Wagerplayer
+    And I enter the following data on Create New Customer page
       | title                | <title>                |
       | firstname            | <firstname>            |
       | lastname             | <lastname>             |
