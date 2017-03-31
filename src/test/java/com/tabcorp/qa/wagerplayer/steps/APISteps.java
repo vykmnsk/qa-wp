@@ -60,7 +60,7 @@ public class APISteps implements En {
                     balanceAfterBet = Config.getAPI().getBalance(accessToken);
                 });
 
-        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([Y|N| ])\"$",
                 (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
                     List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));

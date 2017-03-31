@@ -8,11 +8,9 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
   Scenario: Horse Race multiple Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
-      | base name | TEST RACE                                        |
       | runners   | Runner01, Runner02, Runner03, Runner04, Runner05 |
       | prices    | 1.10, 2.20, 2.80, 3.40, 5.20                     |
     And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Enabled       | On    |
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
       | Betting | Enable Single | EW    |
@@ -29,7 +27,5 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
       | Runner01 | 1 |
       | Runner02 | 2 |
       | Runner03 | 3 |
-
-
     And I settle race
     Then customer balance is increased by $12.40

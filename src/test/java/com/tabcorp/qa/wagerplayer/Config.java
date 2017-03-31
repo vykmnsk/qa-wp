@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 
 public class Config {
-
     public static Logger log = LoggerFactory.getLogger(Config.class);
+
+    public static final String REDBOOK = "redbook";
+    public static final String LUXBET = "luxbet";
 
     private static final String ENV_APP_NAME = "WAGERPLAYER_APP_NAME";
     private static final String ENV_BASE_URL = "WAGERPLAYER_BASE_URL";
@@ -21,7 +23,7 @@ public class Config {
     public static String appName() {
         String appName = System.getenv(ENV_APP_NAME);
         verifyExists(appName, ENV_APP_NAME);
-        Assertions.assertThat(appName).as("Application Name").isIn(Arrays.asList("luxbet", "redbook"));
+        Assertions.assertThat(appName).as("Application Name").isIn(Arrays.asList(LUXBET, REDBOOK));
         return appName;
     }
 
@@ -102,10 +104,13 @@ public class Config {
     public static WagerPlayerAPI getAPI(){
 
         if( apiObj == null) {
-            apiObj = Config.appName().equals("redbook")? new MOBI_V2() : new WAPI() ;
+            apiObj = Config.appName().equals(REDBOOK)? new MOBI_V2() : new WAPI() ;
         }
         log.info("using " + apiObj.getClass().getSimpleName() + " api");
         return apiObj ;
     }
 
+    public static String testEventBaseName() {
+        return "TEST RACE";
+    }
 }

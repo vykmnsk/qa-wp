@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SettlementPage extends AppPage {
@@ -82,7 +83,7 @@ public class SettlementPage extends AppPage {
 
     public void updateSettlePrices(Integer productId, Integer betTypeId, List<BigDecimal> prices){
         List<WebElement> priceInputs;
-        if ("redbook".equals(Config.appName())) {
+        if (Config.REDBOOK.equals(Config.appName())) {
             List<WebElement> hiddenSettlePricesToUpdate = filterWithIds(hiddenSettlePrices, productId, betTypeId);
             priceInputs = findCorrespondingPriceInputs(hiddenSettlePricesToUpdate, priceSelector);
         } else {
@@ -92,9 +93,10 @@ public class SettlementPage extends AppPage {
     }
 
     private List<WebElement> filterWithIds(List<WebElement> elems, Integer prodId, Integer betTypeId){
-        return elems.stream()
-                .filter(el -> nameContainsId(el, prodId) && (betTypeId == BetType.Exotic.id || nameContainsId(el, betTypeId) ))
-                .collect(Collectors.toList());
+        Predicate<WebElement> containsProdId = el -> nameContainsId(el, prodId);
+        Predicate<WebElement> containsProdBetTypeIds = el -> nameContainsId(el, prodId) && nameContainsId(el, betTypeId);
+        Predicate<WebElement> containsIds = (betTypeId == BetType.Exotic.id) ? containsProdId : containsProdBetTypeIds;
+        return elems.stream().filter(containsIds).collect(Collectors.toList());
     }
 
     private boolean nameContainsId(WebElement el, int id) {
