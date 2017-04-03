@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.CustomerDetailsPage;
 import com.tabcorp.qa.wagerplayer.pages.CustomerListPage;
@@ -11,17 +12,19 @@ import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_USERNAME;
 
 public class CreateCustomerInUISteps implements En {
-
     private HeaderPage header;
     private CustomerListPage custListPage;
     private NewCustomerPage newCustPage;
@@ -94,9 +97,15 @@ public class CreateCustomerInUISteps implements En {
         When("^I see new customer created with AML status updated to \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
             custDetailsPage = new CustomerDetailsPage();
             custDetailsPage.verifyLoaded();
-            header.refreshPage();
-            String status = custDetailsPage.readAMLStatus();
-            Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
+
+            class ReloadCheckAMLStatus implements Runnable {
+                public void run() {
+                    header.refreshPage();
+                    String status = custDetailsPage.readAMLStatus();
+                    Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
+                }
+            }
+            Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 3);
         });
 
     }
