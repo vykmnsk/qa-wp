@@ -91,11 +91,21 @@ public class CreateCustomerInUISteps implements En {
         });
 
         When("^I see new customer created with AML status updated to \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
+            boolean success = false;
+            String status = "";
             custDetailsPage = new CustomerDetailsPage();
             custDetailsPage.verifyLoaded();
-            header.refreshPage();
-            String status = custDetailsPage.readAMLStatus();
-            Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
+
+            while (!success) {
+                try {
+                    header.refreshPage();
+                    status = custDetailsPage.readAMLStatus();
+                    Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
+                    success = true;
+                } catch (AssertionError a) {
+                    success = false;
+                }
+            }
         });
 
     }

@@ -111,8 +111,6 @@ public class HeaderPage extends AppPage {
         switchToHeaderFrame();
         assertThat(reloadPage.isDisplayed());
         reloadPage.click();
-        assertThat(reloadPage.isDisplayed());
-        reloadPage.click();
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
