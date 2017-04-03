@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -8,6 +9,8 @@ import org.openqa.selenium.support.ui.Select;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class HeaderPage extends AppPage {
+    @FindBy(css = ("table#main_table th"))
+    public WebElement pageTitle;
 
     @FindBy(css = "#cat")
     private WebElement category;
@@ -117,4 +120,9 @@ public class HeaderPage extends AppPage {
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
+    public void verifyPageTitle(String expectedTitle) {
+        wait.until(ExpectedConditions.visibilityOf(pageTitle));
+        Assertions.assertThat(pageTitle.getText()).isEqualTo(expectedTitle);
+
+    }
 }

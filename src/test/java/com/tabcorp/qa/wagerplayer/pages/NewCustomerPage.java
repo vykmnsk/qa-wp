@@ -5,17 +5,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NewCustomerPage extends AppPage {
-
-    @FindBy(css = ("#main_table > tbody > tr:nth-child(1) > th"))
-    public WebElement labelCreateCustomer;
 
     @FindBy(css = "select[id=salutation]")
     public WebElement title;
@@ -37,9 +32,6 @@ public class NewCustomerPage extends AppPage {
 
     @FindBy(css = "input[name='details[customers_email_address]']")
     public WebElement emailID;
-
-    @FindBy(css = "input[id=residential_building]")
-    public WebElement residentialBuildingNumber;
 
     @FindBy(css = "input[id=residential_street_address]")
     public WebElement residentialStreetAddress;
@@ -64,9 +56,6 @@ public class NewCustomerPage extends AppPage {
 
     @FindBy(css = "select[name='info[timezone]']")
     public WebElement residentialTimezone;
-
-    @FindBy(css = "input[id=building]")
-    public WebElement mailingBuildingNumber;
 
     @FindBy(css = "input[id=street_address]")
     public WebElement mailingStreetAddress;
@@ -119,11 +108,9 @@ public class NewCustomerPage extends AppPage {
     @FindBy(css = "input[id='create_account_submit']")
     public WebElement insert;
 
-    private static Logger log = LoggerFactory.getLogger(NewCustomerPage.class);
-
     public void verifyLoaded() {
-        wait.until(ExpectedConditions.visibilityOf(labelCreateCustomer));
-        assertThat(labelCreateCustomer.getText()).isEqualTo("Create Customer");
+        HeaderPage header = new HeaderPage();
+        header.verifyPageTitle("Create Customer");
     }
 
     public void enterCustomerDetails (

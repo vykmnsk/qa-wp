@@ -95,7 +95,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | ProductName       | BetType      | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
       | STAB Daily Double | Daily Double | Runner21,Runner19 | 3.00  |       | 3.00              | 1.50   |
 
-  @wip
   Scenario Outline: Horse Race Exotic Quaddie bets
     When I enter specifics category "Horse Racing" and subcategory "YEPPOON"
     And I create a default event with details
