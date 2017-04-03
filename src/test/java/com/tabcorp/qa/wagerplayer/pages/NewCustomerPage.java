@@ -130,65 +130,66 @@ public class NewCustomerPage extends AppPage {
         assertThat(labelCreateCustomer.getText()).isEqualTo("Create Customer");
     }
 
-    public void enterCustomerDetails(String username, LocalDate custDob, Map<String, String> cust) {
-        log.info("Customer Username=" + username);
+    public void enterCustomerDetails (
+            String usernameValue,
+            String titleValue,
+            String firstNameValue,
+            String lastNameValue,
+            LocalDate dobValue,
+            String telephoneNoValue,
+            String emailValue,
+            String streetAddressValue,
+            String suburbValue,
+            String cityValue,
+            String stateValue,
+            String postCodeValue,
+            String countryValue,
+            String weeklyLimitValue,
+            String securityQuestionValue,
+            String securityAnswerValue,
+            String currencyValue,
+            String timezoneValue
+    ) {
 
-        String custTitle = (String) Helpers.nonNullGet(cust, "title");
-        String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
-        String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
-        String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
-        String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
-        String custStreetAddress = (String) Helpers.nonNullGet(cust, "street_address");
-        String custSuburb = (String) Helpers.nonNullGet(cust, "suburb");
-        String custCity = (String) Helpers.nonNullGet(cust, "city");
-        String custState = (String) Helpers.nonNullGet(cust, "state");
-        String custPostCode = (String) Helpers.nonNullGet(cust, "postcode");
-        String custCountry = (String) Helpers.nonNullGet(cust, "country");
-        String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
-        String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
-        String custSecurityAnswer = (String) Helpers.nonNullGet(cust, "customer_answer");
-        String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
-        String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
+        new Select(title).selectByValue(titleValue);
+        firstName.sendKeys(firstNameValue);
+        lastName.sendKeys(lastNameValue);
 
-        new Select(title).selectByValue(custTitle);
-        firstName.sendKeys(custFirstName);
-        lastName.sendKeys(custLastName);
+        doBDay.sendKeys(String.valueOf(dobValue.getDayOfMonth()));
+        doBMonth.sendKeys(String.valueOf(dobValue.getMonthValue()));
+        doBYear.sendKeys(String.valueOf(dobValue.getYear()));
 
-        doBDay.sendKeys(String.valueOf(custDob.getDayOfMonth()));
-        doBMonth.sendKeys(String.valueOf(custDob.getMonthValue()));
-        doBYear.sendKeys(String.valueOf(custDob.getYear()));
-
-        emailID.sendKeys(custEmail);
+        emailID.sendKeys(emailValue);
         new Select(countryCode).selectByVisibleText("+61");
-        custMobileNo.sendKeys(custTelephoneNo);
+        custMobileNo.sendKeys(telephoneNoValue);
 
-        residentialStreetAddress.sendKeys(custStreetAddress);
-        residentialSuburb.sendKeys(custSuburb);
-        residentialCity.sendKeys(custCity);
-        residentialPostCode.sendKeys(custPostCode);
-        residentialCountry.sendKeys(custCountry);
-        new Select(residentialState).selectByVisibleText(custState);
+        residentialStreetAddress.sendKeys(streetAddressValue);
+        residentialSuburb.sendKeys(suburbValue);
+        residentialCity.sendKeys(cityValue);
+        residentialPostCode.sendKeys(postCodeValue);
+        residentialCountry.sendKeys(countryValue);
+        new Select(residentialState).selectByVisibleText(stateValue);
 
-        if(!custWeeklyLimit.equals("")) { weeklyDepositLimit.sendKeys(custWeeklyLimit); }
+        if(!weeklyLimitValue.isEmpty()) { weeklyDepositLimit.sendKeys(weeklyLimitValue); }
 
-        new Select(residentialTimezone).selectByValue(custTimezone);
+        new Select(residentialTimezone).selectByValue(timezoneValue);
 
-        mailingStreetAddress.sendKeys(custStreetAddress);
-        mailingSuburb.sendKeys(custSuburb);
-        mailingCity.sendKeys(custCity);
-        mailingPostCode.sendKeys(custPostCode);
-        mailingCountry.sendKeys(custCountry);
-        new Select(mailingState).selectByVisibleText(custState);
+        mailingStreetAddress.sendKeys(streetAddressValue);
+        mailingSuburb.sendKeys(suburbValue);
+        mailingCity.sendKeys(cityValue);
+        mailingPostCode.sendKeys(postCodeValue);
+        mailingCountry.sendKeys(countryValue);
+        new Select(mailingState).selectByVisibleText(stateValue);
 
-        userName.sendKeys(username);
+        userName.sendKeys(usernameValue);
 
         telePassword.sendKeys(Config.password());
         telePasswordConfirmation.sendKeys(Config.password());
         internetPassword.sendKeys(Config.customerPassword());
         internetPasswordConfirmation.sendKeys(Config.customerPassword());
 
-        new Select(challengeQuestion).selectByVisibleText(custSecurityQuestion);
-        challengeAnswer.sendKeys(custSecurityAnswer);
+        new Select(challengeQuestion).selectByVisibleText(securityQuestionValue);
+        challengeAnswer.sendKeys(securityAnswerValue);
 
         new Select(currency).selectByVisibleText(currencyValue);
 

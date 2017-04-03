@@ -1,5 +1,5 @@
 @ui @luxbet
-Feature: Create Luxbet Customer using Wagerplayer
+Feature: Create Luxbet Customer using Wagerplayer UI
 
   Background:
     Given I am logged into WP UI and on Home Page

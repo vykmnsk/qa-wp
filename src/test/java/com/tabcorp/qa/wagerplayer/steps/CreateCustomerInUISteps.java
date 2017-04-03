@@ -8,6 +8,8 @@ import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
 import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
+import org.assertj.core.api.Assertions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -18,8 +20,6 @@ import java.util.Map;
 import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_USERNAME;
 
 public class CreateCustomerInUISteps implements En {
-
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private HeaderPage header;
     private CustomerListPage custListPage;
@@ -39,17 +39,50 @@ public class CreateCustomerInUISteps implements En {
         });
 
         When("^I enter the following data on Create New Customer page$", (DataTable table) -> {
-            Map<String, String> cust = table.asMap(String.class, String.class);
-            String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
-            LocalDate dob = LocalDate.parse(custDob, DATE_TIME_FORMATTER);
+            Map<String, String> custData = table.asMap(String.class, String.class);
+
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
             Storage.add(CUSTOMER_USERNAME, username);
 
+            String title = (String) Helpers.nonNullGet(custData, "title");
+            String firstName = (String) Helpers.nonNullGet(custData, "firstname");
+            String lastName = (String) Helpers.nonNullGet(custData, "lastname");
+            String dobTxt = (String) Helpers.nonNullGet(custData, "date_of_birth");
+            LocalDate dob = LocalDate.parse(dobTxt, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String telephoneNo = (String) Helpers.nonNullGet(custData, "phonenumber");
+            String email = ((String) Helpers.nonNullGet(custData, "email_address")).replace("random", username);
+            String streetAddress = (String) Helpers.nonNullGet(custData, "street_address");
+            String suburb = (String) Helpers.nonNullGet(custData, "suburb");
+            String city = (String) Helpers.nonNullGet(custData, "city");
+            String state = (String) Helpers.nonNullGet(custData, "state");
+            String postCode = (String) Helpers.nonNullGet(custData, "postcode");
+            String country = (String) Helpers.nonNullGet(custData, "country");
+            String weeklyLimit = (String) Helpers.nonNullGet(custData, "weekly_deposit_limit");
+            String securityQuestion = (String) Helpers.nonNullGet(custData, "security_question");
+            String securityAnswer = (String) Helpers.nonNullGet(custData, "customer_answer");
+            String currencyValue = (String) Helpers.nonNullGet(custData, "currency");
+            String timezone = (String) Helpers.nonNullGet(custData, "timezone");
+
             newCustPage.enterCustomerDetails(
                     username,
+                    title,
+                    firstName,
+                    lastName,
                     dob,
-                    cust
+                    telephoneNo,
+                    email,
+                    streetAddress,
+                    suburb,
+                    city,
+                    state,
+                    postCode,
+                    country,
+                    weeklyLimit,
+                    securityQuestion,
+                    securityAnswer,
+                    currencyValue,
+                    timezone
             );
         });
 
@@ -57,7 +90,8 @@ public class CreateCustomerInUISteps implements En {
             custDetailsPage = new CustomerDetailsPage();
             custDetailsPage.verifyLoaded();
             header.refreshPage();
-            custDetailsPage.verifyAmlStatus(amlOne, amlTwo);
+            String status = custDetailsPage.readAMLStatus();
+            Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
         });
 
     }
