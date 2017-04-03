@@ -147,9 +147,42 @@ public class APISteps implements En {
             this.customer_username = username;
 
             if (null == wapi) wapi = new WAPI();
+
+            String custTitle = (String) Helpers.nonNullGet(cust, "title");
+            String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
+            String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
+            String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
+            String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
+            String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
+            String custStreetAddress = (String) Helpers.nonNullGet(cust, "street_address");
+            String custSuburb = (String) Helpers.nonNullGet(cust, "suburb");
+            String custState = (String) Helpers.nonNullGet(cust, "state");
+            String custPostCode = (String) Helpers.nonNullGet(cust, "postcode");
+            String custCountry = (String) Helpers.nonNullGet(cust, "country");
+            String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
+            String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
+            String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
+            String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
+            String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
+
             String successMsg = wapi.createNewCustomer(
                     username,
-                    cust
+                    custTitle,
+                    custFirstName,
+                    custLastName,
+                    custDob,
+                    custTelephoneNo,
+                    custEmail,
+                    custStreetAddress,
+                    custSuburb,
+                    custState,
+                    custPostCode,
+                    custCountry,
+                    custWeeklyLimit,
+                    custSecurityQuestion,
+                    currencyValue,
+                    custTimezone,
+                    custClientIp
             );
             assertThat(successMsg.toString()).isEqualTo("Customer Created");
         });

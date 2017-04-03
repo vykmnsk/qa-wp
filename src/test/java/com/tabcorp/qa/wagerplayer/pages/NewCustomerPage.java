@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -10,9 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

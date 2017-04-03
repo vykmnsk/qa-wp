@@ -2,7 +2,6 @@ package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
 import com.tabcorp.qa.common.BetType;
-import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
@@ -61,25 +60,26 @@ public class WAPI implements WagerPlayerAPI {
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }
 
-    public String createNewCustomer(String username, Map<String, String> cust) {
+    public String createNewCustomer(
+            String username,
+            String custTitle,
+            String custFirstName,
+            String custLastName,
+            String custDobValue,
+            String custTelephoneNoValue,
+            String custEmail,
+            String custStreetAddress,
+            String custSuburb,
+            String custState,
+            String custPostCode,
+            String custCountry,
+            String custWeeklyLimit,
+            String custSecurityQuestion,
+            String currencyValue,
+            String custTimezone,
+            String custClientIp
+    ){
         Map<String, Object> fields = wapiAuthFields();
-
-        String custTitle = (String) Helpers.nonNullGet(cust, "title");
-        String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
-        String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
-        String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
-        String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
-        String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
-        String custStreetAddress = (String) Helpers.nonNullGet(cust, "street_address");
-        String custSuburb = (String) Helpers.nonNullGet(cust, "suburb");
-        String custState = (String) Helpers.nonNullGet(cust, "state");
-        String custPostCode = (String) Helpers.nonNullGet(cust, "postcode");
-        String custCountry = (String) Helpers.nonNullGet(cust, "country");
-        String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
-        String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
-        String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
-        String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
-        String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
 
         fields.put("action", "account_insert_customer");
         fields.put("client_ip", custClientIp);
@@ -92,13 +92,13 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("salutation", custTitle);
         fields.put("firstname", custFirstName);
         fields.put("lastname", custLastName);
-        fields.put("dob", custDob);
+        fields.put("dob", custDobValue);
         fields.put("email_address", custEmail);
         fields.put("deposit_limit", custWeeklyLimit);
         fields.put("street", custStreetAddress);
         fields.put("postcode", custPostCode);
         fields.put("country", custCountry);
-        fields.put("telephone", custTelephoneNo);
+        fields.put("telephone", custTelephoneNoValue);
         fields.put("state", custState);
         fields.put("suburb", custSuburb);
         fields.put("currency", currencyValue);
