@@ -7,6 +7,8 @@ import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
+import org.apache.commons.lang3.RandomStringUtils;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -161,9 +163,13 @@ public class APISteps implements En {
             String custCountry = (String) Helpers.nonNullGet(cust, "country");
             String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
             String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
+            String custAnswer = (String) Helpers.nonNullGet(cust, "customer_answer");
             String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
             String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
             String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
+            String custPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String custTelephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String custInternetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
 
             String successMsg = wapi.createNewCustomer(
                     username,
@@ -180,9 +186,13 @@ public class APISteps implements En {
                     custCountry,
                     custWeeklyLimit,
                     custSecurityQuestion,
+                    custAnswer,
                     currencyValue,
                     custTimezone,
-                    custClientIp
+                    custClientIp,
+                    custPassword,
+                    custTelephonePassword,
+                    custInternetPassword
             );
             assertThat(successMsg.toString()).isEqualTo("Customer Created");
         });
