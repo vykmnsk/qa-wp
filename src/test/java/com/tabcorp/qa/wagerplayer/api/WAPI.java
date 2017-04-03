@@ -200,8 +200,8 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public String verifyAmlStatus(String customerUsername, String amlOne, String amlTwo) {
-        String sessionId = getAccessToken(customerUsername, Config.customerPassword());
+    public String verifyAmlStatus(String customerUsername, String customerPassword) {
+        String sessionId = getAccessToken(customerUsername, customerPassword);
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
         Object resp = post(fields);

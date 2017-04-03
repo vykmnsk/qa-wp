@@ -25,6 +25,7 @@ public class APISteps implements En {
     private String customerId = null;
     private WAPI wapi = null;
     private String customer_username = null;
+    private String customer_password = null;
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
@@ -171,6 +172,8 @@ public class APISteps implements En {
             String custTelephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String custInternetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
 
+            customer_password = custInternetPassword;
+
             String successMsg = wapi.createNewCustomer(
                     username,
                     custTitle,
@@ -200,7 +203,7 @@ public class APISteps implements En {
         Then("^I verify a new customer created with AML status \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
             if (null == wapi) wapi = new WAPI();
 
-            String amlStatus = wapi.verifyAmlStatus((customer_username).replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
+            String amlStatus = wapi.verifyAmlStatus((customer_username).replaceAll("\\[","").replaceAll("]",""), customer_password);
             assertThat(amlStatus).as("AML status").isIn(amlOne, amlTwo);
         });
     }
