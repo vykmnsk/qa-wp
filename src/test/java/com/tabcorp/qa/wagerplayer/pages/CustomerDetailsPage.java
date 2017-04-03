@@ -46,7 +46,7 @@ public class CustomerDetailsPage extends AppPage {
                 break;
             }
         }
-        assertThat(amlStatusValue).as("AML status").isIn(amlOne, amlTwo);
+        assertThat(amlStatusValue.getText()).as("AML status").isIn(amlOne, amlTwo);
     }
 
 }

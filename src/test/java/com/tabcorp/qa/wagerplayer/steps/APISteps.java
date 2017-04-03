@@ -144,7 +144,7 @@ public class APISteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            customer_username = username;
+            this.customer_username = username;
 
             if (null == wapi) wapi = new WAPI();
             String successMsg = wapi.createNewCustomer(
@@ -157,7 +157,7 @@ public class APISteps implements En {
         Then("^I verify a new customer created with AML status \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
             if (null == wapi) wapi = new WAPI();
 
-            String amlStatus = wapi.verifyAmlStatus(Storage.get(CUSTOMER_USERNAME).toString().replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
+            String amlStatus = wapi.verifyAmlStatus((customer_username).replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
             assertThat(amlStatus).as("AML status").isIn(amlOne, amlTwo);
         });
     }

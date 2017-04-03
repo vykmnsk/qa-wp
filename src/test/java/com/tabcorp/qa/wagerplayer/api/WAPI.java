@@ -70,7 +70,10 @@ public class WAPI implements WagerPlayerAPI {
         String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
         String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
         String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
-        String[] custAddress = ((String) Helpers.nonNullGet(cust, "address")).split(",");
+        String custStreetAddress = (String) Helpers.nonNullGet(cust, "street_address");
+        String custSuburb = (String) Helpers.nonNullGet(cust, "suburb");
+        String custState = (String) Helpers.nonNullGet(cust, "state");
+        String custPostCode = (String) Helpers.nonNullGet(cust, "postcode");
         String custCountry = (String) Helpers.nonNullGet(cust, "country");
         String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
         String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
@@ -92,12 +95,12 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("dob", custDob);
         fields.put("email_address", custEmail);
         fields.put("deposit_limit", custWeeklyLimit);
-        fields.put("street", custAddress[0] + " " + custAddress[1] + " " + custAddress[2]);
-        fields.put("postcode", custAddress[4]);
+        fields.put("street", custStreetAddress);
+        fields.put("postcode", custPostCode);
         fields.put("country", custCountry);
         fields.put("telephone", custTelephoneNo);
-        fields.put("state", custAddress[3]);
-        fields.put("suburb", custAddress[2]);
+        fields.put("state", custState);
+        fields.put("suburb", custSuburb);
         fields.put("currency", currencyValue);
         fields.put("timezone", custTimezone);
 

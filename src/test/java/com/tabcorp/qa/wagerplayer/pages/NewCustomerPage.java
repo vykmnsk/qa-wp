@@ -138,7 +138,11 @@ public class NewCustomerPage extends AppPage {
         String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
         String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
         String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
-        String[] custAddress = ((String) Helpers.nonNullGet(cust, "address")).split(",");
+        String custStreetAddress = (String) Helpers.nonNullGet(cust, "street_address");
+        String custSuburb = (String) Helpers.nonNullGet(cust, "suburb");
+        String custCity = (String) Helpers.nonNullGet(cust, "city");
+        String custState = (String) Helpers.nonNullGet(cust, "state");
+        String custPostCode = (String) Helpers.nonNullGet(cust, "postcode");
         String custCountry = (String) Helpers.nonNullGet(cust, "country");
         String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
         String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
@@ -158,23 +162,23 @@ public class NewCustomerPage extends AppPage {
         new Select(countryCode).selectByVisibleText("+61");
         custMobileNo.sendKeys(custTelephoneNo);
 
-        residentialStreetAddress.sendKeys(custAddress[0]);
-        residentialSuburb.sendKeys(custAddress[1]);
-        residentialCity.sendKeys(custAddress[1]);
-        residentialPostCode.sendKeys(custAddress[3]);
+        residentialStreetAddress.sendKeys(custStreetAddress);
+        residentialSuburb.sendKeys(custSuburb);
+        residentialCity.sendKeys(custCity);
+        residentialPostCode.sendKeys(custPostCode);
         residentialCountry.sendKeys(custCountry);
-        new Select(residentialState).selectByVisibleText(custAddress[2]);
+        new Select(residentialState).selectByVisibleText(custState);
 
         if(!custWeeklyLimit.equals("")) { weeklyDepositLimit.sendKeys(custWeeklyLimit); }
 
         new Select(residentialTimezone).selectByValue(custTimezone);
 
-        mailingStreetAddress.sendKeys(custAddress[0]);
-        mailingSuburb.sendKeys(custAddress[1]);
-        mailingCity.sendKeys(custAddress[1]);
-        mailingPostCode.sendKeys(custAddress[3]);
+        mailingStreetAddress.sendKeys(custStreetAddress);
+        mailingSuburb.sendKeys(custSuburb);
+        mailingCity.sendKeys(custCity);
+        mailingPostCode.sendKeys(custPostCode);
         mailingCountry.sendKeys(custCountry);
-        new Select(mailingState).selectByVisibleText(custAddress[2]);
+        new Select(mailingState).selectByVisibleText(custState);
 
         userName.sendKeys(username);
 
