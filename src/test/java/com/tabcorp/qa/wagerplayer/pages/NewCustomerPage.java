@@ -131,7 +131,9 @@ public class NewCustomerPage extends AppPage {
             String securityQuestionValue,
             String securityAnswerValue,
             String currencyValue,
-            String timezoneValue
+            String timezoneValue,
+            String telephonePassword,
+            String internetPasswordValue
     ) {
 
         new Select(title).selectByValue(titleValue);
@@ -166,10 +168,10 @@ public class NewCustomerPage extends AppPage {
 
         userName.sendKeys(usernameValue);
 
-        telePassword.sendKeys(Config.password());
-        telePasswordConfirmation.sendKeys(Config.password());
-        internetPassword.sendKeys(Config.customerPassword());
-        internetPasswordConfirmation.sendKeys(Config.customerPassword());
+        telePassword.sendKeys(telephonePassword);
+        telePasswordConfirmation.sendKeys(telephonePassword);
+        internetPassword.sendKeys(internetPasswordValue);
+        internetPasswordConfirmation.sendKeys(internetPasswordValue);
 
         new Select(challengeQuestion).selectByVisibleText(securityQuestionValue);
         challengeAnswer.sendKeys(securityAnswerValue);

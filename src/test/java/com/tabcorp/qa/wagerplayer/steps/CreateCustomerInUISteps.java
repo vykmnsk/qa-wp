@@ -8,6 +8,7 @@ import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
 import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -60,9 +61,11 @@ public class CreateCustomerInUISteps implements En {
             String country = (String) Helpers.nonNullGet(custData, "country");
             String weeklyLimit = (String) Helpers.nonNullGet(custData, "weekly_deposit_limit");
             String securityQuestion = (String) Helpers.nonNullGet(custData, "security_question");
-            String securityAnswer = (String) Helpers.nonNullGet(custData, "customer_answer");
+            String securityAnswer = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String currencyValue = (String) Helpers.nonNullGet(custData, "currency");
             String timezone = (String) Helpers.nonNullGet(custData, "timezone");
+            String telephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String internetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
 
             newCustPage.enterCustomerDetails(
                     username,
@@ -82,7 +85,9 @@ public class CreateCustomerInUISteps implements En {
                     securityQuestion,
                     securityAnswer,
                     currencyValue,
-                    timezone
+                    timezone,
+                    telephonePassword,
+                    internetPassword
             );
         });
 

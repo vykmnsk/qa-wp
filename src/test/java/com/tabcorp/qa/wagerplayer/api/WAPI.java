@@ -75,20 +75,24 @@ public class WAPI implements WagerPlayerAPI {
             String custCountry,
             String custWeeklyLimit,
             String custSecurityQuestion,
+            String custAnswer,
             String currencyValue,
             String custTimezone,
-            String custClientIp
+            String custClientIp,
+            String custPassword,
+            String custTelephonePassword,
+            String custInternetPassword
     ){
         Map<String, Object> fields = wapiAuthFields();
 
         fields.put("action", "account_insert_customer");
         fields.put("client_ip", custClientIp);
         fields.put("username", username);
-        fields.put("telephone_password", Config.password());
-        fields.put("internet_password", Config.customerPassword());
-        fields.put("password",Config.password());
+        fields.put("telephone_password", custTelephonePassword);
+        fields.put("internet_password", custInternetPassword);
+        fields.put("password",custPassword);
         fields.put("secret_question", custSecurityQuestion);
-        fields.put("secret_answer", Config.customerPassword());
+        fields.put("secret_answer", custAnswer);
         fields.put("salutation", custTitle);
         fields.put("firstname", custFirstName);
         fields.put("lastname", custLastName);
