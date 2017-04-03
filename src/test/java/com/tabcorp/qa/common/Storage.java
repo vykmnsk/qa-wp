@@ -12,8 +12,7 @@ public class Storage {
 
     public enum KEY {
         EVENT_IDS,
-        PRODUCT_ID,
-        CUSTOMER_USERNAME
+        PRODUCT_ID
     }
 
     public static void init() {

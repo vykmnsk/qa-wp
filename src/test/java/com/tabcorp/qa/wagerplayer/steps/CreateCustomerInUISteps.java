@@ -1,8 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.common.REST;
-import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.CustomerDetailsPage;
 import com.tabcorp.qa.wagerplayer.pages.CustomerListPage;
 import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
@@ -11,18 +9,13 @@ import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
-import java.util.function.Function;
 
-import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_USERNAME;
 
 public class CreateCustomerInUISteps implements En {
     private HeaderPage header;
@@ -47,7 +40,6 @@ public class CreateCustomerInUISteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            Storage.add(CUSTOMER_USERNAME, username);
 
             String title = (String) Helpers.nonNullGet(custData, "title");
             String firstName = (String) Helpers.nonNullGet(custData, "firstname");
