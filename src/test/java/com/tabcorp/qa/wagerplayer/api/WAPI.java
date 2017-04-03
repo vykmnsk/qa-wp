@@ -205,8 +205,7 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
         Object resp = post(fields);
-        Object val = JsonPath.read(resp, "$.RSP.account[0].aml_status");
-        return val.toString();
+        return (String) JsonPath.read(resp, RESP_ROOT_PATH + ".account[0].aml_status");
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {

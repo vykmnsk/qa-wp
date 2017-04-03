@@ -22,7 +22,6 @@ public class APISteps implements En {
     private String accessToken = null;
     private BigDecimal balanceBefore = null;
     private BigDecimal balanceAfterBet = null;
-    private String customerId = null;
     private WAPI wapi = null;
     private String customer_username = null;
     private String customer_password = null;

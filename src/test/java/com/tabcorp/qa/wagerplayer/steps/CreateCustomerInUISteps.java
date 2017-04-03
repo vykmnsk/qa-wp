@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.pages.CustomerDetailsPage;
 import com.tabcorp.qa.wagerplayer.pages.CustomerListPage;
 import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
@@ -17,10 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
-import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_USERNAME;
 
 public class CreateCustomerInUISteps implements En {
-
     private HeaderPage header;
     private CustomerListPage custListPage;
     private NewCustomerPage newCustPage;
@@ -43,7 +40,6 @@ public class CreateCustomerInUISteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            Storage.add(CUSTOMER_USERNAME, username);
 
             String title = (String) Helpers.nonNullGet(custData, "title");
             String firstName = (String) Helpers.nonNullGet(custData, "firstname");
@@ -63,8 +59,8 @@ public class CreateCustomerInUISteps implements En {
             String securityAnswer = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String currencyValue = (String) Helpers.nonNullGet(custData, "currency");
             String timezone = (String) Helpers.nonNullGet(custData, "timezone");
-            String custTelephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
-            String custInternetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String telephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String internetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
 
             newCustPage.enterCustomerDetails(
                     username,
@@ -85,27 +81,24 @@ public class CreateCustomerInUISteps implements En {
                     securityAnswer,
                     currencyValue,
                     timezone,
-                    custTelephonePassword,
-                    custInternetPassword
+                    telephonePassword,
+                    internetPassword
             );
         });
 
         When("^I see new customer created with AML status updated to \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
-            boolean success = false;
             String status = "";
             custDetailsPage = new CustomerDetailsPage();
             custDetailsPage.verifyLoaded();
 
-            while (!success) {
-                try {
+            class ReloadCheckAMLStatus implements Runnable {
+                public void run() {
                     header.refreshPage();
-                    status = custDetailsPage.readAMLStatus();
+                    String status = custDetailsPage.readAMLStatus();
                     Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
-                    success = true;
-                } catch (AssertionError a) {
-                    success = false;
                 }
             }
+            Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 3);
         });
 
     }
