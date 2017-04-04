@@ -5,14 +5,19 @@ import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
-import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class WAPI implements WagerPlayerAPI {
+
+    private static Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static final String URL = Config.wapiURL();
     private static final String RESP_ROOT_PATH = "$.RSP";
@@ -34,7 +39,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
         return resp;
     }
 
@@ -42,7 +47,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("output_type", "json");
         Object resp = REST.postWithQueryStrings(URL, fields, selectionIds, key);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
         return resp;
     }
 
@@ -53,6 +58,61 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("customer_password", password);
         Object resp = post(fields);
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
+    }
+
+    public String createNewCustomer(
+            String username,
+            String custTitle,
+            String custFirstName,
+            String custLastName,
+            String custDobValue,
+            String custTelephoneNoValue,
+            String custEmail,
+            String custStreetAddress,
+            String custSuburb,
+            String custState,
+            String custPostCode,
+            String custCountry,
+            String custWeeklyLimit,
+            String custSecurityQuestion,
+            String custAnswer,
+            String currencyValue,
+            String custTimezone,
+            String custClientIp,
+            String custPassword,
+            String custTelephonePassword,
+            String custInternetPassword
+    ){
+        Map<String, Object> fields = wapiAuthFields();
+
+        fields.put("action", "account_insert_customer");
+        fields.put("client_ip", custClientIp);
+        fields.put("username", username);
+        fields.put("telephone_password", custTelephonePassword);
+        fields.put("internet_password", custInternetPassword);
+        fields.put("password",custPassword);
+        fields.put("secret_question", custSecurityQuestion);
+        fields.put("secret_answer", custAnswer);
+        fields.put("salutation", custTitle);
+        fields.put("firstname", custFirstName);
+        fields.put("lastname", custLastName);
+        fields.put("dob", custDobValue);
+        fields.put("email_address", custEmail);
+        fields.put("deposit_limit", custWeeklyLimit);
+        fields.put("street", custStreetAddress);
+        fields.put("postcode", custPostCode);
+        fields.put("country", custCountry);
+        fields.put("telephone", custTelephoneNoValue);
+        fields.put("state", custState);
+        fields.put("suburb", custSuburb);
+        fields.put("currency", currencyValue);
+        fields.put("timezone", custTimezone);
+
+        Object resp = post(fields);
+        String custId = JsonPath.read(resp, RESP_ROOT_PATH + ".success.customer_id").toString();
+        String msg = JsonPath.read(resp, RESP_ROOT_PATH + ".success.message").toString();
+        log.info("Customer ID=" + custId);
+        return msg;
     }
 
     public BigDecimal getBalance(String sessionId) {
@@ -140,6 +200,14 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
+    public String readAmlStatus(String customerUsername, String customerPassword) {
+        String sessionId = getAccessToken(customerUsername, customerPassword);
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "account_verify_aml");
+        Object resp = post(fields);
+        return (String) JsonPath.read(resp, RESP_ROOT_PATH + ".account[0].aml_status");
+    }
+
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
         String mktPath = ".markets.market[0]";
         String selPath = ".selections.selection" + jfilter("name", selName);
@@ -172,7 +240,7 @@ public class WAPI implements WagerPlayerAPI {
     public static String readFirstMarketId(Object resp) {
         String path = "$.RSP.markets.market[0].id";
         String id = JsonPath.read(resp, path);
-        Assertions.assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
+        assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
         return id;
     }
 
@@ -189,11 +257,11 @@ public class WAPI implements WagerPlayerAPI {
     private static String readOneAttr(Object resp, String basePath, String attrName) {
         String path = RESP_ROOT_PATH + basePath + "." + attrName;
         JSONArray attrs = JsonPath.read(resp, path);
-        Assertions.assertThat(attrs.size())
+        assertThat(attrs.size())
                 .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, path))
                 .isEqualTo(1);
         String attr = String.valueOf(attrs.get(0));
-        Assertions.assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
+        assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
         return attr;
     }
 

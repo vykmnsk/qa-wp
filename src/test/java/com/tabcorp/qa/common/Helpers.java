@@ -1,15 +1,20 @@
 package com.tabcorp.qa.common;
 
+import com.tabcorp.qa.wagerplayer.steps.CreateCustomerInUISteps;
 import org.apache.commons.lang3.SystemUtils;
 import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 public class Helpers {
+    private static Logger log = LoggerFactory.getLogger(Helpers.class);
 
     public static int randomBetweenInclusive(int min, int max){
         return (new Random()).nextInt(max - min + 1) + min;
@@ -68,6 +73,21 @@ public class Helpers {
     public static BigDecimal roundOff(BigDecimal value) {
         int decimalPlaces = 2;
         return value.setScale(decimalPlaces,BigDecimal.ROUND_HALF_UP);
+    }
+
+    public static void retryOnAssertionFailure(Runnable block, int maxTries, int sleepSeconds) {
+        for (int i = 1; i <= maxTries; i++) {
+            try {
+                Thread.sleep(sleepSeconds * 1000);
+                block.run();
+                return;
+            } catch (AssertionError ae) {
+                log.info(String.format("Re-trying %d. Exception: %s", i, ae.getMessage()));
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
+        throw new RuntimeException(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
     }
 
 }

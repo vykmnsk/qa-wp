@@ -6,13 +6,15 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.tabcorp.qa.common.Storage.KEY.*;
+import static com.tabcorp.qa.common.Storage.KEY.EVENT_IDS;
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -137,6 +139,7 @@ public class APISteps implements En {
             BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
             assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
         });
+
     }
 
 }
