@@ -1,4 +1,4 @@
-@ui @luxbet @cccust
+@ui @luxbet @wip
 Feature: Create Luxbet Customer using Wagerplayer UI
 
   Background:
@@ -29,4 +29,4 @@ Feature: Create Luxbet Customer using Wagerplayer UI
     Examples:
       | title | firstname | lastname | date_of_birth | phonenumber | email_address      | streetaddress    | suburb         | city          | state           | postcode | country   | weekly_deposit_limit | security_question       | customer_answer | currency          | timezone         |
       | Mr    | Oswald    | Petrucco | 1939-05-31    | 0421147741  | random@test.com.au | 142 Tynte Street | North Adelaide | North Adelaid | South Australia | 5006     | Australia | 4500.00              | Favourite Holiday Spot? | Australia       | Australian Dollar | Australia/Sydney |
-      | Ms    | Keli      | Cowey    | 1952-03-25    | 0463254781  | random@test.com.au | 13a Alan Ave     | SEAFORTH       | SEAFORTH      | New South Wales | 2092     | Australia |                      | Favourite Holiday Spot? | Australia       | Australian Dollar | Australia/Sydney |
+#      | Ms    | Keli      | Cowey    | 1952-03-25    | 0463254781  | random@test.com.au | 13a Alan Ave     | SEAFORTH       | SEAFORTH      | New South Wales | 2092     | Australia |                      | Favourite Holiday Spot? | Australia       | Australian Dollar | Australia/Sydney |

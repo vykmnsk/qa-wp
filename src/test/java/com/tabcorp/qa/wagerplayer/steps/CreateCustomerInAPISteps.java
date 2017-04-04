@@ -14,7 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class CreateCustomerInAPISteps implements En {
-    private String customer_username = null;
+    private String customerUsername = null;
+    private String customerPassword = null;
     private WAPI wapi = null;
 
     public CreateCustomerInAPISteps() {
@@ -23,7 +24,7 @@ public class CreateCustomerInAPISteps implements En {
 
             String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
             String username = "AutoUser" + timeStamp;
-            this.customer_username = username;
+            this.customerUsername = username;
 
             if (null == wapi) wapi = new WAPI();
 
@@ -47,6 +48,7 @@ public class CreateCustomerInAPISteps implements En {
             String custPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String custTelephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String custInternetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            this.customerPassword = custInternetPassword;
 
             String successMsg = wapi.createNewCustomer(
                     username,
@@ -77,7 +79,7 @@ public class CreateCustomerInAPISteps implements En {
         Then("^I verify a new customer created with AML status \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
             if (null == wapi) wapi = new WAPI();
 
-            String amlStatus = wapi.verifyAmlStatus((customer_username).replaceAll("\\[","").replaceAll("]",""), amlOne, amlTwo);
+            String amlStatus = wapi.readAmlStatus(customerUsername, customerPassword);
             assertThat(amlStatus).as("AML status").isIn(amlOne, amlTwo);
         });
     }
