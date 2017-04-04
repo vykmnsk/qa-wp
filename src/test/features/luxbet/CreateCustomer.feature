@@ -1,4 +1,4 @@
-@ui @luxbet @wip @cccust
+@ui @luxbet @wip
 Feature: Create Luxbet Customer using Wagerplayer UI
 
   Background:

@@ -1,4 +1,4 @@
-@api @luxbet @cccust
+@api @luxbet
 Feature: Create Luxbet API Customer
 
   Scenario Outline: Create Luxbet Customer using API
