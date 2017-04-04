@@ -5,15 +5,16 @@ import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
-import cucumber.api.DataTable;
 import cucumber.api.java8.En;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-import static com.tabcorp.qa.common.Storage.KEY.*;
+import static com.tabcorp.qa.common.Storage.KEY.EVENT_IDS;
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -23,8 +24,6 @@ public class APISteps implements En {
     private BigDecimal balanceBefore = null;
     private BigDecimal balanceAfterBet = null;
     private WAPI wapi = null;
-    private String customer_username = null;
-    private String customer_password = null;
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {

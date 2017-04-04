@@ -22,7 +22,7 @@ public class CreateCustomerInAPISteps implements En {
         When("^I post customer specifics to create new customer$", (DataTable table) -> {
             Map<String, String> cust = table.asMap(String.class, String.class);
 
-            String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
+            String timeStamp = new SimpleDateFormat("HHmmssSSS").format(new Date());
             String username = "AutoUser" + timeStamp;
             this.customerUsername = username;
 
@@ -45,9 +45,9 @@ public class CreateCustomerInAPISteps implements En {
             String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
             String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
             String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
-            String custPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
-            String custTelephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
-            String custInternetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String custPassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
+            String custTelephonePassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
+            String custInternetPassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
             this.customerPassword = custInternetPassword;
 
             String successMsg = wapi.createNewCustomer(

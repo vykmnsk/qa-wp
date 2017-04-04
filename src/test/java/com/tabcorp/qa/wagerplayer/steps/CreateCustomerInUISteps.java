@@ -38,7 +38,7 @@ public class CreateCustomerInUISteps implements En {
         When("^I enter the following data on Create New Customer page$", (DataTable table) -> {
             Map<String, String> custData = table.asMap(String.class, String.class);
 
-            String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
+            String timeStamp = new SimpleDateFormat("HHmmssSSS").format(new Date());
             String username = "AutoUser" + timeStamp;
 
             String title = (String) Helpers.nonNullGet(custData, "title");
@@ -59,8 +59,8 @@ public class CreateCustomerInUISteps implements En {
             String securityAnswer = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String currencyValue = (String) Helpers.nonNullGet(custData, "currency");
             String timezone = (String) Helpers.nonNullGet(custData, "timezone");
-            String telephonePassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
-            String internetPassword = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
+            String telephonePassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
+            String internetPassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
 
             newCustPage.enterCustomerDetails(
                     username,
