@@ -1,10 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.wagerplayer.pages.CustomerDetailsPage;
-import com.tabcorp.qa.wagerplayer.pages.CustomerListPage;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
+import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -19,19 +16,17 @@ import java.util.Map;
 
 public class CreateCustomerInUISteps implements En {
     private HeaderPage header;
-    private CustomerListPage custListPage;
+    private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-    private CustomerDetailsPage custDetailsPage;
+
 
     public CreateCustomerInUISteps() {
 
-        When("^I navigate to customer list page to insert new customer$", () -> {
+        When("^I navigate to Customers Page to insert new customer$", () -> {
             header = new HeaderPage();
-            header.navigateToF11();
-            custListPage = new CustomerListPage();
-            custListPage.verifyLoaded();
-            custListPage.insertNew();
-            newCustPage = new NewCustomerPage();
+            customersPage = header.navigateToF11();;
+            customersPage.verifyLoaded();
+            newCustPage = customersPage.insertNew();
             newCustPage.verifyLoaded();
         });
 
@@ -47,7 +42,7 @@ public class CreateCustomerInUISteps implements En {
             String dobTxt = (String) Helpers.nonNullGet(custData, "date_of_birth");
             LocalDate dob = LocalDate.parse(dobTxt, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             String telephoneNo = (String) Helpers.nonNullGet(custData, "phonenumber");
-            String email = ((String) Helpers.nonNullGet(custData, "email_address")).replace("random", username);
+            String email = ((String) Helpers.nonNullGet(custData, "email_address")).replace("#username#", username);
             String streetAddress = (String) Helpers.nonNullGet(custData, "street_address");
             String suburb = (String) Helpers.nonNullGet(custData, "suburb");
             String city = (String) Helpers.nonNullGet(custData, "city");
@@ -56,11 +51,12 @@ public class CreateCustomerInUISteps implements En {
             String country = (String) Helpers.nonNullGet(custData, "country");
             String weeklyLimit = (String) Helpers.nonNullGet(custData, "weekly_deposit_limit");
             String securityQuestion = (String) Helpers.nonNullGet(custData, "security_question");
-            String securityAnswer = RandomStringUtils.randomAlphanumeric(10).toUpperCase();
             String currencyValue = (String) Helpers.nonNullGet(custData, "currency");
             String timezone = (String) Helpers.nonNullGet(custData, "timezone");
-            String telephonePassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
-            String internetPassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
+
+            String securityAnswer = RandomStringUtils.randomAlphanumeric(10);
+            String telephonePassword = RandomStringUtils.randomAlphanumeric(10);
+            String internetPassword = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
 
             newCustPage.enterCustomerDetails(
                     username,
@@ -87,14 +83,12 @@ public class CreateCustomerInUISteps implements En {
         });
 
         When("^I see new customer created with AML status updated to \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
-            String status = "";
-            custDetailsPage = new CustomerDetailsPage();
-            custDetailsPage.verifyLoaded();
+            customersPage.verifyLoaded();
 
             class ReloadCheckAMLStatus implements Runnable {
                 public void run() {
                     header.refreshPage();
-                    String status = custDetailsPage.readAMLStatus();
+                    String status = customersPage.readAMLStatus();
                     Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
                 }
             }

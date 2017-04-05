@@ -97,12 +97,12 @@ public class HeaderPage extends AppPage {
         return settlementPage;
     }
 
-    public CustomerListPage navigateToF11() {
+    public CustomersPage navigateToF11() {
         switchToHeaderFrame();
         f11.click();
-        CustomerListPage customerListPage = new CustomerListPage();
-        customerListPage.load();
-        return customerListPage;
+        CustomersPage cp = new CustomersPage();
+        cp.load();
+        return cp;
     }
 
     private void switchToHeaderFrame() {

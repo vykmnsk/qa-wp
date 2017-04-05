@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -7,17 +8,29 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class CustomerDetailsPage extends AppPage {
+public class CustomersPage extends AppPage{
+    @FindBy(css = "input[value=insert]")
+    public WebElement newCustomer;
 
     @FindBy(css = "table#side_table_inner tbody tr")
     List<WebElement> custInfoRows;
     final String statusLabel = "AML Status:";
 
+    public void load() {
+        driver.switchTo().defaultContent();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
+        wait.until(ExpectedConditions.visibilityOf(newCustomer));
+    }
+
     public void verifyLoaded() {
         HeaderPage header = new HeaderPage();
         header.verifyPageTitle("Customers");
+    }
+
+    public NewCustomerPage insertNew() {
+        newCustomer.click();
+        NewCustomerPage newCustPage = new NewCustomerPage();
+        return newCustPage;
     }
 
     public String readAMLStatus() {

@@ -14,9 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class CreateCustomerInAPISteps implements En {
-    private String customerUsername = null;
-    private String customerPassword = null;
-    private WAPI wapi = null;
+    private String customerUsername;
+    private String customerPassword;
+    private WAPI wapi;
 
     public CreateCustomerInAPISteps() {
         When("^I post customer specifics to create new customer$", (DataTable table) -> {
@@ -28,57 +28,57 @@ public class CreateCustomerInAPISteps implements En {
 
             if (null == wapi) wapi = new WAPI();
 
-            String custTitle = (String) Helpers.nonNullGet(cust, "title");
-            String custFirstName = (String) Helpers.nonNullGet(cust, "firstname");
-            String custLastName = (String) Helpers.nonNullGet(cust, "lastname");
-            String custDob = (String) Helpers.nonNullGet(cust, "date_of_birth");
-            String custTelephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
-            String custEmail = ((String) Helpers.nonNullGet(cust, "email_address")).replace("random", username);
-            String custStreetAddress = (String) Helpers.nonNullGet(cust, "street_address");
-            String custSuburb = (String) Helpers.nonNullGet(cust, "suburb");
-            String custState = (String) Helpers.nonNullGet(cust, "state");
-            String custPostCode = (String) Helpers.nonNullGet(cust, "postcode");
-            String custCountry = (String) Helpers.nonNullGet(cust, "country");
-            String custWeeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
-            String custSecurityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
-            String custAnswer = (String) Helpers.nonNullGet(cust, "customer_answer");
-            String custClientIp = (String) Helpers.nonNullGet(cust, "client_ip");
+            String title = (String) Helpers.nonNullGet(cust, "title");
+            String firstName = (String) Helpers.nonNullGet(cust, "firstname");
+            String lastName = (String) Helpers.nonNullGet(cust, "lastname");
+            String dob = (String) Helpers.nonNullGet(cust, "date_of_birth");
+            String telephoneNo = (String) Helpers.nonNullGet(cust, "phonenumber");
+            String email = ((String) Helpers.nonNullGet(cust, "email_address")).replace("#username#", username);
+            String streetAddress = (String) Helpers.nonNullGet(cust, "street_address");
+            String suburb = (String) Helpers.nonNullGet(cust, "suburb");
+            String state = (String) Helpers.nonNullGet(cust, "state");
+            String postCode = (String) Helpers.nonNullGet(cust, "postcode");
+            String country = (String) Helpers.nonNullGet(cust, "country");
+            String weeklyLimit = (String) Helpers.nonNullGet(cust, "weekly_deposit_limit");
+            String securityQuestion = (String) Helpers.nonNullGet(cust, "security_question");
+            String answer = (String) Helpers.nonNullGet(cust, "customer_answer");
+            String clientIP = (String) Helpers.nonNullGet(cust, "client_ip");
             String currencyValue = (String) Helpers.nonNullGet(cust, "currency");
-            String custTimezone = (String) Helpers.nonNullGet(cust, "timezone");
-            String custPassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
-            String custTelephonePassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
-            String custInternetPassword = RandomStringUtils.randomAlphabetic(7).toUpperCase() + RandomStringUtils.randomNumeric(3);
-            this.customerPassword = custInternetPassword;
+            String timezone = (String) Helpers.nonNullGet(cust, "timezone");
+
+            String password = RandomStringUtils.randomAlphanumeric(10);
+            String telephonePassword = RandomStringUtils.randomAlphanumeric(10);
+            String internetPassword = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
+            this.customerPassword = internetPassword;
 
             String successMsg = wapi.createNewCustomer(
                     username,
-                    custTitle,
-                    custFirstName,
-                    custLastName,
-                    custDob,
-                    custTelephoneNo,
-                    custEmail,
-                    custStreetAddress,
-                    custSuburb,
-                    custState,
-                    custPostCode,
-                    custCountry,
-                    custWeeklyLimit,
-                    custSecurityQuestion,
-                    custAnswer,
+                    title,
+                    firstName,
+                    lastName,
+                    dob,
+                    telephoneNo,
+                    email,
+                    streetAddress,
+                    suburb,
+                    state,
+                    postCode,
+                    country,
+                    weeklyLimit,
+                    securityQuestion,
+                    answer,
                     currencyValue,
-                    custTimezone,
-                    custClientIp,
-                    custPassword,
-                    custTelephonePassword,
-                    custInternetPassword
+                    timezone,
+                    clientIP,
+                    password,
+                    telephonePassword,
+                    internetPassword
             );
-            assertThat(successMsg).isEqualTo("Customer Created");
+            assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
         });
 
         Then("^I verify a new customer created with AML status \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
             if (null == wapi) wapi = new WAPI();
-
             String amlStatus = wapi.readAmlStatus(customerUsername, customerPassword);
             assertThat(amlStatus).as("AML status").isIn(amlOne, amlTwo);
         });

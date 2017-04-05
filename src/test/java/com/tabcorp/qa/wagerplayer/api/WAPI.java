@@ -38,8 +38,14 @@ public class WAPI implements WagerPlayerAPI {
     static Object post(Map<String, Object> fields) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
-        JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+
+        List<String> wapiErrPaths = Arrays.asList(
+                "$..error..error_text",
+                "$..customer_errors..description");
+        for (String path: wapiErrPaths) {
+            JSONArray errors = JsonPath.read(resp, path);
+            assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        }
         return resp;
     }
 
@@ -109,8 +115,8 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("timezone", custTimezone);
 
         Object resp = post(fields);
-        String custId = JsonPath.read(resp, RESP_ROOT_PATH + ".success.customer_id").toString();
-        String msg = JsonPath.read(resp, RESP_ROOT_PATH + ".success.message").toString();
+        Integer custId = JsonPath.read(resp, RESP_ROOT_PATH + ".success.customer_id");
+        String msg = JsonPath.read(resp, RESP_ROOT_PATH + ".success.message");
         log.info("Customer ID=" + custId);
         return msg;
     }

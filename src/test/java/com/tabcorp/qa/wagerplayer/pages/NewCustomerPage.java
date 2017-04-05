@@ -1,12 +1,14 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.wagerplayer.Config;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -108,6 +110,10 @@ public class NewCustomerPage extends AppPage {
     @FindBy(css = "input[id='create_account_submit']")
     public WebElement insert;
 
+    @FindBy(css = "table#main_table .admin_form_errors")
+    List<WebElement> formErrors;
+
+
     public void verifyLoaded() {
         HeaderPage header = new HeaderPage();
         header.verifyPageTitle("Create Customer");
@@ -179,6 +185,13 @@ public class NewCustomerPage extends AppPage {
         new Select(currency).selectByVisibleText(currencyValue);
 
         insert.click();
+        verifyNoFormErrors();
+    }
+
+    private void verifyNoFormErrors() {
+        if (formErrors.size() > 0) {
+            Assertions.fail("Input validation errors: " + formErrors.get(0).getText());
+        }
     }
 
 }
