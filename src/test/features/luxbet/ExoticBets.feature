@@ -36,7 +36,13 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N      | 6.00              | 1.50   |
       | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 1.50   |
 
-    Scenario Outline: Horse Race Exotic Trifecta bets
+
+  Examples:
+    | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |
+    | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 1.50   |
+
+  @wip
+  Scenario Outline: Horse Race Exotic Trifecta bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners   | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
@@ -63,6 +69,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
 #      | NSW Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |   N    | 18.00             | 1.50   |
       | STAB Trifecta  | Trifecta   | Runner01,Runner02,Runner03          | 3.00  |   N    | 18.00             | 1.50   |
 
+  @wip
   Scenario Outline: Horse Race Exotic Daily Double bets
     When I enter specifics category "Horse Racing" and subcategory "YEPPOON"
     And I create a default event with details

@@ -82,7 +82,7 @@ public class WAPI implements WagerPlayerAPI {
             String custPassword,
             String custTelephonePassword,
             String custInternetPassword
-    ){
+    ) {
         Map<String, Object> fields = wapiAuthFields();
 
         fields.put("action", "account_insert_customer");
@@ -90,7 +90,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("username", username);
         fields.put("telephone_password", custTelephonePassword);
         fields.put("internet_password", custInternetPassword);
-        fields.put("password",custPassword);
+        fields.put("password", custPassword);
         fields.put("secret_question", custSecurityQuestion);
         fields.put("secret_answer", custAnswer);
         fields.put("salutation", custTitle);
@@ -167,20 +167,20 @@ public class WAPI implements WagerPlayerAPI {
         return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
     }
 
-       public Object placeExoticBetOnMultipleEvents(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, String flexi) {
+    public Object placeExoticBetMultiMarkets(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
         AtomicInteger atomicIntSel = new AtomicInteger(1);
-           selectionIds.forEach(id -> {
-               fields.put("slot[" + atomicIntSel.getAndIncrement() + "][selection][]", id);
+        selectionIds.forEach(id -> {
+            fields.put("slot[" + atomicIntSel.getAndIncrement() + "][selection][]", id);
         });
         AtomicInteger atomicIntMarket = new AtomicInteger(1);
-           marketIds.forEach(id -> {
-               fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id);
-           });
+        marketIds.forEach(id -> {
+            fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id);
+        });
         fields.put("amount", stake);
-        fields.put("flexi", flexi);
+        if (flexi) fields.put("flexi", "y");
         fields.put("output_type", "json");
         return post(fields);
     }

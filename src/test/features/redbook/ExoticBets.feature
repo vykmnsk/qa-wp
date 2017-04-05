@@ -15,7 +15,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Betting | Display Price | Place |
     And customer balance is at least $20.50
 
-    When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake> with flexi as "N"
+    When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
     When I result race with the runners and positions

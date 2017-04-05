@@ -1,6 +1,5 @@
 package com.tabcorp.qa.common;
 
-import com.tabcorp.qa.wagerplayer.steps.CreateCustomerInUISteps;
 import org.apache.commons.lang3.SystemUtils;
 import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -65,8 +63,12 @@ public class Helpers {
         return String.format("%s %d", baseName, randomBetweenInclusive(1000, 9999));
     }
 
-    public static List<BigDecimal> extractCSVPrices(String winnerPriceCSV) {
-        List<String> pricesTxts = Arrays.asList(winnerPriceCSV.split(",(\\s)*"));
+    public static List<String> extractCSV(String csv) {
+        return Arrays.asList(csv.split(",(\\s)*"));
+    }
+
+    public static List<BigDecimal> extractCSVPrices(String pricesCSV) {
+        List<String> pricesTxts = extractCSV(pricesCSV);
         return pricesTxts.stream().map(BigDecimal::new).collect(Collectors.toList());
     }
 

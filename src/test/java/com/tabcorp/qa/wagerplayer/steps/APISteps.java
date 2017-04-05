@@ -9,7 +9,6 @@ import cucumber.api.java8.En;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,8 @@ public class APISteps implements En {
     private String accessToken = null;
     private BigDecimal balanceBefore = null;
     private BigDecimal balanceAfterBet = null;
-    private WAPI wapi = null;
+    private WagerPlayerAPI api = Config.getAPI();
+    private WAPI wapi = new WAPI();
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
@@ -62,66 +62,27 @@ public class APISteps implements En {
                     balanceAfterBet = Config.getAPI().getBalance(accessToken);
                 });
 
-        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([Y|N| ])\"$",
-                (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
-                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String runnersCSV, BigDecimal stake) -> {
+                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, false);
+                });
+
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([Y|N])\"$",
+                (String betTypeName, String runnersCSV, BigDecimal stake, String flexi) -> {
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
-
-                    if (null == wapi) wapi = new WAPI();
-                    Object resp = wapi.getEventMarkets((String) Storage.getLast(Storage.KEY.EVENT_IDS));
-
-                    String marketId = wapi.readMarketId(resp, "Racing Live");
-                    List<String> selectionIds = wapi.readSelectionIds(resp, marketId, runners);
-
-                    Object response;
-                    switch (betTypeName.toUpperCase()) {
-                        case "FIRST FOUR":
-                        case "TRIFECTA":
-                        case "EXACTA":
-                        case "QUINELLA":
-                        case "EXOTIC":
-                            response = Config.getAPI().placeExoticBet(accessToken, prodId,
-                                    selectionIds , marketId, stake, isFlexi);
-                            break;
-                        default:
-                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
-                    }
-                    balanceAfterBet = Config.getAPI().readNewBalance(response);
-        });
+                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, isFlexi);
+                });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
-                (String betTypeName, String runner, BigDecimal stake, String flexi) -> {
+                (String betTypeName, String runnersCSV, BigDecimal stake, String flexi) -> {
+                    assertThat(betTypeName.toUpperCase()).as("Exotic BetTypeName input")
+                            .isIn("DAILY DOUBLE", "RUNNING DOUBLE", "QUADDIE");
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
                     Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
-
-                    List<String> marketIds = new ArrayList();
-                    List<String> selectionIds = new ArrayList();
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-
-                    if (null == wapi) wapi = new WAPI();
-                    assertThat(eventIds.size()).isEqualTo(runners.size());
-
-                    for (int i = 0; i<runners.size(); i++) {
-                        Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
-                        String marketId = wapi.readMarketId(marketsResponse, "Racing Live");
-                        marketIds.add(marketId);
-                        String selId = wapi.readSelectionId(marketsResponse, marketId, runners.get(i));
-                        selectionIds.add(selId);
-                    }
-
-                    Object betResponse;
-                    switch (betTypeName.toUpperCase()) {
-                        case "DAILY DOUBLE":
-                        case "RUNNING DOUBLE":
-                        case "QUADDIE":
-                            betResponse = wapi.placeExoticBetOnMultipleEvents(accessToken, prodId,
-                                    selectionIds , marketIds, stake, flexi);
-                            break;
-                        default:
-                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
-                    }
-                    balanceAfterBet = Config.getAPI().readNewBalance(betResponse);
+                    Object response = placeExoticBetMultEvents(eventIds, prodId, runners, stake, isFlexi);
+                    balanceAfterBet = api.readNewBalance(response);
                 });
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {
@@ -140,6 +101,38 @@ public class APISteps implements En {
             assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
         });
 
+    }
+
+    private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi) {
+        assertThat(betTypeName.toUpperCase()).as("Exotic BetTypeName input")
+                .isIn("FIRST FOUR", "TRIFECTA", "EXACTA", "QUINELLA", "EXOTIC");
+        List<String> runners = Helpers.extractCSV(runnersCSV);
+        Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+        String eventId = (String) Storage.getLast(Storage.KEY.EVENT_IDS);
+        Object response = placeExoticBetOneEvent(eventId, prodId, runners, stake, isFlexi);
+        return api.readNewBalance(response);
+    }
+
+    private Object placeExoticBetOneEvent(String eventId, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
+        Object resp = wapi.getEventMarkets(eventId);
+        String marketId = wapi.readMarketId(resp, "Racing Live");
+        List<String> selectionIds = wapi.readSelectionIds(resp, marketId, runners);
+        return api.placeExoticBet(accessToken, prodId, selectionIds, marketId, stake, isFlexi);
+    }
+
+    private Object placeExoticBetMultEvents(List<String> eventIds, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
+        List<String> marketIds = new ArrayList<>();
+        List<String> selectionIds = new ArrayList<>();
+
+        assertThat(eventIds.size()).as("Events count must match Runners count").isEqualTo(runners.size());
+        for (int i = 0; i < runners.size(); i++) {
+            Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
+            String marketId = wapi.readMarketId(marketsResponse, "Racing Live");
+            marketIds.add(marketId);
+            String selId = wapi.readSelectionId(marketsResponse, marketId, runners.get(i));
+            selectionIds.add(selId);
+        }
+        return wapi.placeExoticBetMultiMarkets(accessToken, prodId, selectionIds, marketIds, stake, isFlexi);
     }
 
 }
