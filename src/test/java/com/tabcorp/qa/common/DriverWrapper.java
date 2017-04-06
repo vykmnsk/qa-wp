@@ -4,9 +4,13 @@ package com.tabcorp.qa.common;
 import com.tabcorp.qa.wagerplayer.Config;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DriverWrapper {
     private static final int DEFAULT_TIMEOUT_SECONDS = 10;
@@ -28,7 +32,15 @@ public class DriverWrapper {
             } else {
                 System.setProperty("webdriver.chrome.driver",Helpers.getChromeDriverPath());
 
-                driver = new ChromeDriver();
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("disable-infobars");
+
+                Map<String, Object> prefs = new HashMap<>();
+                prefs.put("credentials_enable_service", false);
+                prefs.put("profile.password_manager_enabled", false);
+                options.setExperimentalOption("prefs", prefs);
+
+                driver = new ChromeDriver(options);
             }
         }
         return driver;
