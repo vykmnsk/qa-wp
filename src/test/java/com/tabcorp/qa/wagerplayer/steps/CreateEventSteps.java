@@ -29,12 +29,7 @@ public class CreateEventSteps implements En {
 
     public CreateEventSteps() {
 
-        Given("^I am logged into WP UI and on Home Page$", () -> {
-            LoginPage lp = new LoginPage();
-            lp.load();
-            HomePage hp = lp.enterValidCredentials();
-            hp.verifyLoaded();
-        });
+
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
             this.subcategory = subcategory;
             this.category = category;

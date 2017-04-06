@@ -1,10 +1,9 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.dto.Customer;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDate;
@@ -84,7 +83,7 @@ public class NewCustomerPage extends AppPage {
     public WebElement custMobileNo;
 
     @FindBy(css = "input[name='details[customers_username]']")
-    public WebElement userName;
+    public WebElement username;
 
     @FindBy(css = "input[name='details[customers_password]']")
     public WebElement telePassword;
@@ -119,70 +118,48 @@ public class NewCustomerPage extends AppPage {
         header.verifyPageTitle("Create Customer");
     }
 
-    public void enterCustomerDetails (
-            String usernameValue,
-            String titleValue,
-            String firstNameValue,
-            String lastNameValue,
-            LocalDate dobValue,
-            String telephoneNoValue,
-            String emailValue,
-            String streetAddressValue,
-            String suburbValue,
-            String cityValue,
-            String stateValue,
-            String postCodeValue,
-            String countryValue,
-            String weeklyLimitValue,
-            String securityQuestionValue,
-            String securityAnswerValue,
-            String currencyValue,
-            String timezoneValue,
-            String telephonePassword,
-            String internetPasswordValue
-    ) {
+    public void enterCustomerDetails(Customer cust) {
+        new Select(title).selectByValue(cust.title);
+        firstName.sendKeys(cust.firstName);
+        lastName.sendKeys(cust.lastName);
 
-        new Select(title).selectByValue(titleValue);
-        firstName.sendKeys(firstNameValue);
-        lastName.sendKeys(lastNameValue);
+        doBDay.sendKeys(String.valueOf(cust.dob.getDayOfMonth()));
+        doBMonth.sendKeys(String.valueOf(cust.dob.getMonthValue()));
+        doBYear.sendKeys(String.valueOf(cust.dob.getYear()));
 
-        doBDay.sendKeys(String.valueOf(dobValue.getDayOfMonth()));
-        doBMonth.sendKeys(String.valueOf(dobValue.getMonthValue()));
-        doBYear.sendKeys(String.valueOf(dobValue.getYear()));
-
-        emailID.sendKeys(emailValue);
+        emailID.sendKeys(cust.email);
         new Select(countryCode).selectByVisibleText("+61");
-        custMobileNo.sendKeys(telephoneNoValue);
+        custMobileNo.sendKeys(cust.telephoneNo);
 
-        residentialStreetAddress.sendKeys(streetAddressValue);
-        residentialSuburb.sendKeys(suburbValue);
-        residentialCity.sendKeys(cityValue);
-        residentialPostCode.sendKeys(postCodeValue);
-        residentialCountry.sendKeys(countryValue);
-        new Select(residentialState).selectByVisibleText(stateValue);
+        residentialStreetAddress.sendKeys(cust.street);
+        residentialSuburb.sendKeys(cust.suburb);
+        residentialCity.sendKeys(cust.city);
+        residentialPostCode.sendKeys(cust.postCode);
+        residentialCountry.sendKeys(cust.country);
+        new Select(residentialState).selectByVisibleText(cust.state);
 
-        if(!weeklyLimitValue.isEmpty()) { weeklyDepositLimit.sendKeys(weeklyLimitValue); }
+        if(!cust.weeklyDepositLimit.isEmpty()) { weeklyDepositLimit.sendKeys(cust.weeklyDepositLimit); }
 
-        new Select(residentialTimezone).selectByValue(timezoneValue);
+        new Select(residentialTimezone).selectByValue(cust.timezone);
 
-        mailingStreetAddress.sendKeys(streetAddressValue);
-        mailingSuburb.sendKeys(suburbValue);
-        mailingCity.sendKeys(cityValue);
-        mailingPostCode.sendKeys(postCodeValue);
-        mailingCountry.sendKeys(countryValue);
-        new Select(mailingState).selectByVisibleText(stateValue);
+        mailingStreetAddress.sendKeys(cust.street);
+        mailingSuburb.sendKeys(cust.suburb);
+        mailingCity.sendKeys(cust.city);
+        mailingPostCode.sendKeys(cust.postCode);
+        mailingCountry.sendKeys(cust.country);
+        new Select(mailingState).selectByVisibleText(cust.state);
 
-        userName.sendKeys(usernameValue);
+        username.sendKeys(cust.username);
 
-        telePassword.sendKeys(telephonePassword);
-        telePasswordConfirmation.sendKeys(telephonePassword);
-        internetPassword.sendKeys(internetPasswordValue);
-        internetPasswordConfirmation.sendKeys(internetPasswordValue);
+        telePassword.sendKeys(cust.telephonePassword);
+        telePasswordConfirmation.sendKeys(cust.telephonePassword);
+        internetPassword.sendKeys(cust.internetPassword);
+        internetPasswordConfirmation.sendKeys(cust.internetPassword);
 
-        new Select(challengeQuestion).selectByVisibleText(securityQuestionValue);
-        challengeAnswer.sendKeys(securityAnswerValue);
+        new Select(challengeQuestion).selectByVisibleText(cust.securityQuestion);
+        challengeAnswer.sendKeys(cust.securityAnswer);
 
-        new Select(currency).selectByVisibleText(currencyValue);
+        new Select(currency).selectByVisibleText(cust.currency);
 
         insert.click();
         verifyNoFormErrors();
@@ -193,5 +170,6 @@ public class NewCustomerPage extends AppPage {
             Assertions.fail("Input validation errors: " + formErrors.get(0).getText());
         }
     }
+
 
 }

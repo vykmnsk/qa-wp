@@ -1,6 +1,8 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 
+import com.tabcorp.qa.wagerplayer.dto.Customer;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,4 +26,10 @@ public interface WagerPlayerAPI {
     Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
 
     BigDecimal readNewBalance(Object resp);
+
+    //TODO
+//    String createNewCustomer(Customer cust);
+//    String readAmlStatus(String customerUsername, String customerPassword);
+
+
 }

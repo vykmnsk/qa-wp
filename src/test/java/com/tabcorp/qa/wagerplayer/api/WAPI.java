@@ -4,11 +4,14 @@ import com.jayway.jsonpath.JsonPath;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.dto.Customer;
 import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -66,54 +69,30 @@ public class WAPI implements WagerPlayerAPI {
         return JsonPath.read(resp, "$.RSP.login[0].session_id");
     }
 
-    public String createNewCustomer(
-            String username,
-            String custTitle,
-            String custFirstName,
-            String custLastName,
-            String custDobValue,
-            String custTelephoneNoValue,
-            String custEmail,
-            String custStreetAddress,
-            String custSuburb,
-            String custState,
-            String custPostCode,
-            String custCountry,
-            String custWeeklyLimit,
-            String custSecurityQuestion,
-            String custAnswer,
-            String currencyValue,
-            String custTimezone,
-            String custClientIp,
-            String custPassword,
-            String custTelephonePassword,
-            String custInternetPassword
-    ) {
+    public String createNewCustomer(Customer cust){
         Map<String, Object> fields = wapiAuthFields();
-
         fields.put("action", "account_insert_customer");
-        fields.put("client_ip", custClientIp);
-        fields.put("username", username);
-        fields.put("telephone_password", custTelephonePassword);
-        fields.put("internet_password", custInternetPassword);
-        fields.put("password", custPassword);
-        fields.put("secret_question", custSecurityQuestion);
-        fields.put("secret_answer", custAnswer);
-        fields.put("salutation", custTitle);
-        fields.put("firstname", custFirstName);
-        fields.put("lastname", custLastName);
-        fields.put("dob", custDobValue);
-        fields.put("email_address", custEmail);
-        fields.put("deposit_limit", custWeeklyLimit);
-        fields.put("street", custStreetAddress);
-        fields.put("postcode", custPostCode);
-        fields.put("country", custCountry);
-        fields.put("telephone", custTelephoneNoValue);
-        fields.put("state", custState);
-        fields.put("suburb", custSuburb);
-        fields.put("currency", currencyValue);
-        fields.put("timezone", custTimezone);
-
+        fields.put("client_ip", cust.clientIP);
+        fields.put("username", cust.username);
+        fields.put("telephone_password", cust.telephonePassword);
+        fields.put("internet_password", cust.internetPassword);
+        fields.put("password",cust.password);
+        fields.put("secret_question", cust.securityQuestion);
+        fields.put("secret_answer", cust.securityAnswer);
+        fields.put("salutation", cust.title);
+        fields.put("firstname", cust.firstName);
+        fields.put("lastname", cust.lastName);
+        fields.put("dob", DateTimeFormatter.ISO_LOCAL_DATE.format(cust.dob));
+        fields.put("email_address", cust.email);
+        fields.put("deposit_limit", cust.weeklyDepositLimit);
+        fields.put("street", cust.street);
+        fields.put("postcode", cust.postCode);
+        fields.put("country", cust.country);
+        fields.put("telephone", cust.telephoneNo);
+        fields.put("state", cust.state);
+        fields.put("suburb", cust.suburb);
+        fields.put("currency", cust.currency);
+        fields.put("timezone", cust.timezone);
         Object resp = post(fields);
         Integer custId = JsonPath.read(resp, RESP_ROOT_PATH + ".success.customer_id");
         String msg = JsonPath.read(resp, RESP_ROOT_PATH + ".success.message");

@@ -30,5 +30,10 @@ import cucumber.api.java8.En;
                 loginPage.verifyErrorMessage(msg);
             });
 
+            Given("^I am logged into WP UI and on Home Page$", () -> {
+                LoginPage lp = new LoginPage();
+                lp.login();
+            });
+
         }
 }

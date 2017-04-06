@@ -69,5 +69,12 @@ public class HelpersTest {
         assertThat(name2).contains(BASE);
     }
 
+    @Test
+    public void canNormalize(){
+        final String input = "Active - KYC verified";
+        final String expectedOutput = "ACTIVE_KYC_VERIFIED";
+        String output = Helpers.norm(input);
+        assertThat(output).isEqualTo(expectedOutput);
+    }
 }
 

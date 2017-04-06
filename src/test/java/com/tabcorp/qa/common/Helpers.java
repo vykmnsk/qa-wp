@@ -40,6 +40,11 @@ public class Helpers {
         return (name.substring(0,1).toUpperCase()) + (name.substring(1));
     }
 
+    public static String norm(String input) {
+        String output = input.replaceAll("(\\s|-)+", "_");
+        return output.toUpperCase();
+    }
+
     public static String getChromeDriverPath() {
 
         List<String> strings = new LinkedList<>();

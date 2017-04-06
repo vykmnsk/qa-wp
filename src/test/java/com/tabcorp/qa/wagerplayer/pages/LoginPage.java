@@ -64,4 +64,10 @@ public class LoginPage extends AppPage {
                 .contains(msg);
     }
 
+    public void login() {
+        load();
+        HomePage hp = enterValidCredentials();
+        hp.verifyLoaded();
+    }
+
 }
