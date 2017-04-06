@@ -8,8 +8,8 @@ Feature: Single Bets
   Scenario Outline: Horse Race Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
-      | runners   | Runner01, Runner02, Runner03, Runner04, Runner05 |
-      | prices    | 1.10, 2.20, 3.30, 4.40, 5.50                     |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
+      | prices  | 1.10, 2.20, 3.30, 4.40, 5.50                     |
     And I enable "<ProductName>" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -30,11 +30,11 @@ Feature: Single Bets
 
     Examples:
       | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
-      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50              | 2.75   | 4.20, 4.10 | 3.90,1.29   |
-      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50              | 0.00   | 2.20, 5.10 | 3.90,1.29   |
-      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 5.25   | 5.20, 2.10 | 3.90,1.29   |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50              | 2.75   | 4.20, 4.10 | 3.90, 1.29  |
+      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50              | 0.00   | 2.20, 5.10 | 3.90, 1.29  |
+      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 5.25   | 5.20, 2.10 | 3.90, 1.29  |
 
-    @luxbet
+  @luxbet
     Examples:
       | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
-      | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 2.50   | 3.20, 1.10 | 3.90,1.29   |
+      | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 2.50   | 3.20, 1.10 | 3.90, 1.29  |

@@ -55,17 +55,18 @@ public class SettlementPage extends AppPage {
         int count = 0;
         winnerCheck.click();
         for (Map.Entry<String, String> winner : winners.entrySet()) {
-            Select position = new Select(resultPositions.get(count));
-            String winnerName = winner.getValue() + " " + Helpers.toTitleCase(winner.getKey());
-            Select result = new Select(resultRunners.get(count));
-            position.selectByVisibleText(winner.getValue());
-            //example name is 1 Runner_1, cucumber is sending only 1
-            result.selectByVisibleText(winnerName);
+            String positionVal = winner.getValue();
+            WebElement positionEl = resultPositions.get(count);
+            wait.until(ExpectedConditions.textToBePresentInElement(positionEl, positionVal));
+            new Select(positionEl).selectByVisibleText(positionVal);
+            //example: "1 Runner01"
+            String visibleRunnerVal = winner.getValue() + " " + Helpers.toTitleCase(winner.getKey());
+            WebElement runnerEl = resultRunners.get(count);
+            wait.until(ExpectedConditions.textToBePresentInElement(runnerEl, visibleRunnerVal));
+            new Select(runnerEl).selectByVisibleText(visibleRunnerVal);
             count++;
         }
-
         result.click();
-
     }
 
     public void accept() {

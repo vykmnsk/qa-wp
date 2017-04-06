@@ -27,7 +27,7 @@ public interface WagerPlayerAPI {
 
     BigDecimal readNewBalance(Object resp);
 
-    //TODO
+    //TODO add these methods if V2 supports
 //    String createNewCustomer(Customer cust);
 //    String readAmlStatus(String customerUsername, String customerPassword);
 

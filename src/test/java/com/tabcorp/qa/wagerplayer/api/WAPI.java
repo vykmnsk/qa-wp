@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,7 +51,7 @@ public class WAPI implements WagerPlayerAPI {
         return resp;
     }
 
-    static Object postWithQueryStrs(Map<String, Object> fields, List selectionIds, String key) {
+    static Object postWithQueryStrings(Map<String, Object> fields, List selectionIds, String key) {
         fields.put("output_type", "json");
         Object resp = REST.postWithQueryStrings(URL, fields, selectionIds, key);
         JSONArray errors = JsonPath.read(resp, "$..error..error_text");
@@ -66,7 +65,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("customer_username", username);
         fields.put("customer_password", password);
         Object resp = post(fields);
-        return JsonPath.read(resp, "$.RSP.login[0].session_id");
+        return JsonPath.read(resp, RESP_ROOT_PATH + ".login[0].session_id");
     }
 
     public String createNewCustomer(Customer cust){
@@ -104,7 +103,7 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
         Object resp = post(fields);
-        String balance = JsonPath.read(resp, "$.RSP.account[0].balance");
+        String balance = JsonPath.read(resp, RESP_ROOT_PATH + ".account[0].balance");
         return new BigDecimal(balance);
     }
 
@@ -149,7 +148,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
         if (flexi) fields.put("flexi", "y");
-        return postWithQueryStrs(fields, selectionIds, "slot[1][selection][]");
+        return postWithQueryStrings(fields, selectionIds, "slot[1][selection][]");
     }
 
     public Object placeExoticBetMultiMarkets(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, boolean flexi) {
@@ -171,7 +170,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public BigDecimal readNewBalance(Object resp) {
-        Object val = JsonPath.read(resp, "$.RSP.bet[0].new_balance");
+        Object val = JsonPath.read(resp, RESP_ROOT_PATH + ".bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
     }
@@ -209,24 +208,17 @@ public class WAPI implements WagerPlayerAPI {
     private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
 
-        //TODO hack to bypass broken WAPI for Redbook
-        JSONArray attrs = JsonPath.read(resp, RESP_ROOT_PATH + path + "." + attrName);
-        if (attrs.size() != 1 && BetType.Place.name().equals(betTypeName)) {
-            return "1";
-        }
+        //qTODO hack to bypass broken WAPI for Redbook
+//        JSONArray attrs = JsonPath.read(resp, RESP_ROOT_PATH + path + "." + attrName);
+//        if (attrs.size() != 1 && BetType.Place.name().equals(betTypeName)) {
+//            return "1";
+//        }
         return readOneAttr(resp, path, attrName);
     }
 
     public String readMarketId(Object resp, String mktName) {
         String mktPath = ".markets.market" + jfilter("name", mktName);
         return readOneAttr(resp, mktPath, "id");
-    }
-
-    public static String readFirstMarketId(Object resp) {
-        String path = "$.RSP.markets.market[0].id";
-        String id = JsonPath.read(resp, path);
-        assertThat(id).as(String.format("expected to find one attribute '%s' at path='%s'", "id", path)).isNotEmpty();
-        return id;
     }
 
     public List<String> readSelectionIds(Object resp, String marketId, List<String> selectionNames) {
