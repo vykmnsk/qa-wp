@@ -1,4 +1,4 @@
-@exotic-bets @luxbet @ccbets
+@exotic-bets @luxbet
 Feature: Placing and Settling Exotic Bets for a Single Event
 
   Background:
