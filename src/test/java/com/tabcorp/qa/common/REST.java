@@ -4,6 +4,7 @@ import com.jayway.jsonpath.Configuration;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +31,16 @@ public class REST {
         return verifyAndParseResponse(response);
     }
 
-    public static Object postWithQueryStrings(String url, Map<String, Object> fields, List selectionList, String slotSelectionKey) {
+    public static Object postWithQueryStrings(String url, Map<String, Object> fields, Pair<String, List<String>> pair) {
         fields.put("output_type", "json");
-
         HttpResponse<String> response;
         try {
             response = Unirest.post(url)
                     .queryString(fields)
-                    .queryString(slotSelectionKey, selectionList)
+                    .queryString(pair.getKey(), pair.getValue())
                     .asString();
         } catch (UnirestException e) {
+            log.info("REST URL=" + url);
             throw new RuntimeException(e);
         }
         return verifyAndParseResponse(response);

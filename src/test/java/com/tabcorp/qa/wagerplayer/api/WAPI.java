@@ -6,6 +6,7 @@ import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
 import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,25 +38,23 @@ public class WAPI implements WagerPlayerAPI {
         return fields;
     }
 
-    static Object post(Map<String, Object> fields) {
+    private static Object post(Map<String, Object> fields) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
-
-        List<String> wapiErrPaths = Arrays.asList(
-                "$..error..error_text",
-                "$..customer_errors..description");
-        for (String path: wapiErrPaths) {
-            JSONArray errors = JsonPath.read(resp, path);
-            assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
-        }
+        verifyNoErrors(resp, fields);
         return resp;
     }
 
-    static Object postWithQueryStrings(Map<String, Object> fields, List selectionIds, String key) {
+    private static void verifyNoErrors(Object resp, Object req) {
+        JSONArray errors = JsonPath.read(resp, "$..error");
+        assertThat(errors).as("Errors in response when sending " + req).isEmpty();
+    }
+
+    static Object postWithQueryStrings(Map<String, Object> fields, Pair<String, List<String>> pair) {
         fields.put("output_type", "json");
-        Object resp = REST.postWithQueryStrings(URL, fields, selectionIds, key);
-        JSONArray errors = JsonPath.read(resp, "$..error..error_text");
-        assertThat(errors).as("Errors in response when sending " + fields).isEmpty();
+        Object resp = REST.postWithQueryStrings(URL, fields, pair);
+        String reqText = String.format("%s %s", fields, pair);
+        verifyNoErrors(resp, reqText);
         return resp;
     }
 
@@ -68,14 +67,14 @@ public class WAPI implements WagerPlayerAPI {
         return JsonPath.read(resp, RESP_ROOT_PATH + ".login[0].session_id");
     }
 
-    public String createNewCustomer(Customer cust){
+    public String createNewCustomer(Customer cust) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_insert_customer");
         fields.put("client_ip", cust.clientIP);
         fields.put("username", cust.username);
         fields.put("telephone_password", cust.telephonePassword);
         fields.put("internet_password", cust.internetPassword);
-        fields.put("password",cust.password);
+        fields.put("password", cust.password);
         fields.put("secret_question", cust.securityQuestion);
         fields.put("secret_answer", cust.securityAnswer);
         fields.put("salutation", cust.title);
@@ -148,7 +147,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
         if (flexi) fields.put("flexi", "y");
-        return postWithQueryStrings(fields, selectionIds, "slot[1][selection][]");
+        return postWithQueryStrings(fields, Pair.of("slot[1][selection][]", selectionIds));
     }
 
     public Object placeExoticBetMultiMarkets(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, boolean flexi) {
