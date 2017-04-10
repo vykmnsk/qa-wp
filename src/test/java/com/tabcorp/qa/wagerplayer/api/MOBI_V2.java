@@ -9,35 +9,48 @@ import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MOBI_V2 implements WagerPlayerAPI {
 
     private static String URL_ROOT = Config.moby_V2_URL();
 
-     static Object get(String url,Map<String,Object> queryParams){
-         Object response = REST.get(URL_ROOT + url, queryParams);
-         JSONArray errors = JsonPath.read(response, "$..error..error_message");
-         Assertions.assertThat(errors).as("errors").isEmpty();
-         return response;
-     }
+    static Object get(String url, Map<String, Object> queryParams) {
+        Object response = REST.get(URL_ROOT + url, queryParams);
+        verifyNoErrors(response, queryParams);
+        return response;
+    }
 
     static Object post(String url, Map<String, Object> fields) {
         fields.put("output_type", "json");
         Object response = REST.post(URL_ROOT + url, fields);
-        JSONArray errors = JsonPath.read(response, "$..error..error_text");
-        Assertions.assertThat(errors).as("Errors in response").isEmpty();
+        verifyNoErrors(response, fields);
         return response;
     }
 
     static Object put(String url, String reqJSON) {
         Object response = REST.put(URL_ROOT + url, reqJSON);
-        List<String> errors = JsonPath.read(response, "$..selections..error_message");
-        Assertions.assertThat(errors).withFailMessage("Errors in response: %s", errors).isEmpty();
         return response;
+    }
+
+    private static void verifyNoErrors(Object resp, Object req) {
+        verifyNoErrors(resp, req, null);
+    }
+
+    private static void verifyNoErrors(Object resp, Object req, String errPath) {
+        List<String> errPaths = new ArrayList<>();
+        errPaths.add("$..errors"); //default
+        if (null != errPath) errPaths.add(errPath);
+        JSONArray errors = new JSONArray();
+        for (String path : errPaths) {
+            errors.addAll(JsonPath.read(resp, path));
+        }
+        assertThat(errors).as("Errors in response when sending " + req).isEmpty();
     }
 
     public BigDecimal getBalance(String accessToken) {
@@ -61,35 +74,37 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return accessToken;
     }
 
-    private static Object placeBet(String reqJSON) {
+    private static Object checkoutBet(String reqJSON) {
         Object response = put("/betslip/checkout", reqJSON);
+        verifyNoErrors(response, reqJSON, "$..selections..error_message");
         JSONArray betId = JsonPath.read(response, "$..selections[0].bet_id");
-        Assertions.assertThat(betId).as("BetId").isNotEmpty();
+        Assertions.assertThat(betId).as("Bet ID in response").isNotEmpty();
         return response;
     }
 
-    private static Object placeMultisBet(String reqJSON, int noOfSelections) {
-        Object response = REST.put(URL_ROOT + "/betslip/checkout", reqJSON);
-        List<String> errors = JsonPath.read(response, "$..selections..error_message");
-        Assertions.assertThat(errors.size()).withFailMessage("Errors in response: %s", errors).isLessThanOrEqualTo(noOfSelections);
-
+    private static Object checkoutMultiBet(String reqJSON, int selectionCount) {
+        Object response = put( "/betslip/checkout", reqJSON);
+        verifyNoErrors(response, reqJSON);
+        List<String> selectionsErrors = JsonPath.read(response, "$..selections..error_message");
+        Assertions.assertThat(selectionsErrors.size())
+                .as("Number of Selection Errors in response: %s", selectionsErrors).isLessThanOrEqualTo(selectionCount);
         JSONArray betId = JsonPath.read(response, "$..selections..combins..bet_id");
-        Assertions.assertThat(betId).as("BetId").isNotEmpty();
+        Assertions.assertThat(betId).as("Bet ID in response").isNotEmpty();
         return response;
     }
 
-    public Object placeSingleWinBet(String accessToken, Integer productId , String mpid, String winPrice, BigDecimal stake) {
+    public Object placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
         //prices
         JSONObject price = new JSONObject();
         price.put("win_price", winPrice);
-        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Win.id, price);
-        return placeBet(betPayload);
+        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Win.id, price);
+        return checkoutBet(betPayload);
     }
 
-    public Object placeSinglePlaceBet(String accessToken, Integer productId , String mpid, String placePrice, BigDecimal stake) {
+    public Object placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
@@ -97,11 +112,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
         JSONObject price = new JSONObject();
         price.put("place_price", placePrice);
 
-        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Place.id, price);
-        return placeBet(betPayload);
+        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Place.id, price);
+        return checkoutBet(betPayload);
     }
 
-    public Object placeSingleEachwayBet(String accessToken, Integer productId , String mpid, String winPrice, String placePrice, BigDecimal stake) {
+    public Object placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
@@ -110,8 +125,8 @@ public class MOBI_V2 implements WagerPlayerAPI {
         price.put("place_price", placePrice);
         price.put("win_price", winPrice);
 
-        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Eachway.id, price);
-        return placeBet(betPayload);
+        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Eachway.id, price);
+        return checkoutBet(betPayload);
     }
 
     public Object placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi) {
@@ -131,7 +146,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
             selection.add(0, selectionIds.get(index));
             slotData.put("market", marketId);
             slotData.put("selection", selection);
-            slots.put(index+1, slotData);
+            slots.put(index + 1, slotData);
         }
 
 
@@ -145,7 +160,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
         obj.put("selections", selections);
 
-        return placeBet(obj.toJSONString());
+        return checkoutBet(obj.toJSONString());
     }
 
     public Object placeMultiBet(String accessToken, Integer productId, List<Map<WAPI.KEY, String>> selections, Integer betType, String multiType, BigDecimal stake) {
@@ -157,7 +172,6 @@ public class MOBI_V2 implements WagerPlayerAPI {
         JSONObject selectionsData;
         JSONObject selPrices;
         JSONObject options;
-        int noOfSelections = selections.size();
 
         for (Map<WAPI.KEY, String> sel : selections) {
             selectionsData = new JSONObject();
@@ -199,10 +213,10 @@ public class MOBI_V2 implements WagerPlayerAPI {
         betPayload.put("access_token", accessToken);
         betPayload.put("selections", selectionsObj);
 
-        return placeMultisBet(betPayload.toJSONString(), noOfSelections);
+        return checkoutMultiBet(betPayload.toJSONString(), selections.size());
     }
 
-    private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject)  {
+    private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject) {
         JSONObject obj = new JSONObject();
         JSONArray selections = new JSONArray();
         JSONObject betType = new JSONObject(); //options

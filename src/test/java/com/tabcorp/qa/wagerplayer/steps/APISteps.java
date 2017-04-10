@@ -30,39 +30,39 @@ public class APISteps implements En {
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
-            accessToken = Config.getAPI().getAccessToken(Config.customerUsername(), Config.customerPassword());
+            accessToken = api.getAccessToken(Config.customerUsername(), Config.customerPassword());
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
         });
 
         Given("^customer balance is at least \\$(\\d+.\\d\\d)$", (BigDecimal minBalance) -> {
-            balanceBefore = Config.getAPI().getBalance(accessToken);
+            balanceBefore = api.getBalance(accessToken);
             assertThat(balanceBefore).as("balance before bet").isGreaterThanOrEqualTo(minBalance);
         });
 
         When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(PRODUCT_ID);
-                    if (null == wapi) wapi = new WAPI();
                     Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
 
+                    Object reponse;
                     switch (betTypeName.toUpperCase()) {
                         case "WIN":
-                            Config.getAPI().placeSingleWinBet(accessToken, prodId,
+                            reponse = api.placeSingleWinBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), stake);
                             break;
                         case "PLACE":
-                            Config.getAPI().placeSinglePlaceBet(accessToken, prodId,
+                            reponse = api.placeSinglePlaceBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         case "EACHWAY":
-                            Config.getAPI().placeSingleEachwayBet(accessToken, prodId,
+                            reponse = api.placeSingleEachwayBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = Config.getAPI().getBalance(accessToken);
+                    balanceAfterBet = api.readNewBalance(reponse);
                 });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
@@ -96,9 +96,7 @@ public class APISteps implements En {
                     List<Map<WAPI.KEY, String>> selections = new ArrayList();
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
 
-                    if (null == wapi) wapi = new WAPI();
                     assertThat(eventIds.size()).isEqualTo(runners.size());
-
                     for (int i = 0; i<runners.size(); i++) {
                         Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
                         Map<WAPI.KEY, String> sel = WAPI.readSelection(marketsResponse, runners.get(i), prodId);
@@ -112,7 +110,7 @@ public class APISteps implements En {
                     MOBI_V2 mobi_v2 = new MOBI_V2();
                     betResponse = mobi_v2.placeMultiBet(accessToken, prodId,
                                     selections, betType, multiType, stake);
-                    balanceAfterBet = Config.getAPI().readNewBalance(betResponse);
+                    balanceAfterBet = api.readNewBalance(betResponse);
 
                 });
 
@@ -123,12 +121,12 @@ public class APISteps implements En {
 
         Then("^customer balance is increased by \\$(\\d+.\\d\\d)$", (String payoutText) -> {
             BigDecimal payout = new BigDecimal(payoutText);
-            BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
+            BigDecimal balanceAfterSettle = api.getBalance(accessToken);
             assertThat(Helpers.roundOff(balanceAfterSettle.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(payout));
         });
 
         Then("^customer balance is not changed$", () -> {
-            BigDecimal balanceAfterSettle = Config.getAPI().getBalance(accessToken);
+            BigDecimal balanceAfterSettle = api.getBalance(accessToken);
             assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
         });
 

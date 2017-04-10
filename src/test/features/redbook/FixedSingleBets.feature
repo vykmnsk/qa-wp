@@ -1,4 +1,4 @@
-@single-bets @redbook
+@redbook @single-bets @fixed-single-bets
 
 Feature: Placing and Settling multiple Single bets on a Sunbets event
 

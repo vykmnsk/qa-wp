@@ -1,4 +1,4 @@
-@single-bets @luxbet
+@luxbet @single-bets @fixed-single-bets
 Feature: Placing and Settling multiple Single bets on a Luxbet event
 
   Background:
