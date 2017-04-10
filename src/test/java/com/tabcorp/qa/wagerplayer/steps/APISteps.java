@@ -1,14 +1,17 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +86,34 @@ public class APISteps implements En {
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
                     Object response = placeExoticBetMultEvents(eventIds, prodId, runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
+                });
+
+        When("^I place \"([^\"]*)\" multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String multiType, String runner, BigDecimal stake) -> {
+                        Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                        List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+
+                    List<Map<WAPI.KEY, String>> selections = new ArrayList();
+                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+
+                    if (null == wapi) wapi = new WAPI();
+                    assertThat(eventIds.size()).isEqualTo(runners.size());
+
+                    for (int i = 0; i<runners.size(); i++) {
+                        Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
+                        Map<WAPI.KEY, String> sel = WAPI.readSelection(marketsResponse, runners.get(i), prodId);
+                        selections.add(sel);
+                    }
+
+                    betTypeName = Helpers.toTitleCase(betTypeName);
+                    Integer betType = BetType.valueOf(betTypeName).id;
+
+                    Object betResponse;
+                    MOBI_V2 mobi_v2 = new MOBI_V2();
+                    betResponse = mobi_v2.placeMultiBet(accessToken, prodId,
+                                    selections, betType, multiType, stake);
+                    balanceAfterBet = Config.getAPI().readNewBalance(betResponse);
+
                 });
 
         Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (String diffText) -> {

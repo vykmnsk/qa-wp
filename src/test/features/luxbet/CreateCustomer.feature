@@ -1,4 +1,4 @@
-@luxbet @create-customer
+@ui @luxbet @create-customer
 Feature: Create New Customer
 
   Scenario Outline: Create New Customer

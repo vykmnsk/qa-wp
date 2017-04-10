@@ -68,6 +68,16 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return response;
     }
 
+    private static Object placeMultisBet(String reqJSON, int noOfSelections) {
+        Object response = REST.put(URL_ROOT + "/betslip/checkout", reqJSON);
+        List<String> errors = JsonPath.read(response, "$..selections..error_message");
+        Assertions.assertThat(errors.size()).withFailMessage("Errors in response: %s", errors).isLessThanOrEqualTo(noOfSelections);
+
+        JSONArray betId = JsonPath.read(response, "$..selections..combins..bet_id");
+        Assertions.assertThat(betId).as("BetId").isNotEmpty();
+        return response;
+    }
+
     public Object placeSingleWinBet(String accessToken, Integer productId , String mpid, String winPrice, BigDecimal stake) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
@@ -100,7 +110,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         price.put("place_price", placePrice);
         price.put("win_price", winPrice);
 
-        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.EachWay.id, price);
+        String betPayload =  createBetPayload(accessToken, mpid, stake, BetType.Eachway.id, price);
         return placeBet(betPayload);
     }
 
@@ -138,6 +148,60 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return placeBet(obj.toJSONString());
     }
 
+    public Object placeMultiBet(String accessToken, Integer productId, List<Map<WAPI.KEY, String>> selections, Integer betType, String multiType, BigDecimal stake) {
+        JSONObject betPayload = new JSONObject();
+        JSONArray selectionsObj = new JSONArray();
+        JSONArray selection = new JSONArray();
+
+
+        JSONObject selectionsData;
+        JSONObject selPrices;
+        JSONObject options;
+        int noOfSelections = selections.size();
+
+        for (Map<WAPI.KEY, String> sel : selections) {
+            selectionsData = new JSONObject();
+            selPrices = new JSONObject();
+            options = new JSONObject();
+
+            options.put("bet_type", betType);
+            options.put("include_in_multi", 1);
+
+            selPrices.put("win_price", sel.get(KEY.WIN_PRICE));
+            selPrices.put("win_price", sel.get(KEY.PLACE_PRICE));
+
+
+            selectionsData.put("type", "single");
+            selectionsData.put("stake", "0.00");
+            selectionsData.put("mpid", sel.get(KEY.MPID));
+            selectionsData.put("options", options);
+            selectionsData.put("prices", selPrices);
+
+            selectionsObj.add(selectionsData);
+
+        }
+
+        selectionsData = new JSONObject();
+        options = new JSONObject();
+
+        options.put("bet_type", betType);
+
+        selectionsData.put("type", "multi");
+        selectionsData.put("stake", stake);
+        selectionsData.put("multi_type", multiType);
+        selectionsData.put("options", options);
+
+        selectionsObj.add(selectionsData);
+
+        selection.add(0, selectionsObj);
+
+
+        betPayload.put("access_token", accessToken);
+        betPayload.put("selections", selectionsObj);
+
+        return placeMultisBet(betPayload.toJSONString(), noOfSelections);
+    }
+
     private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject)  {
         JSONObject obj = new JSONObject();
         JSONArray selections = new JSONArray();
@@ -161,9 +225,9 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     public BigDecimal readNewBalance(Object resp) {
-        Object val = JsonPath.read(resp, "$.selections[0].new_balance");
-        BigDecimal newBalance = new BigDecimal(val.toString());
+        JSONArray val = JsonPath.read(resp, "$..new_balance");
+        BigDecimal newBalance = new BigDecimal((val.get(val.size()-1)).toString());
         return newBalance;
     }
-    
+
 }

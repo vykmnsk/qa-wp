@@ -131,7 +131,7 @@ public class WAPI implements WagerPlayerAPI {
     public Object placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
-        fields.put("bet_type", BetType.EachWay.id);
+        fields.put("bet_type", BetType.Eachway.id);
         fields.put("product_id", productId);
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
