@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.common.Helpers;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -121,6 +122,18 @@ public class HeaderPage extends AppPage {
     public void verifyPageTitle(String expectedTitle) {
         wait.until(ExpectedConditions.visibilityOf(pageTitle));
         Assertions.assertThat(pageTitle.getText()).isEqualTo(expectedTitle);
+
+    }
+
+    public void deSelectSettled() {
+        switchToHeaderFrame();
+        wait.until(ExpectedConditions.visibilityOf(buttonSettled));
+        String classForSettled = "high_style";
+        String classForUnSettled = "low_style";
+        if (buttonSettled.getAttribute("class").contains(classForSettled)) {
+            buttonSettled.click();
+            wait.until(ExpectedConditions.attributeContains(buttonSettled, "class", classForUnSettled));
+        }
 
     }
 }

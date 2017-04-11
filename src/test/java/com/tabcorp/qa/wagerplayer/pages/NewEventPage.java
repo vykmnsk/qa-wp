@@ -101,7 +101,10 @@ public class NewEventPage extends AppPage {
         MarketsPage mp = new MarketsPage();
         String evtId = mp.readEventID();
         Storage.add(KEY.EVENT_IDS, evtId);
+        Storage.add(KEY.EVENT_NAMES, eventNameVal);
         log.info("storing Event ID=" + Storage.getLast(KEY.EVENT_IDS));
+        log.info("storing Event NAME=" + Storage.getLast(KEY.EVENT_NAMES));
+
         return mp;
     }
 

@@ -12,6 +12,7 @@ public class Storage {
 
     public enum KEY {
         EVENT_IDS,
+        EVENT_NAMES,
         PRODUCT_ID
     }
 
@@ -32,6 +33,14 @@ public class Storage {
 
     public static Object get(KEY key) {
         return Helpers.nonNullGet(map, key);
+    }
+
+    public static Object poll(KEY key) {
+        List<Object> entries = (List) map.get(key);
+        Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
+        Object entry = entries.get(0);
+        entries.remove(0);
+        return entry;
     }
 
     public static Object getLast(KEY key) {

@@ -26,7 +26,6 @@ public class CreateEventSteps implements En {
     private String eventName = null;
     private int raceNumber = 1;
 
-
     public CreateEventSteps() {
 
 
@@ -112,6 +111,7 @@ public class CreateEventSteps implements En {
             String evtBaseName = evt.get("base name");
             if (null == evtBaseName) evtBaseName = Config.testEventBaseName();
             eventName = Helpers.createUniqueName(evtBaseName);
+
             String runnersText = (String) Helpers.nonNullGet(evt, "runners");
             List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
 
@@ -132,7 +132,8 @@ public class CreateEventSteps implements En {
         When("^I result race with the runners and positions$", (DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
             header = new HeaderPage();
-            header.pickEvent(category, subcategory, eventName);
+            String event = (String) Storage.poll(Storage.KEY.EVENT_NAMES);
+            header.pickEvent(category, subcategory, event);
             settlementPage = header.navigateToF6();
             settlementPage.resultRace(winners);
         });
@@ -161,9 +162,10 @@ public class CreateEventSteps implements En {
         settlementPage.updateSettlePrices(prodId, betType.id, prices);
     }
 
-    private void settleRace(){
+    private void settleRace() {
         settlementPage.accept();
         settlementPage.settle();
+        header.deSelectSettled();
     }
 
 }
