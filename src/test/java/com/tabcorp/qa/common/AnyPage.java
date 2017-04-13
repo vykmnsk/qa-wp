@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,11 @@ public class AnyPage {
     public AnyPage(){
         driver = DriverWrapper.getInstance().getDriver();
         wait = DriverWrapper.getInstance().getDriverWait();
+    }
+
+    public void doubleClick(WebElement element) {
+        Actions actions = new Actions(driver);
+        actions.doubleClick(element).perform();
     }
 
     public List<WebElement> findAll(List<By> locators) {

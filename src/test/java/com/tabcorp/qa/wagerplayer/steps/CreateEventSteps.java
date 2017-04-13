@@ -153,6 +153,19 @@ public class CreateEventSteps implements En {
             parseUpdateSettlePrices(placePricesCSV, BetType.Place);
             settleRace();
         });
+
+        And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            header = new HeaderPage();
+            header.pickEvent(category, subcategory, eventName);
+            header.navigateToF5();
+            LiabilityPage liabilityPage = new LiabilityPage();
+            Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+            liabilityPage.updatePrices(prodId, BetType.Win.id, winPrices);
+            liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
+
+        });
     }
 
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {

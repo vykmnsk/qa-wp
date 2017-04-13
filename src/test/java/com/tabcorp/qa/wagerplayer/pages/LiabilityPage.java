@@ -1,13 +1,20 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class LiabilityPage extends AppPage {
     @FindBy(css = "table[id^='navigable_market_id'] ")
@@ -25,6 +32,30 @@ public class LiabilityPage extends AppPage {
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
         wait.until(ExpectedConditions.visibilityOf(liabilityTable));
         wait.until(ExpectedConditions.visibilityOf(eventName));
+    }
+
+    public void updatePrices(int productId, int betTypeId, List<BigDecimal> prices) {
+        List<WebElement> filterPriceCells = filterMarketPrices(productId, betTypeId);
+        enterPrices(filterPriceCells, prices);
+    }
+
+    private List<WebElement> filterMarketPrices(Integer prodId, Integer betTypeId) {
+        Predicate<WebElement> containsBetId = marketPrice -> marketPrice.getAttribute("bet_type").contains(betTypeId.toString());
+        Predicate<WebElement> containsProdId = marketPrice -> marketPrice.getAttribute("default_fixed_product_id").contains(prodId.toString());
+        return marketPrices.stream().filter(containsBetId).filter(containsProdId).collect(Collectors.toList());
+    }
+
+    private void enterPrices(List<WebElement> priceCells, List<BigDecimal> prices) {
+        assertThat(priceCells.size()).as("Price values should have equivalent UI inputs").isGreaterThanOrEqualTo(prices.size());
+        for(int i = 0; i < prices.size(); i++) {
+            WebElement input = priceCells.get(i);
+            String price = prices.get(i).toString();
+            doubleClick(input);
+            Actions actions = new Actions(driver);
+            actions.sendKeys(price);
+            actions.sendKeys(Keys.RETURN);
+            actions.build().perform();
+        }
     }
 
 }
