@@ -77,8 +77,18 @@ public class MarketsPage extends AppPage {
 
     @FindBy(css = "input[name^='position[']")
     private List<WebElement> positionTxts;
+
     @FindBy(css = "input[type=text][id^=price_][onkeyup^=calculate_selection_percent")
     private List<WebElement> priceTxts;
+
+    @FindBy(css = ("input[type=text][name^='hard_limit[']"))
+    private List<WebElement> hardLimitTxts;
+
+    @FindBy(css = ("input[type=text][name^='soft_limit[']"))
+    private List<WebElement> softLimitTxts;
+
+    @FindBy(css = ("input[type=text][name^='interim_limit[']"))
+    private List<WebElement> interimLimitTxts;
 
     @FindBy(css = "#bet_types_content_body table.product_options tbody tr")
     private List<WebElement> productRows;
@@ -165,6 +175,22 @@ public class MarketsPage extends AppPage {
     public void updateRaceNumber(int num) {
         raceNumTxt.clear();
         raceNumTxt.sendKeys("" + num);
+        updateBtn.click();
+    }
+
+    public void setHardSoftInterimLimits() {
+        for (int i = 0; i < positionTxts.size(); i++) {
+            WebElement hardLimitTxt = hardLimitTxts.get(i);
+            WebElement softLimitTxt = softLimitTxts.get(i);
+            WebElement interimLimitTxt = interimLimitTxts.get(i);
+            hardLimitTxt.clear();
+            hardLimitTxt.sendKeys("999999");
+            softLimitTxt.clear();
+            softLimitTxt.sendKeys("998999");
+            interimLimitTxt.clear();
+            interimLimitTxt.sendKeys("997999");
+        }
+        updateBtn.click();
     }
 
     public void showMarketManagement() {
@@ -179,6 +205,7 @@ public class MarketsPage extends AppPage {
         WebElement tr = enableFindProductRow(prodName);
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
         Storage.put(Storage.KEY.PRODUCT_ID, findProductID(tr));
+        Storage.add(Storage.KEY.PRODUCT_IDS, findProductID(tr));
         log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
         ListUtils.union(defaultProductSettings(), settings).forEach(s -> setOption(tr, s));
         updateBtn.click();

@@ -10,7 +10,7 @@ public interface WagerPlayerAPI {
     enum KEY {
         MPID,
         WIN_PRICE,
-        PLACE_PRICE,
+        PLACE_PRICE
     }
 
     String getAccessToken(String userName, String Password);

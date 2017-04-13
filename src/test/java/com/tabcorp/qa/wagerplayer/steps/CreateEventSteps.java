@@ -3,19 +3,27 @@ package com.tabcorp.qa.wagerplayer.steps;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
-import com.tabcorp.qa.wagerplayer.pages.*;
+import com.tabcorp.qa.wagerplayer.api.WAPI;
+import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
+import com.tabcorp.qa.wagerplayer.pages.MarketsPage;
+import com.tabcorp.qa.wagerplayer.pages.NewEventPage;
+import com.tabcorp.qa.wagerplayer.pages.SettlementPage;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CreateEventSteps implements En {
+
+    private static Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
@@ -64,6 +72,7 @@ public class CreateEventSteps implements En {
         When("^I update race number to \"(\\d+)\"$", (Integer num) -> {
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(num);
+            marketsPage.setHardSoftInterimLimits();
         });
 
         When("^I enable \"([^\"]*)\" product settings$", (String name, DataTable table) -> {
@@ -113,31 +122,37 @@ public class CreateEventSteps implements En {
             eventName = Helpers.createUniqueName(evtBaseName);
 
             String runnersText = (String) Helpers.nonNullGet(evt, "runners");
-            List<String> runners = Arrays.asList(runnersText.split(",\\s+"));
+            List<String> runners = Helpers.extractCSV(runnersText);
 
             String pricesText = (String) Helpers.nonNullGet(evt, "prices");
-            List<String> pricesTokens = Arrays.asList(pricesText.split(",\\s+"));
+            List<String> pricesTokens = Helpers.extractCSV(pricesText);
             List<BigDecimal> prices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
 
-              newEvtPage = new NewEventPage();
-              newEvtPage.load();
-              marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
-              marketsPage.verifyLoaded();
-              marketsPage.enterPrices(prices);
-              marketsPage.verifySuccessStatus("Market Created");
-              marketsPage.showMarketManagement();
-              marketsPage.updateRaceNumber(raceNumber);
-           });
+            newEvtPage = new NewEventPage();
+            newEvtPage.load();
+            marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
+            marketsPage.verifyLoaded();
+            marketsPage.enterPrices(prices);
+            marketsPage.verifySuccessStatus("Market Created");
+            marketsPage.showMarketManagement();
+            marketsPage.updateRaceNumber(raceNumber);
+            marketsPage.setHardSoftInterimLimits();
+        });
 
         When("^I result race with the runners and positions$", (DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
-            header = new HeaderPage();
-            String event = (String) Storage.poll(Storage.KEY.EVENT_NAMES);
-            header.pickEvent(category, subcategory, event);
-            settlementPage = header.navigateToF6();
-            settlementPage.resultRace(winners);
+            resultRace(winners);
         });
 
+        When("^I result/settle created event race with winners \"([^\"]*)\"$", (String winnersCSV) -> {
+            List<String> winners = Helpers.extractCSV(winnersCSV);
+            Map<String, String> winnerData = new StrictHashMap<>();
+            for (int i = 0; i < winners.size(); i++) {
+                winnerData.put(winners.get(i), String.valueOf(i + 1));
+            }
+            resultRace(winnerData);
+            settleRace();
+        });
 
         And("^I settle race$", () -> {
             settleRace();
@@ -166,6 +181,14 @@ public class CreateEventSteps implements En {
             liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
 
         });
+    }
+
+    private void resultRace(Map<String, String> winners) {
+        header = new HeaderPage();
+        String event = (String) Storage.poll(Storage.KEY.EVENT_NAMES);
+        header.pickEvent(category, subcategory, event);
+        settlementPage = header.navigateToF6();
+        settlementPage.resultRace(winners);
     }
 
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {

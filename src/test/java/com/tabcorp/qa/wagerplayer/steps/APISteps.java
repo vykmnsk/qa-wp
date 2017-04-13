@@ -8,6 +8,8 @@ import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,12 +17,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.tabcorp.qa.common.Storage.KEY.EVENT_IDS;
-import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_ID;
+import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class APISteps implements En {
+    private static Logger log = LoggerFactory.getLogger(APISteps.class);
 
     private String accessToken = null;
     private BigDecimal balanceBefore = null;
@@ -43,7 +45,7 @@ public class APISteps implements En {
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     Integer prodId = (Integer) Storage.get(PRODUCT_ID);
                     Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
-                    Map<WAPI.KEY, String> sel = WAPI.readSelection(resp, runner, prodId);
+                    Map<WAPI.KEY, String> sel = wapi.readSelection(resp, runner, prodId);
 
                     Object reponse;
                     switch (betTypeName.toUpperCase()) {
@@ -88,18 +90,34 @@ public class APISteps implements En {
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
+        When("^I place a multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String multiType, String runnersCSV, BigDecimal stake, String flexi) -> {
+                    assertThat(multiType.toUpperCase()).as("Multi TypeName input")
+                            .isIn("DOUBLE", "TREBLE", "DOUBLES", "TRIXIE", "PATENT", "4-FOLD", "TREBLES", "YANKEE",
+                                    "LUCKY 15", "5-FOLD", "4-FOLDS", "CANADIAN", "LUCKY 31");
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+
+                    Object response = placeMultiBets(multiType, eventIds, prodIds, runners, stake, isFlexi);
+                    List betIds = wapi.readBetId(response);
+                    log.info("Bet IDs=" + betIds.toString());
+                    balanceAfterBet = api.readNewBalance(response);
+                });
+
         When("^I place \"([^\"]*)\" multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String multiType, String runner, BigDecimal stake) -> {
-                        Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-                        List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
 
                     List<Map<WAPI.KEY, String>> selections = new ArrayList();
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
 
                     assertThat(eventIds.size()).isEqualTo(runners.size());
-                    for (int i = 0; i<runners.size(); i++) {
+                    for (int i = 0; i < runners.size(); i++) {
                         Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
-                        Map<WAPI.KEY, String> sel = WAPI.readSelection(marketsResponse, runners.get(i), prodId);
+                        Map<WAPI.KEY, String> sel = wapi.readSelection(marketsResponse, runners.get(i), prodId);
                         selections.add(sel);
                     }
 
@@ -109,7 +127,7 @@ public class APISteps implements En {
                     Object betResponse;
                     MOBI_V2 mobi_v2 = new MOBI_V2();
                     betResponse = mobi_v2.placeMultiBet(accessToken, prodId,
-                                    selections, betType, multiType, stake);
+                            selections, betType, multiType, stake);
                     balanceAfterBet = api.readNewBalance(betResponse);
 
                 });
@@ -162,6 +180,11 @@ public class APISteps implements En {
             selectionIds.add(selId);
         }
         return wapi.placeExoticBetMultiMarkets(accessToken, prodId, selectionIds, marketIds, stake, isFlexi);
+    }
+
+    private Object placeMultiBets(String multiType, List<String> eventIds, List<Integer> prodIds, List<String> runners, BigDecimal stake, boolean isFlexi) {
+        String uuid = wapi.addSelectionsToMulti(accessToken, eventIds, prodIds, runners, multiType);
+        return wapi.placeAMultiBet(accessToken, uuid, stake, isFlexi);
     }
 
 }

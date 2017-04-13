@@ -80,8 +80,6 @@ public class NewEventPage extends AppPage {
 
     public MarketsPage enterEventDetails(int inMinutes, String eventNameVal, String betInRunTypeVal, String createMarketVal, List<String> runners) {
         eventName.sendKeys(eventNameVal);
-        log.info("Event Name=" + eventNameVal);
-
         (new Select(betInRunType)).selectByVisibleText(betInRunTypeVal);
         createMarket.sendKeys(createMarketVal);
 

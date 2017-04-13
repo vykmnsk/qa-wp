@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.MPID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WAPI implements WagerPlayerAPI {
@@ -23,7 +24,7 @@ public class WAPI implements WagerPlayerAPI {
     private static Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static final String URL = Config.wapiURL();
-    private static final String RESP_ROOT_PATH = "$.RSP";
+    private static final String RESP_ROOT = "$.RSP";
 
     private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();
@@ -39,9 +40,13 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     private static Object post(Map<String, Object> fields) {
+        return post(fields, true);
+    }
+
+    private static Object post(Map<String, Object> fields, boolean checkErros) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
-        verifyNoErrors(resp, fields);
+        if (checkErros) verifyNoErrors(resp, fields);
         return resp;
     }
 
@@ -64,7 +69,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("customer_username", username);
         fields.put("customer_password", password);
         Object resp = post(fields);
-        return JsonPath.read(resp, RESP_ROOT_PATH + ".login[0].session_id");
+        return JsonPath.read(resp, RESP_ROOT + ".login[0].session_id");
     }
 
     public String createNewCustomer(Customer cust) {
@@ -92,8 +97,8 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("currency", cust.currency);
         fields.put("timezone", cust.timezone);
         Object resp = post(fields);
-        Integer custId = JsonPath.read(resp, RESP_ROOT_PATH + ".success.customer_id");
-        String msg = JsonPath.read(resp, RESP_ROOT_PATH + ".success.message");
+        Integer custId = JsonPath.read(resp, RESP_ROOT + ".success.customer_id");
+        String msg = JsonPath.read(resp, RESP_ROOT + ".success.message");
         log.info("Customer ID=" + custId);
         return msg;
     }
@@ -102,7 +107,7 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
         Object resp = post(fields);
-        String balance = JsonPath.read(resp, RESP_ROOT_PATH + ".account[0].balance");
+        String balance = JsonPath.read(resp, RESP_ROOT + ".account[0].balance");
         return new BigDecimal(balance);
     }
 
@@ -164,14 +169,56 @@ public class WAPI implements WagerPlayerAPI {
         });
         fields.put("amount", stake);
         if (flexi) fields.put("flexi", "y");
-        fields.put("output_type", "json");
+        return post(fields);
+    }
+
+    public Object addSelectionToMulti(String sessionId, Integer prodId, String mpid) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_add_sel_to_multi");
+        fields.put("mpid", mpid);
+        fields.put("product_id", prodId);
+        return post(fields, false);
+    }
+
+    public String addSelectionsToMulti(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, String multiType) {
+        List<Integer> sizes = Arrays.asList(eventIds.size(), prodIds.size(), runners.size());
+        Integer count = sizes.get(0);
+        assertThat(count).as("Multi Selections count").isGreaterThan(1);
+        assertThat(sizes).as("Number of Events, Products and Runners").allMatch(count::equals);
+
+        Object resp = null;
+        for (int i = 0; i < count; i++) {
+            Object marketsResponse = getEventMarkets(eventIds.get(i));
+            Map<WAPI.KEY, String> sel = readSelection(marketsResponse, runners.get(i), prodIds.get(i));
+            resp = addSelectionToMulti(sessionId, prodIds.get(i), sel.get(MPID));
+            if (i == 0) {  // error shows only for 1 selection
+                String msg = JsonPath.read(resp, RESP_ROOT + ".error[0].error_text");
+                assertThat(msg).isEqualTo("Add more selections for multiple bet types");
+            }
+        }
+        JSONArray uuidsFound = JsonPath.read(resp, RESP_ROOT + ".multiple" + jfilter("name", multiType) + ".uuid");
+        assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(1);
+        return uuidsFound.get(0).toString();
+    }
+
+    public Object placeAMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("placing_multiple", 1);
+        fields.put("multi[uuid][" + uuid + "][stake]", stake);
+        if (flexi) fields.put("flexi", "y");
         return post(fields);
     }
 
     public BigDecimal readNewBalance(Object resp) {
-        Object val = JsonPath.read(resp, RESP_ROOT_PATH + ".bet[0].new_balance");
+        Object val = JsonPath.read(resp, RESP_ROOT + ".bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
+    }
+
+    public List readBetId(Object resp) {
+        JSONArray betIds = JsonPath.read(resp, RESP_ROOT + ".bet[*].bet_id");
+        return betIds;
     }
 
     public Object getEventMarkets(String evtId) {
@@ -188,7 +235,7 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
         Object resp = post(fields);
-        return (String) JsonPath.read(resp, RESP_ROOT_PATH + ".account[0].aml_status");
+        return (String) JsonPath.read(resp, RESP_ROOT + ".account[0].aml_status");
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
@@ -206,9 +253,8 @@ public class WAPI implements WagerPlayerAPI {
 
     private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
-
         //qTODO hack to bypass broken WAPI for Redbook
-//        JSONArray attrs = JsonPath.read(resp, RESP_ROOT_PATH + path + "." + attrName);
+//        JSONArray attrs = JsonPath.read(resp, RESP_ROOT + path + "." + attrName);
 //        if (attrs.size() != 1 && BetType.Place.name().equals(betTypeName)) {
 //            return "1";
 //        }
@@ -231,7 +277,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     private static String readOneAttr(Object resp, String basePath, String attrName) {
-        String path = RESP_ROOT_PATH + basePath + "." + attrName;
+        String path = RESP_ROOT + basePath + "." + attrName;
         JSONArray attrs = JsonPath.read(resp, path);
         assertThat(attrs.size())
                 .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, path))

@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.common.Helpers;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

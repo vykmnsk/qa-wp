@@ -53,6 +53,7 @@ public class SettlementPage extends AppPage {
 
     public void resultRace(Map<String, String> winners) {
         int count = 0;
+        wait.until(ExpectedConditions.elementToBeClickable(winnerCheck));
         winnerCheck.click();
         for (Map.Entry<String, String> winner : winners.entrySet()) {
             String positionVal = winner.getValue();
