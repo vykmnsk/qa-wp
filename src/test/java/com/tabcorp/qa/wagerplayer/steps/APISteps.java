@@ -43,7 +43,7 @@ public class APISteps implements En {
 
         When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
-                    Integer prodId = (Integer) Storage.get(PRODUCT_ID);
+                    Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
                     Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = wapi.readSelection(resp, runner, prodId);
 
@@ -84,7 +84,7 @@ public class APISteps implements En {
                             .isIn("DAILY DOUBLE", "RUNNING DOUBLE", "QUADDIE");
                     List<String> runners = Helpers.extractCSV(runnersCSV);
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
-                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+                    Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
                     Object response = placeExoticBetMultEvents(eventIds, prodId, runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
@@ -107,14 +107,13 @@ public class APISteps implements En {
                 });
 
         When("^I place \"([^\"]*)\" multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
-                (String betTypeName, String multiType, String runner, BigDecimal stake) -> {
-                    Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
-                    List<String> runners = new ArrayList<>(Arrays.asList(runner.split(",")));
+                (String betTypeName, String multiType, String runnersCVS, BigDecimal stake) -> {
+                    List<String> runners = Helpers.extractCSV(runnersCVS);
+                    Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+                    assertThat(eventIds.size()).isEqualTo(runners.size());
 
                     List<Map<WAPI.KEY, String>> selections = new ArrayList();
-                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-
-                    assertThat(eventIds.size()).isEqualTo(runners.size());
                     for (int i = 0; i < runners.size(); i++) {
                         Object marketsResponse = wapi.getEventMarkets(eventIds.get(i));
                         Map<WAPI.KEY, String> sel = wapi.readSelection(marketsResponse, runners.get(i), prodId);
@@ -122,12 +121,12 @@ public class APISteps implements En {
                     }
 
                     betTypeName = Helpers.toTitleCase(betTypeName);
-                    Integer betType = BetType.valueOf(betTypeName).id;
+                    Integer betTypeId = BetType.valueOf(betTypeName).id;
 
                     Object betResponse;
                     MOBI_V2 mobi_v2 = new MOBI_V2();
                     betResponse = mobi_v2.placeMultiBet(accessToken, prodId,
-                            selections, betType, multiType, stake);
+                            selections, betTypeId, multiType, stake);
                     balanceAfterBet = api.readNewBalance(betResponse);
 
                 });
@@ -154,7 +153,7 @@ public class APISteps implements En {
         assertThat(betTypeName.toUpperCase()).as("Exotic BetTypeName input")
                 .isIn("FIRST FOUR", "TRIFECTA", "EXACTA", "QUINELLA", "EXOTIC");
         List<String> runners = Helpers.extractCSV(runnersCSV);
-        Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+        Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
         String eventId = (String) Storage.getLast(Storage.KEY.EVENT_IDS);
         Object response = placeExoticBetOneEvent(eventId, prodId, runners, stake, isFlexi);
         return api.readNewBalance(response);

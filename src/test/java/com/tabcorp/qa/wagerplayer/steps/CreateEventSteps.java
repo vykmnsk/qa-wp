@@ -6,10 +6,7 @@ import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.MarketsPage;
-import com.tabcorp.qa.wagerplayer.pages.NewEventPage;
-import com.tabcorp.qa.wagerplayer.pages.SettlementPage;
+import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.assertj.core.api.Assertions;
@@ -176,7 +173,7 @@ public class CreateEventSteps implements En {
             header.pickEvent(category, subcategory, eventName);
             header.navigateToF5();
             LiabilityPage liabilityPage = new LiabilityPage();
-            Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
             liabilityPage.updatePrices(prodId, BetType.Win.id, winPrices);
             liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
 
@@ -185,14 +182,14 @@ public class CreateEventSteps implements En {
 
     private void resultRace(Map<String, String> winners) {
         header = new HeaderPage();
-        String event = (String) Storage.poll(Storage.KEY.EVENT_NAMES);
+        String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
         header.pickEvent(category, subcategory, event);
         settlementPage = header.navigateToF6();
         settlementPage.resultRace(winners);
     }
 
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {
-        Integer prodId = (Integer) Storage.get(Storage.KEY.PRODUCT_ID);
+        Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
         List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCVS);
         Assertions.assertThat(prices).as(betType + " prices cucumber input").isNotEmpty();
         settlementPage.updateSettlePrices(prodId, betType.id, prices);

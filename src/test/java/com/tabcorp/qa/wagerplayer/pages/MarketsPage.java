@@ -204,9 +204,8 @@ public class MarketsPage extends AppPage {
         showMarketManagement();
         WebElement tr = enableFindProductRow(prodName);
         assertThat(tr).as("Product %s is not found on Market Page", prodName).isNotNull();
-        Storage.put(Storage.KEY.PRODUCT_ID, findProductID(tr));
         Storage.add(Storage.KEY.PRODUCT_IDS, findProductID(tr));
-        log.info("storing Product ID=" + Storage.get(Storage.KEY.PRODUCT_ID));
+        log.info("storing Product ID=" + Storage.getLast(Storage.KEY.PRODUCT_IDS));
         ListUtils.union(defaultProductSettings(), settings).forEach(s -> setOption(tr, s));
         updateBtn.click();
     }
