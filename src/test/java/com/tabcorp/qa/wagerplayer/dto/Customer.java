@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.dto;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class Customer {
     public String username;
@@ -13,10 +12,12 @@ public class Customer {
     public String telephoneNo;
     public String email;
     public String street;
+    public String building;
     public String city;
     public String suburb;
     public String state;
     public String postCode;
+    public String postalCounty;
     public String country;
     public String weeklyDepositLimit;
     public String securityQuestion;
@@ -27,4 +28,5 @@ public class Customer {
     public String password;
     public String telephonePassword;
     public String internetPassword;
+    public String manualVerification;
 }

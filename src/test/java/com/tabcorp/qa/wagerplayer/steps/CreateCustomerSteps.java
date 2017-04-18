@@ -1,7 +1,8 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.wagerplayer.api.WAPI;
+import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
 import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
 import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
@@ -22,13 +23,11 @@ public class CreateCustomerSteps implements En {
     //for API
     private String customerUsername;
     private String customerPassword;
-    //TODO change to WagerPlayerAPI
-    private WAPI api = new WAPI();
+    private WagerPlayerAPI api = Config.getAPI();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-
 
 
     public CreateCustomerSteps() {
@@ -47,44 +46,46 @@ public class CreateCustomerSteps implements En {
             newCustPage.enterCustomerDetails(custData);
         });
 
-        Then("^the customer AML status in API is updated to \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
-            String amlStatus = api.readAmlStatus(customerUsername, customerPassword);
-            assertThat(Helpers.norm(amlStatus)).as("AML status").isIn(Helpers.norm(amlOne), Helpers.norm(amlTwo));
-        });
-
-        Then("^the customer AML status in UI is updated to \"([^\"]*)\" or \"([^\"]*)\"$", (String amlOne, String amlTwo) -> {
+        Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             customersPage.verifyLoaded();
 
             class ReloadCheckAMLStatus implements Runnable {
                 public void run() {
                     header.refreshPage();
-                    String status = customersPage.readAMLStatus();
-                    Assertions.assertThat(status).as("AML status").isIn(amlOne, amlTwo);
+                    String actualAmlStatus = customersPage.readAMLStatus();
+                    Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
                 }
             }
             Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 3);
         });
+
+        Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
+            String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
+            assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+        });
+
     }
 
     private Customer parseUpdateCustomerData(DataTable table) {
         List<Customer> customers = table.transpose().asList(Customer.class);
-        Customer cust = customers.get(0);
+        Customer customer = customers.get(0);
+        customer.username = "AutoUser" + RandomStringUtils.randomNumeric(7);
+        customer.email = customer.email.replace("#username#", customer.username);
+        customer.dob = LocalDate.parse(customer.dateOfBirth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        customer.securityAnswer = RandomStringUtils.randomAlphanumeric(10);
+        customer.password = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
+        customer.telephonePassword = RandomStringUtils.randomAlphanumeric(10);
+        customer.internetPassword = customer.password;
+        customer.manualVerification = customer.manualVerification.equalsIgnoreCase("Y") ? "1" : "0";
 
-        cust.username = "AutoUser" + RandomStringUtils.randomNumeric(7);
-        cust.email = cust.email.replace("#username#", cust.username);
-        cust.dob = LocalDate.parse(cust.dateOfBirth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        cust.securityAnswer = RandomStringUtils.randomAlphanumeric(10);
-        cust.password = RandomStringUtils.randomAlphanumeric(10);
-        cust.telephonePassword = RandomStringUtils.randomAlphanumeric(10);
-        cust.internetPassword = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
-        return cust;
+        return customer;
     }
 
-    private void loginGoToCustomersPage(){
+    private void loginGoToCustomersPage() {
         LoginPage lp = new LoginPage();
         lp.login();
         header = new HeaderPage();
-        customersPage = header.navigateToF11();;
+        customersPage = header.navigateToF11();
         customersPage.verifyLoaded();
         newCustPage = customersPage.insertNew();
         newCustPage.verifyLoaded();
