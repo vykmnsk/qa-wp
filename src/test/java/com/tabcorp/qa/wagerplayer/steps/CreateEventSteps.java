@@ -69,7 +69,7 @@ public class CreateEventSteps implements En {
         When("^I update race number to \"(\\d+)\"$", (Integer num) -> {
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(num);
-            marketsPage.setHardSoftInterimLimits();
+            if (Config.LUXBET.equals(Config.appName())) marketsPage.setHardSoftInterimLimits();
         });
 
         When("^I enable \"([^\"]*)\" product settings$", (String name, DataTable table) -> {
@@ -133,7 +133,7 @@ public class CreateEventSteps implements En {
             marketsPage.verifySuccessStatus("Market Created");
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(raceNumber);
-            marketsPage.setHardSoftInterimLimits();
+            if (Config.LUXBET.equals(Config.appName())) marketsPage.setHardSoftInterimLimits();
         });
 
         When("^I result race with the runners and positions$", (DataTable table) -> {

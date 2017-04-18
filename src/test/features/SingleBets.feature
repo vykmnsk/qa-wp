@@ -5,7 +5,7 @@ Feature: Single Bets
     Given I am logged into WP API
     And I am logged into WP UI and on Home Page
 
-  Scenario Outline: Horse Race Single bets
+  Scenario Outline: Horse Race Win Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
@@ -34,7 +34,7 @@ Feature: Single Bets
       | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50              | 0.00   | 2.20, 5.10 | 3.90, 1.29  |
 
 
-  Scenario Outline: Horse Race Eachway and Place Single bets
+  Scenario Outline: Horse Race Eachway or Place Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
