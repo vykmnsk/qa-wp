@@ -60,11 +60,11 @@ public class SettlementPage extends AppPage {
             WebElement positionEl = resultPositions.get(count);
             wait.until(ExpectedConditions.textToBePresentInElement(positionEl, positionVal));
             new Select(positionEl).selectByVisibleText(positionVal);
-            //example: "1 Runner01"
-            String visibleRunnerVal = winner.getValue() + " " + Helpers.toTitleCase(winner.getKey());
+            //example: "Runner01"
+            String visibleRunnerVal = Helpers.toTitleCase(winner.getKey());
             WebElement runnerEl = resultRunners.get(count);
             wait.until(ExpectedConditions.textToBePresentInElement(runnerEl, visibleRunnerVal));
-            new Select(runnerEl).selectByVisibleText(visibleRunnerVal);
+            selectByPartialVisibleText(runnerEl, visibleRunnerVal);
             count++;
         }
         result.click();

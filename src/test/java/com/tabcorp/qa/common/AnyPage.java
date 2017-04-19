@@ -6,6 +6,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Quotes;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,12 @@ public class AnyPage {
 
     public void scrollTo(WebElement elem) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", elem);
+    }
+
+    public void selectByPartialVisibleText(WebElement dropdown, String text) {
+        String xpath = ".//option[contains(., " + Quotes.escape(text) + ")]";
+        WebElement option = dropdown.findElement(By.xpath(xpath));
+        new Select(dropdown).selectByVisibleText(option.getText());
     }
 
     public void setScreenSizeToMax() {
