@@ -26,6 +26,7 @@ Feature: Create New Customer
       | manualVerification | <manualVerification> |
 
     Then the customer AML status in <UIorAPI> is updated to <amlStatus>
+    And the user deposits $<depositAmount> cash in <UIorAPI>
 
   @api @redbook
     Examples:
@@ -37,11 +38,12 @@ Feature: Create New Customer
 
   @api @luxbet
     Examples:
-      | UIorAPI | title | firstName | lastName | dateOfBirth | telephoneNo | email                  | street           | city     | suburb         | state | postCode | country | weeklyDepositLimit | clientIP    | securityQuestion        | securityAnswer | currency | timezone         | amlStatus        |
-      | API     | Mr    | Oswald    | Petrucco | 1939-05-31  | 0421147741  | #username#@example.com | 142 Tynte Street | Adelaide | North Adelaide | SA    | 5006     | AU      | 4500.00            | 61.9.192.13 | Favourite Holiday Spot? | Australia      | AUD      | Australia/Sydney | account_verified |
-      | API     | Ms    | Keli      | Cowey    | 1952-03-25  | 0463254781  | #username#@example.com | 13a Alan Ave     | SEAFORTH | SEAFORTH       | NSW   | 2092     | AU      |                    | 61.9.192.13 | Favourite Holiday Spot? | Australia      | AUD      | Australia/Sydney | account_verified |
+      | UIorAPI | title | firstName | lastName | dateOfBirth | telephoneNo | email                  | street           | city     | suburb         | state | postCode | country | weeklyDepositLimit | clientIP    | securityQuestion        | securityAnswer | currency | timezone         | amlStatus        | depositAmount |
+      | API     | Mr    | Oswald    | Petrucco | 1939-05-31  | 0421147741  | #username#@example.com | 142 Tynte Street | Adelaide | North Adelaide | SA    | 5006     | AU      | 4500.00            | 61.9.192.13 | Favourite Holiday Spot? | Australia      | AUD      | Australia/Sydney | account_verified | 10000.00      |
+      | API     | Ms    | Keli      | Cowey    | 1952-03-25  | 0463254781  | #username#@example.com | 13a Alan Ave     | SEAFORTH | SEAFORTH       | NSW   | 2092     | AU      |                    | 61.9.192.13 | Favourite Holiday Spot? | Australia      | AUD      | Australia/Sydney | account_verified | 10000.00      |
 
   @ui @luxbet
     Examples:
-      | UIorAPI | title | firstName | lastName | dateOfBirth | telephoneNo | email                  | street       | city     | suburb   | state           | postCode | country | weeklyDepositLimit | clientIP    | securityQuestion        | securityAnswer | currency          | timezone         | amlStatus        |
-      | UI      | Ms    | Keli      | Cowey    | 1952-03-25  | 0463254781  | #username#@example.com | 13a Alan Ave | SEAFORTH | SEAFORTH | New South Wales | 2092     | AU      |                    | 61.9.192.13 | Favourite Holiday Spot? | Australia      | Australian Dollar | Australia/Sydney | Account Verified |
+      | UIorAPI | title | firstName | lastName | dateOfBirth | telephoneNo | email                  | street           | city     | suburb         | state           | postCode | country | weeklyDepositLimit | clientIP    | securityQuestion        | securityAnswer | currency          | timezone         | amlStatus        | depositAmount |
+      | UI      | Mr    | Oswald    | Petrucco | 1939-05-31  | 0421147741  | #username#@example.com | 142 Tynte Street | Adelaide | North Adelaide | South Australia | 5006     | AU      | 4500.00            | 61.9.192.13 | Favourite Holiday Spot? | Australia      | Australian Dollar | Australia/Sydney | Account Verified | 10000.00      |
+      | UI      | Ms    | Keli      | Cowey    | 1952-03-25  | 0463254781  | #username#@example.com | 13a Alan Ave     | SEAFORTH | SEAFORTH       | New South Wales | 2092     | AU      |                    | 61.9.192.13 | Favourite Holiday Spot? | Australia      | Australian Dollar | Australia/Sydney | Account Verified | 10000.00      |

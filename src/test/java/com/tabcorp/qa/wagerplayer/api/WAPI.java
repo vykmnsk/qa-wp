@@ -103,6 +103,19 @@ public class WAPI implements WagerPlayerAPI {
         return msg;
     }
 
+    public String depositCash(String custUsername, String custPassword, String cashAmount) {
+        String sessionId = getAccessToken(custUsername, custPassword);
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "account_deposit");
+        fields.put("amount", cashAmount);
+        Object resp = post(fields);
+        String msg = JsonPath.read(resp, RESP_ROOT + ".account[0].message");
+        int transId = JsonPath.read(resp, RESP_ROOT + ".account[0].transaction_id");
+        log.info("Amount deposited=" + msg);
+        log.info("Transaction ID=" + transId);
+        return msg;
+    }
+
     public BigDecimal getBalance(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");

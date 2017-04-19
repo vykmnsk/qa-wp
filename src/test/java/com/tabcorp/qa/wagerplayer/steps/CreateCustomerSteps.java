@@ -2,6 +2,7 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
 import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
@@ -24,6 +25,7 @@ public class CreateCustomerSteps implements En {
     private String customerUsername;
     private String customerPassword;
     private WagerPlayerAPI api = Config.getAPI();
+    private WAPI wapi = new WAPI();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
@@ -62,6 +64,15 @@ public class CreateCustomerSteps implements En {
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
             assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+        });
+
+        When("^the user deposits \\$(\\d+\\.\\d\\d) cash in API$", (String cashAmount) -> {
+            String depositStatus = wapi.depositCash(customerUsername, customerPassword, cashAmount);
+            assertThat(depositStatus).isEqualToIgnoringCase(cashAmount + " AUD successfully deposited");
+        });
+
+        When("^the user deposits \\$(\\d+\\.\\d\\d) cash in UI$", (String cashAmount) -> {
+
         });
 
     }
