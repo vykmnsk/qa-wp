@@ -111,7 +111,7 @@ public class WAPI implements WagerPlayerAPI {
         Object resp = post(fields);
         String msg = JsonPath.read(resp, RESP_ROOT + ".account[0].message");
         int transId = JsonPath.read(resp, RESP_ROOT + ".account[0].transaction_id");
-        log.info("Amount deposited=" + msg);
+        log.info("Amount=" + msg);
         log.info("Transaction ID=" + transId);
         return msg;
     }

@@ -24,6 +24,7 @@ public class CreateCustomerSteps implements En {
     //for API
     private String customerUsername;
     private String customerPassword;
+    private String currency;
     private WagerPlayerAPI api = Config.getAPI();
     //for UI
     private HeaderPage header;
@@ -39,6 +40,7 @@ public class CreateCustomerSteps implements En {
             assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
             this.customerUsername = custData.username;
             this.customerPassword = custData.internetPassword;
+            this.currency = custData.currency;
         });
 
         When("^I create a new customer via UI with data$", (DataTable table) -> {
@@ -67,7 +69,7 @@ public class CreateCustomerSteps implements En {
 
         When("^the user deposits \\$(\\d+\\.\\d\\d) cash in API$", (String cashAmount) -> {
             String depositStatus = api.depositCash(customerUsername, customerPassword, cashAmount);
-            assertThat(depositStatus).isEqualToIgnoringCase(cashAmount + " AUD successfully deposited");
+            assertThat(depositStatus).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
         });
 
         When("^the user deposits \\$(\\d+\\.\\d\\d) cash in UI$", (String cashAmount) -> {
