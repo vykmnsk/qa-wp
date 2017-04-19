@@ -31,4 +31,6 @@ public interface WagerPlayerAPI {
 
     String readAmlStatus(String customerUsername, String customerPassword);
 
+    String depositCash(String custUsername, String custPassword, String cashAmount);
+
 }

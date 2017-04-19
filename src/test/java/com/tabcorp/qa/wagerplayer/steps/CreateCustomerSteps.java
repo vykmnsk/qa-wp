@@ -25,7 +25,6 @@ public class CreateCustomerSteps implements En {
     private String customerUsername;
     private String customerPassword;
     private WagerPlayerAPI api = Config.getAPI();
-    private WAPI wapi = new WAPI();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
@@ -67,7 +66,7 @@ public class CreateCustomerSteps implements En {
         });
 
         When("^the user deposits \\$(\\d+\\.\\d\\d) cash in API$", (String cashAmount) -> {
-            String depositStatus = wapi.depositCash(customerUsername, customerPassword, cashAmount);
+            String depositStatus = api.depositCash(customerUsername, customerPassword, cashAmount);
             assertThat(depositStatus).isEqualToIgnoringCase(cashAmount + " AUD successfully deposited");
         });
 

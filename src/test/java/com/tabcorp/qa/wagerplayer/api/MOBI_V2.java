@@ -79,6 +79,10 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return response;
     }
 
+    public String depositCash(String custUsername, String custPassword, String cashAmount) {
+        return null;  // change this to the appropriate return value for redbook
+    }
+
     public BigDecimal getBalance(String accessToken) {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("access_token", accessToken);
