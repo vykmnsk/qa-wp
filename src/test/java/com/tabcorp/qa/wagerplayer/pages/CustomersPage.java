@@ -14,6 +14,10 @@ public class CustomersPage extends AppPage{
 
     @FindBy(css = "table#side_table_inner tbody tr")
     List<WebElement> custInfoRows;
+
+    @FindBy(css = "img[src='images/button_deposit.gif']")
+    public WebElement depositButton;
+
     final String statusLabel = "AML Status:";
 
     public void load() {
@@ -43,6 +47,16 @@ public class CustomersPage extends AppPage{
 
         int labelEnd = statusRow.indexOf(statusLabel) + statusLabel.length();
         return statusRow.substring(labelEnd).trim();
+    }
+
+    public void openDepositPage() {
+        depositButton.click();
+        DepositPage dp = new DepositPage();
+        dp.load();
+    }
+
+    public void isVisible() {
+        wait.until(ExpectedConditions.visibilityOf(depositButton));
     }
 
 }

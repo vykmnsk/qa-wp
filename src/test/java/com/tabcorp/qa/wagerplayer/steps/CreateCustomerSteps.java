@@ -1,21 +1,22 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.tabcorp.qa.common.DriverWrapper;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
-import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.LoginPage;
-import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
+import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +31,8 @@ public class CreateCustomerSteps implements En {
     private HeaderPage header;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-
+    private DepositPage depositPage;
+    private String transactionID;
 
     public CreateCustomerSteps() {
 
@@ -73,7 +75,20 @@ public class CreateCustomerSteps implements En {
         });
 
         When("^the user deposits \\$(\\d+\\.\\d\\d) cash in UI$", (String cashAmount) -> {
+            customersPage.openDepositPage();
+            depositPage.verifyLoaded();
+            depositPage.selectManualTab();
+            depositPage.selectTransactionType();
+            depositPage.depositAndCurrencySelections(cashAmount);
 
+            depositPage.clickReadBack();
+            depositPage.submitManualCashDeposit();
+            depositPage.acceptAlert();
+
+            this.transactionID = depositPage.getTransactionDetails();
+            depositPage.closeWindows();
+            depositPage.verifyTransactionStatus(transactionID, cashAmount);
+            customersPage.isVisible();
         });
 
     }
