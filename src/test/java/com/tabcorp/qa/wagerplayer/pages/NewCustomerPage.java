@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
@@ -57,6 +58,9 @@ public class NewCustomerPage extends AppPage {
 
     @FindBy(css = "select[name='info[timezone]']")
     public WebElement residentialTimezone;
+
+    @FindBy(css = "input[id=building]")
+    public WebElement mailingBuilding;
 
     @FindBy(css = "input[id=street_address]")
     public WebElement mailingStreetAddress;
@@ -136,18 +140,24 @@ public class NewCustomerPage extends AppPage {
         residentialCity.sendKeys(cust.city);
         residentialPostCode.sendKeys(cust.postCode);
         residentialCountry.sendKeys(cust.country);
-        new Select(residentialState).selectByVisibleText(cust.state);
-
-        if(!cust.weeklyDepositLimit.isEmpty()) { weeklyDepositLimit.sendKeys(cust.weeklyDepositLimit); }
-
         new Select(residentialTimezone).selectByValue(cust.timezone);
 
+        if (Config.REDBOOK.equals(Config.appName())) {
+            mailingBuilding.sendKeys(cust.building);
+        }
         mailingStreetAddress.sendKeys(cust.street);
         mailingSuburb.sendKeys(cust.suburb);
         mailingCity.sendKeys(cust.city);
         mailingPostCode.sendKeys(cust.postCode);
         mailingCountry.sendKeys(cust.country);
-        new Select(mailingState).selectByVisibleText(cust.state);
+
+        if (Config.LUXBET.equals(Config.appName())) {
+            new Select(residentialState).selectByVisibleText(cust.state);
+            new Select(mailingState).selectByVisibleText(cust.state);
+            if (!cust.weeklyDepositLimit.isEmpty()) {
+                weeklyDepositLimit.sendKeys(cust.weeklyDepositLimit);
+            }
+        }
 
         username.sendKeys(cust.username);
 

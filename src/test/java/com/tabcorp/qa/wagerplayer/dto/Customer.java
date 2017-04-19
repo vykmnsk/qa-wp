@@ -17,7 +17,6 @@ public class Customer {
     public String suburb;
     public String state;
     public String postCode;
-    public String postalCounty;
     public String country;
     public String weeklyDepositLimit;
     public String securityQuestion;
