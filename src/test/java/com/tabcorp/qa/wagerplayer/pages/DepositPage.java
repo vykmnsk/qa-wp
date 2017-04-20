@@ -1,6 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import com.tabcorp.qa.common.DriverWrapper;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -11,6 +11,8 @@ import java.util.Iterator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DepositPage extends AppPage {
+    @FindBy(css = ("table#main_table th"))
+    public WebElement pageTitle;
 
     @FindBy(css = "a#method_999")
     public WebElement manualTabLink;
@@ -42,6 +44,9 @@ public class DepositPage extends AppPage {
     @FindBy(css = "a[id=deposits]")
     public WebElement depositsTabLink;
 
+    @FindBy(css = "#trans_list > tbody > tr > td:nth-child(1)")
+    public WebElement transactionIdValue;
+
     @FindBy(css = "#trans_list > tbody > tr > td:nth-child(5)")
     public WebElement amountInTable;
 
@@ -49,21 +54,23 @@ public class DepositPage extends AppPage {
     private String windowTwo;
 
     public void load() {
+        windowOne = captureWindowHandle();
+        switchToANewWindow(windowOne);
         driver.switchTo().defaultContent();
-        //wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
         wait.until(ExpectedConditions.visibilityOf(manualTabLink));
     }
 
     public void verifyLoaded() {
-        HeaderPage header = new HeaderPage();
-        header.verifyPageTitle("Transaction Deposit");
+        verifyPageTitle("Transaction Deposit");
+    }
+
+    public void verifyPageTitle(String expectedTitle) {
+        wait.until(ExpectedConditions.visibilityOf(pageTitle));
+        Assertions.assertThat(pageTitle.getText()).isEqualTo(expectedTitle);
     }
 
     public void selectManualTab() {
-        windowOne = captureWindowHandle();
-        switchToANewWindow(windowOne);
         manualTabLink.click();
-        //waitForIframeAndSwitchToIt("deposit_screen");
         waitForIframeAndSwitchToIt("deposit_screen");
     }
 
@@ -118,7 +125,8 @@ public class DepositPage extends AppPage {
     }
 
     public void verifyTransactionIdsMatch(String transactionIDValue) {
-        assertThat(transactionIDValue).contains(transactionId.getText());
+        wait.until(ExpectedConditions.visibilityOf(transactionIdValue));
+        assertThat(transactionIDValue).contains(transactionIdValue.getText());
     }
 
     public void verifyAmountDepositedMatches(String expectedAmount) {
@@ -128,52 +136,49 @@ public class DepositPage extends AppPage {
 
     /////////////////////////////////////////////////////////
 
-
     public void acceptAlert() {
-        DriverWrapper.getInstance().getDriver().switchTo().alert().accept();
+        driver.switchTo().alert().accept();
     }
 
     public String captureWindowHandle() {
-        return DriverWrapper.getInstance().getDriver().getWindowHandle();
+        return driver.getWindowHandle();
     }
 
-    public static void switchToANewWindow(String originalWindow, String secondaryWindow) {
-        Iterator var2 = DriverWrapper.getInstance().getDriver().getWindowHandles().iterator();
+    public void switchToANewWindow(String originalWindow, String secondaryWindow) {
+        Iterator var2 = driver.getWindowHandles().iterator();
 
         while (var2.hasNext()) {
             String window = (String) var2.next();
             if (!window.equals(originalWindow) && !window.equals(secondaryWindow)) {
-                DriverWrapper.getInstance().getDriver().switchTo().window(window);
+                driver.switchTo().window(window);
             }
         }
-
-        DriverWrapper.getInstance().getDriver().switchTo().defaultContent();
+        driver.switchTo().defaultContent();
     }
 
-    public static void switchToANewWindow(String secondaryWindow) {
-        Iterator var1 = DriverWrapper.getInstance().getDriver().getWindowHandles().iterator();
+    public void switchToANewWindow(String secondaryWindow) {
+        Iterator var1 = driver.getWindowHandles().iterator();
 
         while (var1.hasNext()) {
             String window = (String) var1.next();
             if (!window.equals(secondaryWindow)) {
-                DriverWrapper.getInstance().getDriver().switchTo().window(window);
+                driver.switchTo().window(window);
             }
         }
-
-        DriverWrapper.getInstance().getDriver().switchTo().defaultContent();
+        driver.switchTo().defaultContent();
     }
 
-    public static void switchBackToPreviousWindow(String window) {
-        DriverWrapper.getInstance().getDriver().switchTo().window(window);
+    public  void switchBackToPreviousWindow(String window) {
+        driver.switchTo().window(window);
     }
 
-    public static void closeMiddleWindow() {
-        DriverWrapper.getInstance().getDriver().close();
+    public void closeMiddleWindow() {
+        driver.close();
     }
 
-    public static void waitForIframeAndSwitchToIt(String frameId) {
-        DriverWrapper.getInstance().getDriver().switchTo().defaultContent();
-        DriverWrapper.getInstance().getDriverWait().until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameId));
+    public void waitForIframeAndSwitchToIt(String frameId) {
+        driver.switchTo().defaultContent();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameId));
     }
 
 }

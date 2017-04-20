@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
-import com.tabcorp.qa.common.DriverWrapper;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
@@ -11,12 +10,9 @@ import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +23,7 @@ public class CreateCustomerSteps implements En {
     private String customerPassword;
     private String currency;
     private WagerPlayerAPI api = Config.getAPI();
+    private WAPI wapi = new WAPI();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
@@ -70,12 +67,14 @@ public class CreateCustomerSteps implements En {
         });
 
         When("^the user deposits \\$(\\d+\\.\\d\\d) cash in API$", (String cashAmount) -> {
-            String depositStatus = api.depositCash(customerUsername, customerPassword, cashAmount);
+            String depositStatus = wapi.depositCash(customerUsername, customerPassword, cashAmount);
             assertThat(depositStatus).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
         });
 
         When("^the user deposits \\$(\\d+\\.\\d\\d) cash in UI$", (String cashAmount) -> {
             customersPage.openDepositPage();
+            depositPage = new DepositPage();
+            depositPage.load();
             depositPage.verifyLoaded();
             depositPage.selectManualTab();
             depositPage.selectTransactionType();

@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -51,8 +50,6 @@ public class CustomersPage extends AppPage{
 
     public void openDepositPage() {
         depositButton.click();
-        DepositPage dp = new DepositPage();
-        dp.load();
     }
 
     public void isVisible() {
