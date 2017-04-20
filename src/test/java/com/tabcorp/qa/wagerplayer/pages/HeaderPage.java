@@ -121,7 +121,6 @@ public class HeaderPage extends AppPage {
     public void verifyPageTitle(String expectedTitle) {
         wait.until(ExpectedConditions.visibilityOf(pageTitle));
         Assertions.assertThat(pageTitle.getText()).isEqualTo(expectedTitle);
-
     }
 
     public void deSelectSettled() {

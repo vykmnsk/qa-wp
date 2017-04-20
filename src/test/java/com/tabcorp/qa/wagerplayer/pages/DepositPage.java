@@ -6,6 +6,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,76 +52,58 @@ public class DepositPage extends AppPage {
     private String windowOne;
     private String windowTwo;
 
-    public void load() {
-        windowOne = captureWindowHandle();
-        switchToANewWindow(windowOne);
-        driver.switchTo().defaultContent();
-        wait.until(ExpectedConditions.visibilityOf(manualTabLink));
-    }
-
     public void verifyLoaded() {
-        verifyPageTitle("Transaction Deposit");
-    }
-
-    public void verifyPageTitle(String expectedTitle) {
-        wait.until(ExpectedConditions.visibilityOf(pageTitle));
-        Assertions.assertThat(pageTitle.getText()).isEqualTo(expectedTitle);
+        windowOne = driver.getWindowHandle();;
+        switchToANewWindow(windowOne);
+        HeaderPage deposit = new HeaderPage();
+        deposit.verifyPageTitle("Transaction Deposit");
+        wait.until(ExpectedConditions.visibilityOf(manualTabLink));
     }
 
     public void selectManualTab() {
         manualTabLink.click();
-        waitForIframeAndSwitchToIt("deposit_screen");
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("deposit_screen"));
     }
 
-    public void selectTransactionType() {
+    public void depositCash(String cashAmount) {
         new Select(transactionType).selectByVisibleText("- Cash Deposit");
-    }
-
-    public void depositAndCurrencySelections(String cashAmount) {
         wait.until(ExpectedConditions.visibilityOf(amountTextBox));
-        amountTextBox.sendKeys(cashAmount);
-        windowTwo = captureWindowHandle();
+        amountTextBox.sendKeys(cashAmount.toString());
+        windowTwo = driver.getWindowHandle();
 
         // below step commented as this field is missing from AWS6 but available in Load Test
         //selectOption(currency).from(customerDepositWindow.currency);
-    }
 
-    public void clickReadBack() {
         wait.until(ExpectedConditions.elementToBeClickable(readbackButton));
         readbackButton.click();
         switchToANewWindow(windowTwo, windowOne);
-    }
 
-    public void submitManualCashDeposit() {
         wait.until(ExpectedConditions.visibilityOf(cancel));
         wait.until(ExpectedConditions.elementToBeClickable(cancel));
         wait.until(ExpectedConditions.visibilityOf(submit));
         wait.until(ExpectedConditions.elementToBeClickable(submit));
         submit.click();
+
+        acceptAlert();
     }
 
-    public String getTransactionDetails() {
+    public void verifyTransaction(String amount) {
         String actualSuccessMessage = successMessage.getText();
         assertThat(actualSuccessMessage).isEqualTo("Transaction processed successfully.");
         String transactionID = transactionId.getText();
         log.info("Transaction " + transactionID);
-        return transactionID;
-    }
 
-    public void closeWindows() {
         close.click();
-        switchBackToPreviousWindow(windowTwo);
-    }
+        driver.switchTo().window(windowTwo);
 
-    public void verifyTransactionStatus(String transactionID, String amount) {
         depositsTabLink.click();
-        waitForIframeAndSwitchToIt("deposit_screen");
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("deposit_screen"));
         verifyTransactionIdsMatch(transactionID);
 
         verifyAmountDepositedMatches(amount);
-        closeMiddleWindow();
-        switchBackToPreviousWindow(windowOne);
-        waitForIframeAndSwitchToIt("frame_bottom");
+        driver.close();
+        driver.switchTo().window(windowOne);
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
     public void verifyTransactionIdsMatch(String transactionIDValue) {
@@ -130,18 +113,10 @@ public class DepositPage extends AppPage {
 
     public void verifyAmountDepositedMatches(String expectedAmount) {
         wait.until(ExpectedConditions.visibilityOf(transactionValuesInTable.get(4)));
-        assertThat(transactionValuesInTable.get(4).getText()).isEqualTo(expectedAmount);
+        assertThat(transactionValuesInTable.get(4).getText()).isEqualTo(expectedAmount.toString());
     }
 
     /////////////////////////////////////////////////////////
-
-    public void acceptAlert() {
-        driver.switchTo().alert().accept();
-    }
-
-    public String captureWindowHandle() {
-        return driver.getWindowHandle();
-    }
 
     public void switchToANewWindow(String originalWindow, String secondaryWindow) {
         Iterator var2 = driver.getWindowHandles().iterator();
@@ -165,19 +140,6 @@ public class DepositPage extends AppPage {
             }
         }
         driver.switchTo().defaultContent();
-    }
-
-    public  void switchBackToPreviousWindow(String window) {
-        driver.switchTo().window(window);
-    }
-
-    public void closeMiddleWindow() {
-        driver.close();
-    }
-
-    public void waitForIframeAndSwitchToIt(String frameId) {
-        driver.switchTo().defaultContent();
-        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameId));
     }
 
 }

@@ -11,6 +11,7 @@ import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,7 +30,6 @@ public class CreateCustomerSteps implements En {
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
     private DepositPage depositPage;
-    private String transactionID;
 
     public CreateCustomerSteps() {
 
@@ -74,19 +74,12 @@ public class CreateCustomerSteps implements En {
         When("^the customer deposits (\\d+\\.\\d\\d) cash via UI$", (String cashAmount) -> {
             customersPage.depositButton.click();
             depositPage = new DepositPage();
-            depositPage.load();
             depositPage.verifyLoaded();
             depositPage.selectManualTab();
-            depositPage.selectTransactionType();
-            depositPage.depositAndCurrencySelections(cashAmount);
 
-            depositPage.clickReadBack();
-            depositPage.submitManualCashDeposit();
-            depositPage.acceptAlert();
+            depositPage.depositCash(cashAmount);
 
-            this.transactionID = depositPage.getTransactionDetails();
-            depositPage.closeWindows();
-            depositPage.verifyTransactionStatus(transactionID, cashAmount);
+            depositPage.verifyTransaction(cashAmount);
             customersPage.depositButton.isDisplayed();
         });
 
