@@ -1,4 +1,4 @@
-@wip @multi-bets @redbook
+@multi-bets @redbook
 Feature: Placing and Settling multi Bets
 
   Background:

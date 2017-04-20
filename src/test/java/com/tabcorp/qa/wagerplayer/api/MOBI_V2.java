@@ -277,7 +277,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         fields.put("postal_country", customer.country);
         fields.put("postal_postcode", customer.postCode);
         fields.put("suburb", customer.suburb);
-        fields.put("postal_county", customer.postalCounty);
+        fields.put("postal_county", customer.suburb);
         fields.put("street", customer.street);
         fields.put("manual_verification", customer.manualVerification);
 
