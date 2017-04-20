@@ -105,6 +105,7 @@ public class DepositPage extends AppPage {
         String actualSuccessMessage = successMessage.getText();
         assertThat(actualSuccessMessage).isEqualTo("Transaction processed successfully.");
         String transactionID = transactionId.getText();
+        log.info("Transaction ID details=" + transactionID);
         return transactionID;
     }
 
