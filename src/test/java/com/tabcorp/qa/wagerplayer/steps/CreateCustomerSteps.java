@@ -66,13 +66,13 @@ public class CreateCustomerSteps implements En {
             assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
         });
 
-        When("^the user deposits \\$(\\d+\\.\\d\\d) cash in API$", (String cashAmount) -> {
+        When("^the customer deposits (\\d+\\.\\d\\d) cash via API$", (String cashAmount) -> {
             String depositStatus = wapi.depositCash(customerUsername, customerPassword, cashAmount);
             assertThat(depositStatus).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
         });
 
-        When("^the user deposits \\$(\\d+\\.\\d\\d) cash in UI$", (String cashAmount) -> {
-            customersPage.openDepositPage();
+        When("^the customer deposits (\\d+\\.\\d\\d) cash via UI$", (String cashAmount) -> {
+            customersPage.depositButton.click();
             depositPage = new DepositPage();
             depositPage.load();
             depositPage.verifyLoaded();
@@ -87,7 +87,7 @@ public class CreateCustomerSteps implements En {
             this.transactionID = depositPage.getTransactionDetails();
             depositPage.closeWindows();
             depositPage.verifyTransactionStatus(transactionID, cashAmount);
-            customersPage.isVisible();
+            customersPage.depositButton.isDisplayed();
         });
 
     }

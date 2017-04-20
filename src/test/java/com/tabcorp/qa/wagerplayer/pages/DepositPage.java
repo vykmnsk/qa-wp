@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.Iterator;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,11 +45,8 @@ public class DepositPage extends AppPage {
     @FindBy(css = "a[id=deposits]")
     public WebElement depositsTabLink;
 
-    @FindBy(css = "#trans_list > tbody > tr > td:nth-child(1)")
-    public WebElement transactionIdValue;
-
-    @FindBy(css = "#trans_list > tbody > tr > td:nth-child(5)")
-    public WebElement amountInTable;
+    @FindBy(css = "#trans_list > tbody > tr > td")
+    public List<WebElement> transactionValuesInTable;
 
     private String windowOne;
     private String windowTwo;
@@ -126,13 +124,13 @@ public class DepositPage extends AppPage {
     }
 
     public void verifyTransactionIdsMatch(String transactionIDValue) {
-        wait.until(ExpectedConditions.visibilityOf(transactionIdValue));
-        assertThat(transactionIDValue).contains(transactionIdValue.getText());
+        wait.until(ExpectedConditions.visibilityOf(transactionValuesInTable.get(0)));
+        assertThat(transactionIDValue).contains(transactionValuesInTable.get(0).getText());
     }
 
     public void verifyAmountDepositedMatches(String expectedAmount) {
-        wait.until(ExpectedConditions.visibilityOf(amountInTable));
-        assertThat(amountInTable.getText()).isEqualTo(expectedAmount);
+        wait.until(ExpectedConditions.visibilityOf(transactionValuesInTable.get(4)));
+        assertThat(transactionValuesInTable.get(4).getText()).isEqualTo(expectedAmount);
     }
 
     /////////////////////////////////////////////////////////

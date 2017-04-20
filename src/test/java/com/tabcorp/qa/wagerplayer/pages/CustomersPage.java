@@ -48,12 +48,4 @@ public class CustomersPage extends AppPage{
         return statusRow.substring(labelEnd).trim();
     }
 
-    public void openDepositPage() {
-        depositButton.click();
-    }
-
-    public void isVisible() {
-        wait.until(ExpectedConditions.visibilityOf(depositButton));
-    }
-
 }
