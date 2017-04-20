@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import cucumber.api.java.hu.De;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -15,7 +16,7 @@ public class CustomersPage extends AppPage{
     List<WebElement> custInfoRows;
 
     @FindBy(css = "img[src='images/button_deposit.gif']")
-    public WebElement depositButton;
+    private WebElement depositButton;
 
     final String statusLabel = "AML Status:";
 
@@ -48,4 +49,10 @@ public class CustomersPage extends AppPage{
         return statusRow.substring(labelEnd).trim();
     }
 
+    public DepositPage openDepositWindow() {
+        depositButton.click();
+        DepositPage dp = new DepositPage();
+        dp.load();
+        return dp;
+    }
 }

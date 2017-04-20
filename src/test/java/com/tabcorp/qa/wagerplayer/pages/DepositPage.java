@@ -1,6 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import org.assertj.core.api.Assertions;
+import com.tabcorp.qa.common.Helpers;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -34,10 +34,10 @@ public class DepositPage extends AppPage {
     @FindBy(css = "input[name=cancel]")
     public WebElement cancel;
 
-    @FindBy(css = "body > div.transaction_success")
+    @FindBy(css = "div.transaction_success")
     public WebElement successMessage;
 
-    @FindBy(css = "body > div.transaction_success_message")
+    @FindBy(css = "div.transaction_success_message")
     public WebElement transactionId;
 
     @FindBy(css = "input.wp_button")
@@ -46,15 +46,18 @@ public class DepositPage extends AppPage {
     @FindBy(css = "a[id=deposits]")
     public WebElement depositsTabLink;
 
-    @FindBy(css = "#trans_list > tbody > tr > td")
-    public List<WebElement> transactionValuesInTable;
+    @FindBy(css = "#trans_list tr td")
+    public List<WebElement> transactionData;
 
-    private String windowOne;
-    private String windowTwo;
+    private String depositsWindow;
+    private String manualTabWindow;
+
+    public void load() {
+        depositsWindow = driver.getWindowHandle();;
+        switchToANewWindow(depositsWindow);
+    }
 
     public void verifyLoaded() {
-        windowOne = driver.getWindowHandle();;
-        switchToANewWindow(windowOne);
         HeaderPage deposit = new HeaderPage();
         deposit.verifyPageTitle("Transaction Deposit");
         wait.until(ExpectedConditions.visibilityOf(manualTabLink));
@@ -63,20 +66,21 @@ public class DepositPage extends AppPage {
     public void selectManualTab() {
         manualTabLink.click();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("deposit_screen"));
+        manualTabWindow = driver.getWindowHandle();
     }
 
-    public void depositCash(String cashAmount) {
+    public void depositCash(BigDecimal amount) {
         new Select(transactionType).selectByVisibleText("- Cash Deposit");
         wait.until(ExpectedConditions.visibilityOf(amountTextBox));
-        amountTextBox.sendKeys(cashAmount.toString());
-        windowTwo = driver.getWindowHandle();
+        amountTextBox.sendKeys(amount.toString());
 
         // below step commented as this field is missing from AWS6 but available in Load Test
         //selectOption(currency).from(customerDepositWindow.currency);
 
         wait.until(ExpectedConditions.elementToBeClickable(readbackButton));
         readbackButton.click();
-        switchToANewWindow(windowTwo, windowOne);
+//        switchToANewWindow(manualTabWindow, depositsWindow);
+        switchToANewWindow(depositsWindow);
 
         wait.until(ExpectedConditions.visibilityOf(cancel));
         wait.until(ExpectedConditions.elementToBeClickable(cancel));
@@ -87,14 +91,14 @@ public class DepositPage extends AppPage {
         acceptAlert();
     }
 
-    public void verifyTransaction(String amount) {
+    public void verifyTransaction(BigDecimal amount) {
         String actualSuccessMessage = successMessage.getText();
         assertThat(actualSuccessMessage).isEqualTo("Transaction processed successfully.");
         String transactionID = transactionId.getText();
         log.info("Transaction " + transactionID);
 
         close.click();
-        driver.switchTo().window(windowTwo);
+        driver.switchTo().window(manualTabWindow);
 
         depositsTabLink.click();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("deposit_screen"));
@@ -102,18 +106,20 @@ public class DepositPage extends AppPage {
 
         verifyAmountDepositedMatches(amount);
         driver.close();
-        driver.switchTo().window(windowOne);
+        driver.switchTo().window(depositsWindow);
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
     public void verifyTransactionIdsMatch(String transactionIDValue) {
-        wait.until(ExpectedConditions.visibilityOf(transactionValuesInTable.get(0)));
-        assertThat(transactionIDValue).contains(transactionValuesInTable.get(0).getText());
+        wait.until(ExpectedConditions.visibilityOf(transactionData.get(0)));
+        assertThat(transactionIDValue).contains(transactionData.get(0).getText());
     }
 
-    public void verifyAmountDepositedMatches(String expectedAmount) {
-        wait.until(ExpectedConditions.visibilityOf(transactionValuesInTable.get(4)));
-        assertThat(transactionValuesInTable.get(4).getText()).isEqualTo(expectedAmount.toString());
+    public void verifyAmountDepositedMatches(BigDecimal expectedAmount) {
+        wait.until(ExpectedConditions.visibilityOf(transactionData.get(4)));
+        String actualAmountTxt = transactionData.get(4).getText();
+        BigDecimal actualAmount = new BigDecimal(actualAmountTxt);
+        assertThat(Helpers.roundOff(actualAmount)).isEqualTo(Helpers.roundOff(expectedAmount));
     }
 
     /////////////////////////////////////////////////////////
