@@ -169,7 +169,7 @@ public class NewCustomerPage extends AppPage {
         new Select(challengeQuestion).selectByVisibleText(cust.securityQuestion);
         challengeAnswer.sendKeys(cust.securityAnswer);
 
-        new Select(currency).selectByVisibleText(cust.currency);
+        new Select(currency).selectByValue(cust.currency);
 
         insert.click();
         verifyNoFormErrors();

@@ -45,6 +45,7 @@ public class CreateCustomerSteps implements En {
             Customer custData = parseUpdateCustomerData(table);
             loginGoToCustomersPage();
             newCustPage.enterCustomerDetails(custData);
+            this.currency = custData.currency;
         });
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
@@ -75,8 +76,10 @@ public class CreateCustomerSteps implements En {
             depositPage.verifyLoaded();
             depositPage.selectManualTab();
 
-            depositPage.depositCash(cashAmount);
-            depositPage.verifyTransaction(cashAmount);
+            String transMsg = depositPage.depositCash(cashAmount);
+            assertThat(transMsg).contains("successfully");
+
+            depositPage.verifyTransactionRecord(transMsg, cashAmount, currency);
         });
 
     }
