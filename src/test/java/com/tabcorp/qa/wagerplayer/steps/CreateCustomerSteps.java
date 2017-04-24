@@ -2,17 +2,16 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
-import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.LoginPage;
-import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
+import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,12 +22,13 @@ public class CreateCustomerSteps implements En {
     //for API
     private String customerUsername;
     private String customerPassword;
+    private String currency;
     private WagerPlayerAPI api = Config.getAPI();
+    private WAPI wapi = new WAPI();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-
 
     public CreateCustomerSteps() {
 
@@ -38,12 +38,14 @@ public class CreateCustomerSteps implements En {
             assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
             this.customerUsername = custData.username;
             this.customerPassword = custData.internetPassword;
+            this.currency = custData.currency;
         });
 
         When("^I create a new customer via UI with data$", (DataTable table) -> {
             Customer custData = parseUpdateCustomerData(table);
             loginGoToCustomersPage();
             newCustPage.enterCustomerDetails(custData);
+            this.currency = custData.currency;
         });
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
@@ -62,6 +64,22 @@ public class CreateCustomerSteps implements En {
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
             assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+        });
+
+        When("^the customer deposits (\\d+\\.\\d\\d) cash via API$", (BigDecimal cashAmount) -> {
+            String statusMsg = wapi.depositCash(customerUsername, customerPassword, cashAmount);
+            assertThat(statusMsg).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
+        });
+
+        When("^the customer deposits (\\d+\\.\\d\\d) cash via UI$", (BigDecimal cashAmount) -> {
+            DepositPage depositPage = customersPage.openDepositWindow();
+            depositPage.verifyLoaded();
+            depositPage.selectManualTab();
+
+            String transMsg = depositPage.depositCash(cashAmount);
+            assertThat(transMsg).contains("successfully");
+
+            depositPage.verifyTransactionRecord(transMsg, cashAmount, currency);
         });
 
     }

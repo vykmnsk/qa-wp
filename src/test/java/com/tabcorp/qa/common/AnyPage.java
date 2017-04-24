@@ -70,4 +70,8 @@ public class AnyPage {
         driver.manage().window().setSize(new org.openqa.selenium.Dimension(width,height));
     }
 
+    public void acceptAlert() {
+        driver.switchTo().alert().accept();
+    }
+
 }
