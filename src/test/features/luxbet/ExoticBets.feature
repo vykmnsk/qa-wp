@@ -5,6 +5,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     Given I am logged into WP UI and on Home Page
     And I am logged into WP API
 
+  @lux-ft
   Scenario Outline: Horse Race Exotic bets
     When I enter specifics category "Horse Racing" and subcategory "<Subcategory>"
     And I create a default event with details
@@ -38,12 +39,12 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | Subcategory   | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout | PlacePrices            |
-      | BALLINA       | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 0.00   | 2.85, 1.10             |
-      | BALLINA       | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 0.00   | 2.85, 1.10             |
-      | BALLINA       | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 0.00   | 2.85, 1.10, 2.70       |
-      | BALLINA       | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 0.00   | 2.85, 1.10, 2.70, 2.60 |
-      | BALLINA       | NSW First Four  | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 0.00   | 2.85, 1.10, 2.70, 2.60 |
-      | WOLVERHAMPTON | NSW Quinella    | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 0.00   | 2.85, 1.10             |
-      | WOLVERHAMPTON | NSW Exacta      | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 0.00   | 2.85, 1.10             |
-      | WOLVERHAMPTON | NSW Trifecta    | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 0.00   | 2.85, 1.10, 2.70       |
+      | Subcategory   | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout | WinPrices                                                            | PlacePrices                                                |
+      | BALLINA       | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | BALLINA       | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | BALLINA       | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | BALLINA       | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | BALLINA       | NSW First Four  | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | WOLVERHAMPTON | NSW Quinella    | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | WOLVERHAMPTON | NSW Exacta      | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | WOLVERHAMPTON | NSW Trifecta    | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 0.00   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |

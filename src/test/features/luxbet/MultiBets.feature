@@ -5,11 +5,12 @@ Feature: Placing and Settling multi Bets
     Given I am logged into WP UI and on Home Page
     And I am logged into WP API
 
+  @lux-ft
   Scenario Outline: Horse Race Multi Double bets
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"
     And I create a default event with details
-      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
-      | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
+      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -17,10 +18,18 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
+    And I enter market details
+      | Market Status      | Live      |
+      | Bets Allowed       | WIN Yes   |
+      | Bets Allowed Place | PLACE DVP |
+      | Place Fraction     | -         |
+      | No of Places       | 3         |
+      | E/W                | yes       |
+    And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"
     And I create a default event with details
-      | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
-      | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
+      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -28,6 +37,14 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
+    And I enter market details
+      | Market Status      | Live      |
+      | Bets Allowed       | WIN Yes   |
+      | Bets Allowed Place | PLACE DVP |
+      | Place Fraction     | -         |
+      | No of Places       | 3         |
+      | E/W                | yes       |
+    And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
     And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
@@ -38,14 +55,14 @@ Feature: Placing and Settling multi Bets
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | MultiType | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
-      | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 7.59   |
+      | MultiType | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout | WinPrices                                                            | PlacePrices                                                |
+      | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 7.59   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
 
   Scenario Outline: Horse Race Multi Treble/Doubles/Trixie/Patent bets
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"
     And I create a default event with details
-      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
-      | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
+      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
