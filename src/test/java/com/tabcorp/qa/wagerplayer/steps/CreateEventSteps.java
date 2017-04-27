@@ -179,17 +179,14 @@ public class CreateEventSteps implements En {
 
         });
 
-        And("^I update fixed place prices$", (DataTable table) -> {
-            Map<String, String> evt = table.asMap(String.class, String.class);
-            String pricesText = (String) Helpers.nonNullGet(evt, "placePrices");
-            List<String> pricesTokens = Helpers.extractCSV(pricesText);
-            List<BigDecimal> placePrices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
+        And("^I update fixed place prices \"([^\"]*)\"$", (String placePrices) -> {
+            List<BigDecimal> prices = Helpers.extractCSVPrices(placePrices);
             header = new HeaderPage();
             header.pickEvent(category, subcategory, eventName);
             header.navigateToF5();
             LiabilityPage liabilityPage = new LiabilityPage();
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
+            liabilityPage.updatePrices(prodId, BetType.Place.id, prices);
         });
     }
 
