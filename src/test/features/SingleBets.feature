@@ -22,7 +22,7 @@ Feature: Single Bets
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result race with the runners and positions
+    When I result "WOLVERHAMPTON" race with the runners and positions
       | Runner01 | 1 |
       | Runner02 | 2 |
     And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
@@ -60,7 +60,7 @@ Feature: Single Bets
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result race with the runners and positions
+    When I result "WOLVERHAMPTON" race with the runners and positions
       | Runner01 | 1 |
       | Runner02 | 2 |
       | Runner03 | 3 |

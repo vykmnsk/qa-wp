@@ -41,7 +41,7 @@ public class LiabilityPage extends AppPage {
 
     private List<WebElement> filterMarketPrices(Integer prodId, Integer betTypeId) {
         Predicate<WebElement> containsBetId = marketPrice -> marketPrice.getAttribute("bet_type").contains(betTypeId.toString());
-        Predicate<WebElement> containsProdId = marketPrice -> marketPrice.getAttribute("default_fixed_product_id").contains(prodId.toString());
+        Predicate<WebElement> containsProdId = marketPrice -> marketPrice.getAttribute("product_id").contains(prodId.toString());
         return marketPrices.stream().filter(containsBetId).filter(containsProdId).collect(Collectors.toList());
     }
 

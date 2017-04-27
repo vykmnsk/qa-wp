@@ -5,12 +5,11 @@ Feature: Placing and Settling multi Bets
     Given I am logged into WP UI and on Home Page
     And I am logged into WP API
 
-  @lux-ft
   Scenario Outline: Horse Race Multi Double bets
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
     And I create a default event with details
-      | runners   | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
-      | prices | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
+      | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -25,11 +24,10 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | -         |
       | No of Places       | 3         |
       | E/W                | yes       |
-    And I update fixed place prices
-      | placePrices | 2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60 |
+    And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
     And I create a default event with details
-      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
+      | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
@@ -45,20 +43,19 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | -         |
       | No of Places       | 3         |
       | E/W                | yes       |
-    And I update fixed place prices
-      | placePrices | 2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55 |
+    And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result/settle created event race with winners "Runner01,Runner02,Runner03"
-    When I result/settle created event race with winners "Runner11,Runner12,Runner13"
+    When I result/settle created "PAKENHAM" event race with winners "Runner01,Runner02,Runner03"
+    When I result/settle created "SEYMOUR" event race with winners "Runner11,Runner12,Runner13"
     Then customer balance is increased by $<Payout>
 
     Examples:
       | MultiType | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
-      | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 7.59   |
+      | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
 
   Scenario Outline: Horse Race Multi Treble/Doubles/Trixie/Patent bets
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"
@@ -72,7 +69,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
     And I create a default event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -83,7 +80,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
     And I create a default event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -99,9 +96,9 @@ Feature: Placing and Settling multi Bets
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result/settle created event race with winners "Runner01,Runner02,Runner03"
-    When I result/settle created event race with winners "Runner11,Runner12,Runner13"
-    When I result/settle created event race with winners "Runner21,Runner22,Runner23"
+    When I result/settle created "BALLINA" event race with winners "Runner01,Runner02,Runner03"
+    When I result/settle created "PAKENHAM" event race with winners "Runner11,Runner12,Runner13"
+    When I result/settle created "SEYMOUR" event race with winners "Runner21,Runner22,Runner23"
     Then customer balance is increased by $<Payout>
 
     Examples:
@@ -123,7 +120,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
     And I create a default event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -134,7 +131,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
     And I create a default event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -145,7 +142,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -161,10 +158,10 @@ Feature: Placing and Settling multi Bets
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result/settle created event race with winners "Runner01,Runner02,Runner03"
-    When I result/settle created event race with winners "Runner11,Runner12,Runner13"
-    When I result/settle created event race with winners "Runner21,Runner22,Runner23"
-    When I result/settle created event race with winners "Runner31,Runner32,Runner33"
+    When I result/settle created "BALLINA" event race with winners "Runner01,Runner02,Runner03"
+    When I result/settle created "PAKENHAM" event race with winners "Runner11,Runner12,Runner13"
+    When I result/settle created "SEYMOUR" event race with winners "Runner21,Runner22,Runner23"
+    When I result/settle created "WOLVERHAMPTON" event race with winners "Runner31,Runner32,Runner33"
     Then customer balance is increased by $<Payout>
 
     Examples:
@@ -187,7 +184,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
     And I create a default event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -198,7 +195,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
     And I create a default event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -209,7 +206,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -220,7 +217,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | Place |
       | Betting | Enable Multi  | EW    |
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "CRANBOURNE"
     And I create a default event with details
       | runners | Runner41, Runner42, Runner43, Runner44, Runner45, Runner46, Runner47, Runner48 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
@@ -236,11 +233,11 @@ Feature: Placing and Settling multi Bets
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result/settle created event race with winners "Runner01,Runner02,Runner03"
-    When I result/settle created event race with winners "Runner11,Runner12,Runner13"
-    When I result/settle created event race with winners "Runner21,Runner22,Runner23"
-    When I result/settle created event race with winners "Runner31,Runner32,Runner33"
-    When I result/settle created event race with winners "Runner41,Runner42,Runner43"
+    When I result/settle created "BALLINA" event race with winners "Runner01,Runner02,Runner03"
+    When I result/settle created "PAKENHAM" event race with winners "Runner11,Runner12,Runner13"
+    When I result/settle created "SEYMOUR" event race with winners "Runner21,Runner22,Runner23"
+    When I result/settle created "WOLVERHAMPTON" event race with winners "Runner31,Runner32,Runner33"
+    When I result/settle created "CRANBOURNE" event race with winners "Runner41,Runner42,Runner43"
     Then customer balance is increased by $<Payout>
 
     Examples:

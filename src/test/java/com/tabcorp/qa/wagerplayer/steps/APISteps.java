@@ -47,24 +47,26 @@ public class APISteps implements En {
                     Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = wapi.readSelection(resp, runner, prodId);
 
-                    Object reponse;
+                    Object response;
                     switch (betTypeName.toUpperCase()) {
                         case "WIN":
-                            reponse = api.placeSingleWinBet(accessToken, prodId,
+                            response = api.placeSingleWinBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), stake);
                             break;
                         case "PLACE":
-                            reponse = api.placeSinglePlaceBet(accessToken, prodId,
+                            response = api.placeSinglePlaceBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         case "EACHWAY":
-                            reponse = api.placeSingleEachwayBet(accessToken, prodId,
+                            response = api.placeSingleEachwayBet(accessToken, prodId,
                                     sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                             break;
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    balanceAfterBet = api.readNewBalance(reponse);
+                    List betIds = wapi.readBetId(response);
+                    log.info("Bet IDs=" + betIds.toString());
+                    balanceAfterBet = api.readNewBalance(response);
                 });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",

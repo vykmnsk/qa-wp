@@ -23,14 +23,13 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Place Fraction     | -         |
       | No of Places       | 3         |
       | E/W                | yes       |
-    And I update fixed place prices
-      | placePrices | 3.20, 21.85, 1.55, 4.75, 5.60, 1.65, 1.80, 1.85, 1.85, 2.85 |
+    And I update fixed place prices "3.20, 21.85, 1.55, 4.75, 5.60, 1.65, 1.80, 1.85, 1.85, 2.85"
     And customer balance is at least $20.50
 
     When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result race with the runners and positions
+    When I result "<Subcategory>" race with the runners and positions
       | Runner01 | 1 |
       | Runner02 | 2 |
       | Runner03 | 3 |

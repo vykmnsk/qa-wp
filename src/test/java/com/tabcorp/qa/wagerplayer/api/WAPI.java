@@ -30,12 +30,14 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = new HashMap<>();
         fields.put("wapi_client_user", Config.wapiUsername());
         fields.put("wapi_client_pass", Config.wapiPassword());
+        fields.put("client_ip", "61.9.192.13");
         return fields;
     }
 
     private static Map<String, Object> wapiAuthFields(String sessionId) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("session_id", sessionId);
+        fields.put("client_ip", "61.9.192.13");
         return fields;
     }
 
@@ -68,6 +70,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("action", "account_login");
         fields.put("customer_username", username);
         fields.put("customer_password", password);
+        fields.put("client_ip", "61.9.192.13");
         Object resp = post(fields);
         return JsonPath.read(resp, RESP_ROOT + ".login[0].session_id");
     }

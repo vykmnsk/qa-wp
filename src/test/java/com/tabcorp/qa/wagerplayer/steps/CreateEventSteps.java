@@ -136,18 +136,18 @@ public class CreateEventSteps implements En {
             if (Config.LUXBET.equals(Config.appName())) marketsPage.setHardSoftInterimLimits();
         });
 
-        When("^I result race with the runners and positions$", (DataTable table) -> {
+        When("^I result \"([^\"]*)\" race with the runners and positions$", (String subcat, DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
-            resultRace(winners);
+            resultRace(subcat, winners);
         });
 
-        When("^I result/settle created event race with winners \"([^\"]*)\"$", (String winnersCSV) -> {
+        When("^I result/settle created \"([^\"]*)\" event race with winners \"([^\"]*)\"$", (String subcategory, String winnersCSV) -> {
             List<String> winners = Helpers.extractCSV(winnersCSV);
             Map<String, String> winnerData = new StrictHashMap<>();
             for (int i = 0; i < winners.size(); i++) {
                 winnerData.put(winners.get(i), String.valueOf(i + 1));
             }
-            resultRace(winnerData);
+            resultRace(subcategory, winnerData);
             settleRace();
         });
 
@@ -179,21 +179,21 @@ public class CreateEventSteps implements En {
 
         });
 
-        And("^I update fixed place prices \"([^\"]*)\"$", (String placePrices) -> {
-            List<BigDecimal> prices = Helpers.extractCSVPrices(placePrices);
+        And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
             header = new HeaderPage();
             header.pickEvent(category, subcategory, eventName);
             header.navigateToF5();
             LiabilityPage liabilityPage = new LiabilityPage();
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            liabilityPage.updatePrices(prodId, BetType.Place.id, prices);
+            liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
         });
     }
 
-    private void resultRace(Map<String, String> winners) {
+    private void resultRace(String subcat, Map<String, String> winners) {
         header = new HeaderPage();
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
-        header.pickEvent(category, subcategory, event);
+        header.pickEvent(category, subcat, event);
         settlementPage = header.navigateToF6();
         settlementPage.resultRace(winners);
     }

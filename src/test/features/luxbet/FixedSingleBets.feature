@@ -5,7 +5,6 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     Given I am logged into WP API
     And I am logged into WP UI and on Home Page
 
-  @lux-ft
   Scenario: Horse Race multiple Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
@@ -32,9 +31,9 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
     Then customer balance is decreased by $27.50
 
-    When I result race with the runners and positions
+    When I result "WOLVERHAMPTON" race with the runners and positions
       | ROCKING HORSE | 1 |
       | COLORADO MISS | 2 |
       | CADEYRN       | 3 |
     And I settle race
-    Then customer balance is increased by $23.26
+    Then customer balance is increased by $154.93
