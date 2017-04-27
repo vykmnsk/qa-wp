@@ -7,10 +7,10 @@ Feature: Placing and Settling multi Bets
 
   @lux-ft
   Scenario Outline: Horse Race Multi Double bets
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
     And I create a default event with details
-      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
-      | prices  | "<WinPrices>"                                                                                      |
+      | runners   | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
+      | prices | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -25,11 +25,12 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | -         |
       | No of Places       | 3         |
       | E/W                | yes       |
-    And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
-    When I enter specifics category "Horse Racing" and subcategory "BALLINA"
+    And I update fixed place prices
+      | placePrices | 2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60 |
+    When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
     And I create a default event with details
-      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
-      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                               |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
+      | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -44,7 +45,8 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | -         |
       | No of Places       | 3         |
       | E/W                | yes       |
-    And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
+    And I update fixed place prices
+      | placePrices | 2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55 |
     And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
@@ -55,8 +57,8 @@ Feature: Placing and Settling multi Bets
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | MultiType | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout | WinPrices                                                            | PlacePrices                                                |
-      | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 7.59   | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 |
+      | MultiType | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
+      | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 7.59   |
 
   Scenario Outline: Horse Race Multi Treble/Doubles/Trixie/Patent bets
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"

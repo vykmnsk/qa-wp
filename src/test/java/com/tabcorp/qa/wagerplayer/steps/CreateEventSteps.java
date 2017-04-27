@@ -178,6 +178,19 @@ public class CreateEventSteps implements En {
             liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
 
         });
+
+        And("^I update fixed place prices$", (DataTable table) -> {
+            Map<String, String> evt = table.asMap(String.class, String.class);
+            String pricesText = (String) Helpers.nonNullGet(evt, "placePrices");
+            List<String> pricesTokens = Helpers.extractCSV(pricesText);
+            List<BigDecimal> placePrices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
+            header = new HeaderPage();
+            header.pickEvent(category, subcategory, eventName);
+            header.navigateToF5();
+            LiabilityPage liabilityPage = new LiabilityPage();
+            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
+        });
     }
 
     private void resultRace(Map<String, String> winners) {
