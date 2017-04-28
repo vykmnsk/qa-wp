@@ -58,6 +58,7 @@ public class Config {
     }
 
     private static final String ENV_WAPI_URL = "WAGERPLAYER_WAPI_URL";
+    private static final String ENV_LUXMOBILE_URL = "WAGERPLAYER_LUXMOBILE_URL";
     private static final String ENV_WAPI_USERNAME = "WAGERPLAYER_WAPI_USERNAME";
     private static final String ENV_WAPI_PASSWORD = "WAGERPLAYER_WAPI_PASSWORD";
     private static final String ENV_CUSTOMER_USERNAME = "WAGERPLAYER_CUSTOMER_USERNAME";
@@ -71,6 +72,10 @@ public class Config {
 
     public static String wapiURL() {
         return readVerify(ENV_WAPI_URL);
+    }
+
+    public static String luxMobileURL() {
+        return readVerify(ENV_LUXMOBILE_URL);
     }
 
     public static String wapiUsername() {
@@ -89,25 +94,17 @@ public class Config {
         return readVerify(ENV_CUSTOMER_PASSWORD);
     }
 
-    //----------------------- MYOB V2 ------------------------
 
     private static final String ENV_MOBI_V2_URL = "WAGERPLAYER_MOBIV2_URL";
-    
-    public static String moby_V2_URL() {
-        return readVerify(ENV_MOBI_V2_URL);
-    }
+    public static String moby_V2_URL() { return readVerify(ENV_MOBI_V2_URL); }
 
-// ------------------------------------------------
-
-    private static WagerPlayerAPI apiObj;
-
+    private static WagerPlayerAPI api;
     public static WagerPlayerAPI getAPI(){
-
-        if( apiObj == null) {
-            apiObj = Config.appName().equals(REDBOOK)? new MOBI_V2() : new WAPI() ;
+        if( api == null) {
+            api = Config.appName().equals(REDBOOK)? new MOBI_V2() : new WAPI() ;
         }
-        log.info("using " + apiObj.getClass().getSimpleName() + " api");
-        return apiObj ;
+        log.info("using " + api.getClass().getSimpleName() + " api");
+        return api;
     }
 
     public static String testEventBaseName() {

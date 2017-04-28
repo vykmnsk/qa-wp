@@ -1,18 +1,19 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.mobile.pages.LuxbetMobilePage;
 import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
-import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.LoginPage;
-import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
+import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,12 +24,13 @@ public class CreateCustomerSteps implements En {
     //for API
     private String customerUsername;
     private String customerPassword;
+    private String currency;
     private WagerPlayerAPI api = Config.getAPI();
+    private WAPI wapi = new WAPI();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-
 
     public CreateCustomerSteps() {
 
@@ -38,12 +40,14 @@ public class CreateCustomerSteps implements En {
             assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
             this.customerUsername = custData.username;
             this.customerPassword = custData.internetPassword;
+            this.currency = custData.currency;
         });
 
         When("^I create a new customer via UI with data$", (DataTable table) -> {
             Customer custData = parseUpdateCustomerData(table);
             loginGoToCustomersPage();
             newCustPage.enterCustomerDetails(custData);
+            this.currency = custData.currency;
         });
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
@@ -60,13 +64,52 @@ public class CreateCustomerSteps implements En {
         });
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
+            String accessToken = api.login(customerUsername, customerPassword);
+            String actualAmlStatus = api.readAmlStatus(accessToken);
+            assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
+        });
+
+        Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
+            String accessToken = api.login(customerUsername, customerPassword);
             class ReloadCheckAMLStatus implements Runnable {
                 public void run() {
-                    String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
+                    String actualAmlStatus = api.readAmlStatus(accessToken);
                     assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
                 }
             }
+            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
             Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 2);
+        });
+
+        Then("^the affiliate customer should be able to login to mobile site successfully$", () -> {
+            String sessionId = wapi.login(customerUsername, customerPassword);
+            String mobileAccessToken = wapi.generateAffiliateLoginToken(sessionId);
+
+            LuxbetMobilePage lmp = new LuxbetMobilePage();
+            lmp.load(mobileAccessToken);
+            lmp.verifyNoLoginError();
+            lmp.verifyDisplaysUsername(customerUsername);
+        });
+        When("^the customer deposits (\\d+\\.\\d\\d) cash via API$", (BigDecimal cashAmount) -> {
+            String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+
+            //TODO implement depositCash in MOBI and remove the following login
+            String sessionId = wapi.login(customerUsername, customerPassword);
+
+            String statusMsg = wapi.depositCash(sessionId, cashAmount);
+            assertThat(statusMsg).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
+        });
+
+        When("^the customer deposits (\\d+\\.\\d\\d) cash via UI$", (BigDecimal cashAmount) -> {
+            DepositPage depositPage = customersPage.openDepositWindow();
+            depositPage.verifyLoaded();
+            depositPage.selectManualTab();
+
+            String transMsg = depositPage.depositCash(cashAmount);
+            assertThat(transMsg).contains("successfully");
+
+            depositPage.verifyTransactionRecord(transMsg, cashAmount, currency);
         });
 
     }

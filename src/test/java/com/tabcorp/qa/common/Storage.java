@@ -12,6 +12,7 @@ public class Storage {
 
     public enum KEY {
         SUBCATEGORIES,
+        API_ACCESS_TOKEN,
         EVENT_IDS,
         EVENT_NAMES,
         PRODUCT_IDS

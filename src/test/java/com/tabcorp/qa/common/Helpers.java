@@ -1,7 +1,10 @@
 package com.tabcorp.qa.common;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +12,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class Helpers {
@@ -97,4 +101,18 @@ public class Helpers {
         throw new RuntimeException(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
     }
 
+    public static List<String> collectElementsTexts(WebElement parent, By childrenSelector){
+        return parent.findElements(childrenSelector)
+                .stream().map(e -> e.getText().trim())
+                .collect(Collectors.toList());
+    }
+
+    public static Map<String, String> readTableRow(WebElement table) {
+        List<String> headers = collectElementsTexts(table, By.cssSelector("tr th"));
+        List<String> data = collectElementsTexts(table, By.cssSelector("tr td"));
+        Map<String, String> row = IntStream.range(0, Math.min(headers.size(), data.size()))
+                .mapToObj(i -> Pair.of(headers.get(i), data.get(i)))
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+        return row;
+    }
 }

@@ -12,6 +12,12 @@ public class Customer {
     public String telephoneNo;
     public String email;
     public String street;
+    public String unitNumber;
+    public String streetName;
+    public String streetType;
+    public String residentialStreetAddress;
+    public String residentialSuburb;
+    public String streetAddress;
     public String building;
     public String city;
     public String suburb;
