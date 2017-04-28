@@ -36,6 +36,7 @@ public class CreateEventSteps implements En {
 
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
             this.subcategory = subcategory;
+            Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
             this.category = category;
             header = new HeaderPage();
             header.navigateToF3(category, subcategory);
@@ -138,17 +139,21 @@ public class CreateEventSteps implements En {
 
         When("^I result \"([^\"]*)\" race with the runners and positions$", (String subcat, DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
-            resultRace(subcat, winners);
+            resultRace(winners);
         });
 
-        When("^I result/settle created \"([^\"]*)\" event race with winners \"([^\"]*)\"$", (String subcategory, String winnersCSV) -> {
+        When("^I result/settle created event race with winners \"([^\"]*)\"$", (String winnersCSV) -> {
             List<String> winners = Helpers.extractCSV(winnersCSV);
             Map<String, String> winnerData = new StrictHashMap<>();
             for (int i = 0; i < winners.size(); i++) {
                 winnerData.put(winners.get(i), String.valueOf(i + 1));
             }
-            resultRace(subcategory, winnerData);
+            resultRace(winnerData);
             settleRace();
+        });
+
+        And("^I update Exotic Prices$", () -> {
+            settlementPage.updateExoticPrices(); //TODO to be done in a different PR
         });
 
         And("^I settle race$", () -> {
@@ -188,10 +193,21 @@ public class CreateEventSteps implements En {
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
             liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
         });
+
+        And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            header = new HeaderPage();
+            header.pickEvent(category, subcategory, eventName);
+            header.navigateToF5();
+            LiabilityPage liabilityPage = new LiabilityPage();
+            Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
+            liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
+        });
     }
 
-    private void resultRace(String subcat, Map<String, String> winners) {
+    private void resultRace(Map<String, String> winners) {
         header = new HeaderPage();
+        String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
         header.pickEvent(category, subcat, event);
         settlementPage = header.navigateToF6();

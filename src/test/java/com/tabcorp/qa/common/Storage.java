@@ -11,6 +11,7 @@ public class Storage {
     private static Map<KEY, Object> map;
 
     public enum KEY {
+        SUBCATEGORIES,
         EVENT_IDS,
         EVENT_NAMES,
         PRODUCT_IDS
@@ -45,6 +46,12 @@ public class Storage {
         Deque<Object> entries = (Deque) map.get(key);
         Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
         return entries.getLast();
+    }
+
+    public static Object getFirst(KEY key) {
+        Deque<Object> entries = (Deque) map.get(key);
+        Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
+        return entries.getFirst();
     }
 
 }

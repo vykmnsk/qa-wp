@@ -158,6 +158,8 @@ public class APISteps implements En {
         Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
         String eventId = (String) Storage.getLast(Storage.KEY.EVENT_IDS);
         Object response = placeExoticBetOneEvent(eventId, prodId, runners, stake, isFlexi);
+        List betIds = wapi.readBetId(response);
+        log.info("Bet IDs=" + betIds.toString());
         return api.readNewBalance(response);
     }
 

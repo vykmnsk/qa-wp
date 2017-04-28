@@ -60,8 +60,13 @@ public class CreateCustomerSteps implements En {
         });
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
-            String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
-            assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+            class ReloadCheckAMLStatus implements Runnable {
+                public void run() {
+                    String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
+                    assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+                }
+            }
+            Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 2);
         });
 
     }

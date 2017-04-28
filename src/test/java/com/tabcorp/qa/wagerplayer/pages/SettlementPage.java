@@ -38,6 +38,9 @@ public class SettlementPage extends AppPage {
     @FindBy(id = "settle")
     WebElement settle;
 
+    @FindBy(id = "td[valign=top] > table[id=no_padding_table_inner]")
+    WebElement exoticsPriceTable;
+
     @FindBy(css = "input[name^=product_prices]")
     List<WebElement> luxbetSettlePrices;
 
@@ -49,6 +52,10 @@ public class SettlementPage extends AppPage {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
         wait.until(ExpectedConditions.visibilityOf(resultsTable));
+    }
+
+    public void updateExoticPrices() {
+
     }
 
     public void resultRace(Map<String, String> winners) {
