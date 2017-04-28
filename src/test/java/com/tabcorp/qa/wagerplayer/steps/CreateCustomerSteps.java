@@ -65,13 +65,6 @@ public class CreateCustomerSteps implements En {
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             String accessToken = api.login(customerUsername, customerPassword);
-            String actualAmlStatus = api.readAmlStatus(accessToken);
-            assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
-            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
-        });
-
-        Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
-            String accessToken = api.login(customerUsername, customerPassword);
             class ReloadCheckAMLStatus implements Runnable {
                 public void run() {
                     String actualAmlStatus = api.readAmlStatus(accessToken);
