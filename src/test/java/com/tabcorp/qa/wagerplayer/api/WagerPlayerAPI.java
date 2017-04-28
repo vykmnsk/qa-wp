@@ -13,22 +13,22 @@ public interface WagerPlayerAPI {
         PLACE_PRICE
     }
 
-    String getAccessToken(String userName, String Password);
+    String login(String username, String password);
 
     BigDecimal getBalance(String sessionToken);
 
-    Object placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake);
+    Object placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake);
 
-    Object placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake);
+    Object placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake);
 
-    Object placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
+    Object placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
 
-    Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
-
-    BigDecimal readNewBalance(Object resp);
+    Object placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
 
     String createNewCustomer(Customer customer);
 
-    String readAmlStatus(String customerUsername, String customerPassword);
+    String readAmlStatus(String accessToken);
+
+    BigDecimal readNewBalance(Object resp);
 
 }

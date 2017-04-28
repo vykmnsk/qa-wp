@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
@@ -12,12 +13,16 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.MPID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class WAPI implements WagerPlayerAPI {
 
@@ -46,8 +51,17 @@ public class WAPI implements WagerPlayerAPI {
     private static Object post(Map<String, Object> fields, boolean checkErros) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
+        verifyJSONRoot(resp);
         if (checkErros) verifyNoErrors(resp, fields);
         return resp;
+    }
+
+    private static void verifyJSONRoot(Object resp) {
+        try {
+            JsonPath.read(resp, RESP_ROOT);
+        } catch (PathNotFoundException e) {
+            fail(String.format("Response JSON seems invalid: %s, %s", resp.toString(), e.getMessage()));
+        }
     }
 
     private static void verifyNoErrors(Object resp, Object req) {
@@ -63,7 +77,7 @@ public class WAPI implements WagerPlayerAPI {
         return resp;
     }
 
-    public String getAccessToken(String username, String password) {
+    public String login(String username, String password) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_login");
         fields.put("customer_username", username);
@@ -89,6 +103,16 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("email_address", cust.email);
         fields.put("deposit_limit", cust.weeklyDepositLimit);
         fields.put("street", cust.street);
+        ////// Affiliate customer detail fields
+        fields.put("unit_number", cust.unitNumber);
+        fields.put("street_name", cust.streetName);
+        fields.put("street_type", cust.streetType);
+        fields.put("residential_street_address", cust.residentialStreetAddress);
+        fields.put("residential_suburb", cust.residentialSuburb);
+        fields.put("street_address", cust.streetAddress);
+        fields.put("building_number", cust.building);
+        ////// Affiliate customer detail fields
+        fields.put("city", cust.city);
         fields.put("postcode", cust.postCode);
         fields.put("country", cust.country);
         fields.put("telephone", cust.telephoneNo);
@@ -96,6 +120,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("suburb", cust.suburb);
         fields.put("currency", cust.currency);
         fields.put("timezone", cust.timezone);
+        if (cust.manualVerification.equals("Y")) fields.put("manual_verification", 1);
         Object resp = post(fields);
         Integer custId = JsonPath.read(resp, RESP_ROOT + ".success.customer_id");
         String msg = JsonPath.read(resp, RESP_ROOT + ".success.message");
@@ -103,8 +128,7 @@ public class WAPI implements WagerPlayerAPI {
         return msg;
     }
 
-    public String depositCash(String custUsername, String custPassword, BigDecimal cashAmount) {
-        String sessionId = getAccessToken(custUsername, custPassword);
+    public String depositCash(String sessionId, BigDecimal cashAmount) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_deposit");
         fields.put("amount", cashAmount);
@@ -235,7 +259,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public Object getEventMarkets(String evtId) {
-        String sessionId = getAccessToken(Config.customerUsername(), Config.customerPassword());
+        String sessionId = login(Config.customerUsername(), Config.customerPassword());
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_markets");
         fields.put("eid", evtId);
@@ -243,12 +267,19 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public String readAmlStatus(String customerUsername, String customerPassword) {
-        String sessionId = getAccessToken(customerUsername, customerPassword);
+    public String readAmlStatus(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
         Object resp = post(fields);
         return (String) JsonPath.read(resp, RESP_ROOT + ".account[0].aml_status");
+    }
+
+
+    public String generateAffiliateLoginToken(String sessionId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "account_generate_login_token");
+        Object resp = post(fields);
+        return (String) JsonPath.read(resp, RESP_ROOT + ".token");
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {

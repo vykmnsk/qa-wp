@@ -34,8 +34,8 @@ Feature: Create New Customer
 
   @redbook @ui
     Examples:
-      | UIorAPI | title | firstName | lastName | dateOfBirth | email                  | telephoneNo | building | street           | city     | suburb         | postCode | state | country | timezone           | securityQuestion        | currency | weeklyDepositLimit | clientIP | manualVerification | amlStatus  | depositAmount |
-      | UI      | Ms    | Keli      | Cowey    | 1952-03-25  | #username#@example.com | 0421147741  | Level5   | 142 Tynte Street | Adelaide | North Adelaide | 2092     | N/A   | AU      | Australia/Adelaide | Favourite Holiday Spot? | GBP      | N/A                | N/A      | N/A                | Unverified | 10000.00      |
+      | UIorAPI | title | firstName | lastName | dateOfBirth | email                  | telephoneNo | building | street           | city     | suburb         | postCode | state | country   | timezone           | securityQuestion        | currency | weeklyDepositLimit | clientIP | manualVerification | amlStatus  | depositAmount |
+      | UI      | Ms    | Keli      | Cowey    | 1952-03-25  | #username#@example.com | 0421147741  | Level5   | 142 Tynte Street | Adelaide | North Adelaide | 2092     | N/A   | Australia | Australia/Adelaide | Favourite Holiday Spot? | GBP      | N/A                | N/A      | N/A                | Unverified | 10000.00      |
 
   @luxbet @api
     Examples:
@@ -45,5 +45,6 @@ Feature: Create New Customer
 
   @luxbet @ui
     Examples:
-      | UIorAPI | title | firstName | lastName | dateOfBirth | email                  | telephoneNo | building | street       | city     | suburb   | postCode | state           | country | timezone         | securityQuestion        | currency | weeklyDepositLimit | clientIP    | manualVerification | amlStatus        | depositAmount |
-      | UI      | Ms    | Keli      | Cowey    | 1952-03-25  | #username#@example.com | 0463254781  | N/A      | 13a Alan Ave | SEAFORTH | SEAFORTH | 2092     | New South Wales | AU      | Australia/Sydney | Favourite Holiday Spot? | AUD      |                    | 61.9.192.13 | N/A                | Account Verified | 10000.00      |
+      | UIorAPI | title | firstName | lastName | dateOfBirth | email                  | telephoneNo | building | street           | city     | suburb         | postCode | state           | country   | timezone         | securityQuestion        | currency | weeklyDepositLimit | clientIP    | manualVerification | amlStatus        | depositAmount |
+      | UI      | Ms    | Keli      | Cowey    | 1952-03-25  | #username#@example.com | 0463254781  | N/A      | 13a Alan Ave     | SEAFORTH | SEAFORTH       | 2092     | New South Wales | Australia | Australia/Sydney | Favourite Holiday Spot? | AUD      |                    | 61.9.192.13 | N/A                | Account Verified | 10000.00      |
+      | UI      | Mr    | Oswald    | Petrucco | 1939-05-31  | #username#@example.com | 0421147741  | N/A      | 142 Tynte Street | Adelaide | North Adelaide | 5006     | South Australia | Australia | Australia/Sydney | Favourite Holiday Spot? | AUD      | 4500.00            | 61.9.192.13 | N/A                | Account Verified | 10000.00      |

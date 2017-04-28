@@ -87,7 +87,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return new BigDecimal(balance);
     }
 
-    public String getAccessToken(String username, String password) {
+    public String login(String username, String password) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("username", username);
         fields.put("password", password);
@@ -285,8 +285,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return msg;
     }
 
-    public String readAmlStatus(String customerUsername, String customerPassword) {
-        String accessToken = getAccessToken(customerUsername, customerPassword);
+    public String readAmlStatus(String accessToken) {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("access_token", accessToken);
         Object response = get("/customer", queryParams);

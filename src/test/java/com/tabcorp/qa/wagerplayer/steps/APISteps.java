@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +31,9 @@ public class APISteps implements En {
 
     public APISteps() {
         Given("^I am logged into WP API$", () -> {
-            accessToken = api.getAccessToken(Config.customerUsername(), Config.customerPassword());
+            accessToken = api.login(Config.customerUsername(), Config.customerPassword());
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
+            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
         Given("^customer balance is at least \\$(\\d+.\\d\\d)$", (BigDecimal minBalance) -> {

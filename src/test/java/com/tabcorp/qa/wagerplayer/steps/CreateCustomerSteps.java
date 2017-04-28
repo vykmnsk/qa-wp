@@ -1,6 +1,8 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.mobile.pages.LuxbetMobilePage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
@@ -62,12 +64,28 @@ public class CreateCustomerSteps implements En {
         });
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
-            String actualAmlStatus = api.readAmlStatus(customerUsername, customerPassword);
+            String accessToken = api.login(customerUsername, customerPassword);
+            String actualAmlStatus = api.readAmlStatus(accessToken);
             assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
+        Then("^the affiliate customer should be able to login to mobile site successfully$", () -> {
+            String sessionId = wapi.login(customerUsername, customerPassword);
+            String mobileAccessToken = wapi.generateAffiliateLoginToken(sessionId);
+
+            LuxbetMobilePage lmp = new LuxbetMobilePage();
+            lmp.load(mobileAccessToken);
+            lmp.verifyNoLoginError();
+            lmp.verifyDisplaysUsername(customerUsername);
+        });
         When("^the customer deposits (\\d+\\.\\d\\d) cash via API$", (BigDecimal cashAmount) -> {
-            String statusMsg = wapi.depositCash(customerUsername, customerPassword, cashAmount);
+            String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+
+            //TODO implement depositCash in MOBI and remove the following login
+            String sessionId = wapi.login(customerUsername, customerPassword);
+
+            String statusMsg = wapi.depositCash(sessionId, cashAmount);
             assertThat(statusMsg).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
         });
 

@@ -139,7 +139,7 @@ public class NewCustomerPage extends AppPage {
         residentialSuburb.sendKeys(cust.suburb);
         residentialCity.sendKeys(cust.city);
         residentialPostCode.sendKeys(cust.postCode);
-        residentialCountry.sendKeys(cust.country);
+        new Select(residentialCountry).selectByVisibleText(cust.country);
         new Select(residentialTimezone).selectByValue(cust.timezone);
 
         if (Config.REDBOOK.equals(Config.appName())) {
