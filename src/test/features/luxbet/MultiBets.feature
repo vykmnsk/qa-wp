@@ -1,4 +1,4 @@
-@multi-bets @luxbet @lux-ftt
+@multi-bets @luxbet
 Feature: Placing and Settling multi Bets
 
   Background:

@@ -269,7 +269,7 @@ public class MarketsPage extends AppPage {
         }
     }
 
-    public void showMarketDetails() {  // change it before commit
+    public void showMarketDetails() {
         boolean expanded = marketManagementSection.isDisplayed();
         if (expanded) {
             showHideMarketManagement.click();

@@ -5,7 +5,6 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     Given I am logged into WP UI and on Home Page
     And I am logged into WP API
 
-#  @lux-ft
   Scenario Outline: Horse Race Exotic bets
     When I enter specifics category "Horse Racing" and subcategory "<Subcategory>"
     And I create a default event with details
