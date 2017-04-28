@@ -137,7 +137,7 @@ public class CreateEventSteps implements En {
             if (Config.LUXBET.equals(Config.appName())) marketsPage.setHardSoftInterimLimits();
         });
 
-        When("^I result \"([^\"]*)\" race with the runners and positions$", (String subcat, DataTable table) -> {
+        When("^I result race with the runners and positions$", (DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
             resultRace(winners);
         });

@@ -18,7 +18,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result "WOLVERHAMPTON" race with the runners and positions
+    When I result race with the runners and positions
       | Runner01 | 1 |
       | Runner02 | 2 |
       | Runner03 | 3 |

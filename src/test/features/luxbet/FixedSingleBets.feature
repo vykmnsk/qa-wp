@@ -6,7 +6,7 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     And I am logged into WP UI and on Home Page
 
   Scenario: Horse Race multiple Single bets
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                        |
@@ -32,7 +32,7 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
     Then customer balance is decreased by $31.00
 
-    When I result "WOLVERHAMPTON" race with the runners and positions
+    When I result race with the runners and positions
       | ROCKING HORSE | 1 |
       | COLORADO MISS | 2 |
       | CADEYRN       | 3 |

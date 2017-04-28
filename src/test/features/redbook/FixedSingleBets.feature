@@ -22,7 +22,7 @@ Feature: Placing and Settling multiple Single bets on a Sunbets event
     And I place a single "Eachway" bet on the runner "Runner03" for $2.50
     Then customer balance is decreased by $25.00
 
-    When I result "WOLVERHAMPTON" race with the runners and positions
+    When I result race with the runners and positions
       | Runner01 | 1 |
       | Runner02 | 2 |
       | Runner03 | 3 |

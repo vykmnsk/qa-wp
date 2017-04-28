@@ -25,12 +25,12 @@ Feature: Placing and Settling multi Bets
     When I place "<BetType>" multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result "WOLVERHAMPTON" race with the runners and positions
+    When I result race with the runners and positions
       | Runner01 | 1 |
       | Runner02 | 2 |
       | Runner03 | 3 |
     And I settle race
-    When I result "WOLVERHAMPTON" race with the runners and positions
+    When I result race with the runners and positions
       | Runner11 | 1 |
       | Runner12 | 2 |
       | Runner13 | 3 |

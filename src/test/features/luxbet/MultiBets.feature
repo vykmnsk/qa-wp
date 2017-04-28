@@ -221,12 +221,12 @@ Feature: Placing and Settling multi Bets
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | MultiType | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout  |
-      | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 9075.00 |
-      | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 1083.00 |
-      | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 5271.00 |
-      | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 5423.00 |
-      | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 181.41  |
+      | MultiType | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout   |
+      | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 9075.00  |
+      | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 1083.00  |
+      | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 5271.00  |
+      | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 15423.00 |
+      | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 181.41   |
 
   Scenario Outline: Horse Race Multi 5-Fold/Doubles/Trebles/4-Folds/Canadian/Lucky31 bets
     When I enter specifics category "Horse Racing" and subcategory "BALLINA"
