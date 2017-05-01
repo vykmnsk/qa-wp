@@ -1,4 +1,4 @@
-@exotic-bets @luxbet
+@exotic-bets @luxbet @wip
 Feature: Placing and Settling Exotic Bets for a Single Event
 
   Background:

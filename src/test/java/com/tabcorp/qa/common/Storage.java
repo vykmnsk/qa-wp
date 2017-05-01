@@ -38,21 +38,24 @@ public class Storage {
     }
 
     public static Object removeFirst(KEY key) {
-        Deque<Object> entries = (Deque) map.get(key);
-        Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
+        Deque<Object> entries = getDoubleEndQue(key);
         return entries.removeFirst();
     }
 
     public static Object getLast(KEY key) {
-        Deque<Object> entries = (Deque) map.get(key);
-        Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
+        Deque<Object> entries = getDoubleEndQue(key);
         return entries.getLast();
     }
 
     public static Object getFirst(KEY key) {
+        Deque<Object> entries = getDoubleEndQue(key);
+        return entries.getFirst();
+    }
+
+    private static Deque<Object> getDoubleEndQue(KEY key) {
         Deque<Object> entries = (Deque) map.get(key);
         Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
-        return entries.getFirst();
+        return entries;
     }
 
 }
