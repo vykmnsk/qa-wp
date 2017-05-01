@@ -85,6 +85,7 @@ public class CreateEventSteps implements En {
 
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
+            marketsPage.hideMarketManagement();
             marketsPage.showMarketDetails();
             boolean isLive = Helpers.nonNullGet(mkt, "Market Status").equals("Live");
             boolean isEW = mkt.get("E/W").equals("yes");

@@ -269,12 +269,15 @@ public class MarketsPage extends AppPage {
         }
     }
 
-    public void showMarketDetails() {
+    public void hideMarketManagement() {
         boolean expanded = marketManagementSection.isDisplayed();
         if (expanded) {
             showHideMarketManagement.click();
         }
-        expanded = marketDetailsSection.isDisplayed();
+    }
+
+    public void showMarketDetails() {
+        boolean expanded = marketDetailsSection.isDisplayed();
         if (!expanded) {
             showHideMarketDetails.click();
         }
