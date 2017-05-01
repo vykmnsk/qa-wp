@@ -83,7 +83,6 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("action", "account_login");
         fields.put("customer_username", username);
         fields.put("customer_password", password);
-        fields.put("client_ip", "61.9.192.13");
         Object resp = post(fields);
         return JsonPath.read(resp, RESP_ROOT + ".login[0].session_id");
     }
