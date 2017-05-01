@@ -186,25 +186,23 @@ public class CreateEventSteps implements En {
         });
 
         And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
-            List<BigDecimal> placePrices = updatePlacePrices(placePricesCSV);
-            LiabilityPage liabilityPage = new LiabilityPage();
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
+            updatePlacePrices(placePricesCSV, prodId);
         });
 
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
-            List<BigDecimal> placePrices = updatePlacePrices(placePricesCSV);
-            LiabilityPage liabilityPage = new LiabilityPage();
             Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
-            liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
+            updatePlacePrices(placePricesCSV, prodId);
         });
     }
     
-    private List<BigDecimal> updatePlacePrices(String placePricesCSV) {
+    private List<BigDecimal> updatePlacePrices(String placePricesCSV, Integer prodId) {
         List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
         header = new HeaderPage();
         header.pickEvent(category, subcategory, eventName);
         header.navigateToF5();
+        LiabilityPage liabilityPage = new LiabilityPage();
+        liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
         return placePrices;
     }
 
