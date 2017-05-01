@@ -29,16 +29,16 @@ public class SettlementPage extends AppPage {
     @FindBy(css = "select[name^='settle_result']")
     List<WebElement> resultRunners;
 
-    @FindBy(id = "result")
+    @FindBy(css = "result")
     WebElement result;
 
-    @FindBy(id = "accept_button")
+    @FindBy(css = "accept_button")
     WebElement accept;
 
-    @FindBy(id = "settle")
+    @FindBy(css = "settle")
     WebElement settle;
 
-    @FindBy(id = "td[valign=top] > table[id=no_padding_table_inner]")
+    @FindBy(css = "td[valign=top] > table[id=no_padding_table_inner]")
     WebElement exoticsPriceTable;
 
     @FindBy(css = "input[name^=product_prices]")

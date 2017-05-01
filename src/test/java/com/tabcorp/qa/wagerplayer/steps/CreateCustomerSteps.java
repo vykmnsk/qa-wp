@@ -71,8 +71,8 @@ public class CreateCustomerSteps implements En {
                     assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
                 }
             }
-            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
             Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 2);
+            Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
         Then("^the affiliate customer should be able to login to mobile site successfully$", () -> {

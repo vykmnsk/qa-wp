@@ -64,7 +64,7 @@ public class APISteps implements En {
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    List betIds = wapi.readBetId(response);
+                    List betIds = wapi.readBetIds(response);
                     log.info("Bet IDs=" + betIds.toString());
                     balanceAfterBet = api.readNewBalance(response);
                 });
@@ -103,7 +103,7 @@ public class APISteps implements En {
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
 
                     Object response = placeMultiBets(multiType, eventIds, prodIds, runners, stake, isFlexi);
-                    List betIds = wapi.readBetId(response);
+                    List betIds = wapi.readBetIds(response);
                     log.info("Bet IDs=" + betIds.toString());
                     balanceAfterBet = api.readNewBalance(response);
                 });
@@ -158,7 +158,7 @@ public class APISteps implements En {
         Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
         String eventId = (String) Storage.getLast(Storage.KEY.EVENT_IDS);
         Object response = placeExoticBetOneEvent(eventId, prodId, runners, stake, isFlexi);
-        List betIds = wapi.readBetId(response);
+        List betIds = wapi.readBetIds(response);
         log.info("Bet IDs=" + betIds.toString());
         return api.readNewBalance(response);
     }
