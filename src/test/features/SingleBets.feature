@@ -30,7 +30,7 @@ Feature: Single Bets
 
     Examples:
       | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
-      | Luxbook DVP Fixed | Win     | Runner01 | 3.00  | 2.50              | 2.75   | 4.20, 4.10 | 3.90, 1.29  |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50              | 2.75   | 4.20, 4.10 | 3.90, 1.29  |
       | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50              | 0.00   | 2.20, 5.10 | 3.90, 1.29  |
 
 
