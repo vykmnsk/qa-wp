@@ -196,14 +196,13 @@ public class CreateEventSteps implements En {
         });
     }
     
-    private List<BigDecimal> updatePlacePrices(String placePricesCSV, Integer prodId) {
+    private void updatePlacePrices(String placePricesCSV, Integer prodId) {
         List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
         header = new HeaderPage();
         header.pickEvent(category, subcategory, eventName);
         header.navigateToF5();
         LiabilityPage liabilityPage = new LiabilityPage();
         liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
-        return placePrices;
     }
 
     private void resultRace(Map<String, String> winners) {
