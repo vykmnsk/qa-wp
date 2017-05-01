@@ -38,9 +38,6 @@ public class SettlementPage extends AppPage {
     @FindBy(id = "settle")
     WebElement settle;
 
-    @FindBy(css = "td[valign=top] > table[id=no_padding_table_inner]")
-    WebElement exoticsPriceTable;
-
     @FindBy(css = "input[name^=product_prices]")
     List<WebElement> luxbetSettlePrices;
 
