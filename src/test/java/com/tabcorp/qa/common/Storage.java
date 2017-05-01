@@ -11,6 +11,7 @@ public class Storage {
     private static Map<KEY, Object> map;
 
     public enum KEY {
+        SUBCATEGORIES,
         API_ACCESS_TOKEN,
         EVENT_IDS,
         EVENT_NAMES,
@@ -38,15 +39,24 @@ public class Storage {
     }
 
     public static Object removeFirst(KEY key) {
-        Deque<Object> entries = (Deque) map.get(key);
-        Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
+        Deque<Object> entries = getDoubleEndQue(key);
         return entries.removeFirst();
     }
 
     public static Object getLast(KEY key) {
+        Deque<Object> entries = getDoubleEndQue(key);
+        return entries.getLast();
+    }
+
+    public static Object getFirst(KEY key) {
+        Deque<Object> entries = getDoubleEndQue(key);
+        return entries.getFirst();
+    }
+
+    private static Deque<Object> getDoubleEndQue(KEY key) {
         Deque<Object> entries = (Deque) map.get(key);
         Assertions.assertThat(entries).as(String.format("Data in storage key=%s", key)).isNotEmpty();
-        return entries.getLast();
+        return entries;
     }
 
 }

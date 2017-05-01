@@ -35,6 +35,7 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = new HashMap<>();
         fields.put("wapi_client_user", Config.wapiUsername());
         fields.put("wapi_client_pass", Config.wapiPassword());
+        fields.put("client_ip", Config.clientIp());
         return fields;
     }
 
@@ -253,7 +254,7 @@ public class WAPI implements WagerPlayerAPI {
         return newBalance;
     }
 
-    public List readBetId(Object resp) {
+    public List readBetIds(Object resp) {
         JSONArray betIds = JsonPath.read(resp, RESP_ROOT + ".bet[*].bet_id");
         return betIds;
     }

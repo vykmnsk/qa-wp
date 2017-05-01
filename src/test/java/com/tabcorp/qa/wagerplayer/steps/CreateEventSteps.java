@@ -39,6 +39,7 @@ public class CreateEventSteps implements En {
             this.category = category;
             header = new HeaderPage();
             header.navigateToF3(category, subcategory);
+            Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
         });
 
 
@@ -84,6 +85,7 @@ public class CreateEventSteps implements En {
 
         When("^I enter market details$", (DataTable table) -> {
             Map<String, String> mkt = table.asMap(String.class, String.class);
+            marketsPage.hideMarketManagement();
             marketsPage.showMarketDetails();
             boolean isLive = Helpers.nonNullGet(mkt, "Market Status").equals("Live");
             boolean isEW = mkt.get("E/W").equals("yes");
@@ -151,6 +153,10 @@ public class CreateEventSteps implements En {
             settleRace();
         });
 
+        And("^I update Exotic Prices$", () -> {
+            //settlementPage.updateExoticPrices(); //TODO to be done in a different PR
+        });
+
         And("^I settle race$", () -> {
             settleRace();
         });
@@ -178,12 +184,32 @@ public class CreateEventSteps implements En {
             liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
 
         });
+
+        And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
+            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            updatePlacePrices(placePricesCSV, prodId);
+        });
+
+        And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
+            Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
+            updatePlacePrices(placePricesCSV, prodId);
+        });
+    }
+    
+    private void updatePlacePrices(String placePricesCSV, Integer prodId) {
+        List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+        header = new HeaderPage();
+        header.pickEvent(category, subcategory, eventName);
+        header.navigateToF5();
+        LiabilityPage liabilityPage = new LiabilityPage();
+        liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
     }
 
     private void resultRace(Map<String, String> winners) {
         header = new HeaderPage();
+        String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
-        header.pickEvent(category, subcategory, event);
+        header.pickEvent(category, subcat, event);
         settlementPage = header.navigateToF6();
         settlementPage.resultRace(winners);
     }
