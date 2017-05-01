@@ -2,7 +2,6 @@ package com.tabcorp.qa.common;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -10,9 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class Helpers {
@@ -61,11 +63,26 @@ public class Helpers {
 
     }
 
+    public static String getUriOfResource(String fileName) {
+        ClassLoader classLoader = Helpers.class.getClassLoader();
+        String path  = classLoader.getResource(fileName).getPath();
+        return new File(path).toURI().toString();
+    }
+
     public static Object nonNullGet(Map map, Object key){
-        Assertions.assertThat(map.get(key))
+        assertThat(map.get(key))
                 .withFailMessage("Map key='%s' does not exist in: %s", key, map.keySet())
                 .isNotNull();
         return map.get(key);
+    }
+
+    public static void verifyNotExpired(int expMonth, int expYear) {
+        assertThat(expMonth).as("Expiry month").isBetween(1, 12);
+        assertThat(expYear).as("Expiry Year").isBetween(1950, 3000);
+        LocalDate nextMonthStart = LocalDate.of(expYear, expMonth + 1, 1);
+        LocalDate lastValidDate = nextMonthStart.minusDays(1);
+        LocalDate today = LocalDate.now();
+        assertThat(lastValidDate).as("CC month=%d year=%d is expired", expMonth, expYear).isAfterOrEqualTo(today);
     }
 
     public static String createUniqueName(String baseName){

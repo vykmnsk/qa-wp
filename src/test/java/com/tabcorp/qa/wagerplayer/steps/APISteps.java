@@ -146,7 +146,6 @@ public class APISteps implements En {
             BigDecimal balanceAfterSettle = api.getBalance(accessToken);
             assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
         });
-
     }
 
     private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi) {

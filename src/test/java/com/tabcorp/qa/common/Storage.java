@@ -14,7 +14,8 @@ public class Storage {
         API_ACCESS_TOKEN,
         EVENT_IDS,
         EVENT_NAMES,
-        PRODUCT_IDS
+        PRODUCT_IDS,
+        CUSTOMER
     }
 
     public static void init() {

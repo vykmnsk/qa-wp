@@ -37,6 +37,7 @@ public class CreateCustomerSteps implements En {
         When("^I create a new customer via API with data$", (DataTable table) -> {
             Customer custData = parseUpdateCustomerData(table);
             String successMsg = api.createNewCustomer(custData);
+            Storage.put(Storage.KEY.CUSTOMER, custData);
             assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
             this.customerUsername = custData.username;
             this.customerPassword = custData.internetPassword;
@@ -47,6 +48,7 @@ public class CreateCustomerSteps implements En {
             Customer custData = parseUpdateCustomerData(table);
             loginGoToCustomersPage();
             newCustPage.enterCustomerDetails(custData);
+            Storage.put(Storage.KEY.CUSTOMER, custData);
             this.currency = custData.currency;
         });
 

@@ -3,6 +3,7 @@ package com.tabcorp.qa.wagerplayer.api;
 import com.jayway.jsonpath.JsonPath;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
 import net.minidev.json.JSONArray;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -292,6 +294,37 @@ public class MOBI_V2 implements WagerPlayerAPI {
         String amlStatus = JsonPath.read(response, "$.customer_balance.aml_status");
         log.info("AML Status : " + amlStatus);
         return amlStatus;
+    }
+
+    public String getPaymentRefence(String accessToken) {
+        Map fields = new HashMap<String, Object>();
+        fields.put("access_token", accessToken);
+        Object response = get("/payment/reference", fields);
+        String paymentRef = JsonPath.read(response, "$.results.reference");
+        Assertions.assertThat(paymentRef).as("Payment reference in response").isNotEmpty();
+        return paymentRef;
+    }
+
+    public String getEncryptionKey(String accessToken) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        Object response = get("/payment/encryption_key", fields);
+        String key = JsonPath.read(response, "$.results.encryption_key");
+        Assertions.assertThat(key).as("Encryption key in response").isNotEmpty();
+        return key;
+    }
+
+    public void addCardAndDeposit(String accessToken, String paymentReference, String cardEncryption, String cardType, BigDecimal deposit) {
+        Map fields = new HashMap<String, Object>();
+        fields.put("access_token", accessToken);
+        fields.put("card_encrypted", cardEncryption);
+        fields.put("payment_method", cardType);
+        fields.put("amount", String.valueOf(deposit));
+        fields.put("deposit_reference", paymentReference);
+        fields.put("output_type", "json");
+        Object response = post("/payment/deposit/card", fields);
+        String resultCode = JsonPath.read(response, "$.results.result_code");
+        Assertions.assertThat(resultCode).as("Found result code in response is " + resultCode).isEqualToIgnoringCase("Authorised");
     }
 
 }

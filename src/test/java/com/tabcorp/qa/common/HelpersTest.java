@@ -1,10 +1,11 @@
 package com.tabcorp.qa.common;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HelpersTest {
 

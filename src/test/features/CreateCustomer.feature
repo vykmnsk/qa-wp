@@ -22,7 +22,6 @@ Feature: Create New Customer
       | timezone           | <timezone>           |
       | clientIP           | <clientIP>           |
       | manualVerification | <manualVerification> |
-
     Then the customer AML status in <UIorAPI> is updated to <amlStatus>
     And the customer deposits <depositAmount> cash via <UIorAPI>
 
