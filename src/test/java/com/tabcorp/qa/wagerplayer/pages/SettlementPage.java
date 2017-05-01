@@ -54,10 +54,6 @@ public class SettlementPage extends AppPage {
         wait.until(ExpectedConditions.visibilityOf(resultsTable));
     }
 
-    public void updateExoticPrices() {
-
-    }
-
     public void resultRace(Map<String, String> winners) {
         int count = 0;
         wait.until(ExpectedConditions.elementToBeClickable(winnerCheck));

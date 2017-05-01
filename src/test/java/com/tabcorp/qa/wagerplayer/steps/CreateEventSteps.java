@@ -153,7 +153,7 @@ public class CreateEventSteps implements En {
         });
 
         And("^I update Exotic Prices$", () -> {
-            settlementPage.updateExoticPrices(); //TODO to be done in a different PR
+            //settlementPage.updateExoticPrices(); //TODO to be done in a different PR
         });
 
         And("^I settle race$", () -> {
