@@ -9,19 +9,21 @@ import org.openqa.selenium.support.PageFactory;
 import java.util.Arrays;
 import java.util.List;
 
-public class AppPage extends AnyPage{
+public class AppPage extends AnyPage {
 
     public String appName;
     private String baseUrl;
 
-    AppPage(){
+    AppPage() {
         appName = Config.appName();
         baseUrl = Config.baseUrl();
         PageFactory.initElements(driver, this);
     }
 
-    public void load(){
-        setScreenSizeToMax();
+    public void load() {
+        if (!Config.isDockerRun()) {
+            setScreenSizeToMax();
+        }
         driver.get(baseUrl);
     }
 

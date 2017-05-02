@@ -1,0 +1,31 @@
+version: '2.1'
+services:
+  seleniumhub:
+      image: selenium/standalone-chrome:3.4.0
+      container_name: seleniumhub
+      hostname: seleniumhub
+      environment:
+          # Required to avoid container startup hanging sometimes in
+          # some environments
+          JAVA_OPTS: -Djava.security.egd=file:/dev/./urandom
+      ports:
+          - "4444:4444"
+
+  testservice:
+      container_name: testservice
+      build:
+        context: .
+      links:
+        - seleniumhub
+      environment:
+        -  WAGERPLAYER_APP_NAME=redbook
+        -  WAGERPLAYER_BASE_URL=http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/admin/frames.php
+        -  WAGERPLAYER_MOBIV2_URL=http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/mobi/v2/wev
+        -  WAGERPLAYER_USERNAME=admin
+        -  WAGERPLAYER_PASSWORD=luxbet123
+        -  WAGERPLAYER_RUN_MODE=DOCKER
+        -  WAGERPLAYER_WAPI_URL=http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/wapi1.php
+        -  WAGERPLAYER_WAPI_PASSWORD=1e55afbd5ee7ed823f4351c63e4c4d39
+        -  WAGERPLAYER_WAPI_USERNAME=testapi
+        -  WAGERPLAYER_CUSTOMER_USERNAME=monika_01
+        -  WAGERPLAYER_CUSTOMER_PASSWORD=luxbet321

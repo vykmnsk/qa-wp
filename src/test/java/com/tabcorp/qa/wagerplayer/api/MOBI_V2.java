@@ -279,11 +279,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
         fields.put("street", customer.street);
         fields.put("manual_verification", customer.manualVerification);
 
-        Object resp = post("/customer", fields);
-        log.info("Response for create customer mobi_v2 : " + resp);
-        Integer custId = JsonPath.read(resp, "$.success.customer_id");
+        Object response = post("/customer", fields);
+        log.info("Response for create customer mobi_v2 : " + response);
+        Integer custId = JsonPath.read(response,"$.success.customer_id");
         log.info("Customer ID=" + custId);
-        String msg = JsonPath.read(resp, "$.success.message");
+        String msg = JsonPath.read(response, "$.success.message");
         return msg;
     }
 
