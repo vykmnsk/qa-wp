@@ -7,6 +7,7 @@ import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.dto.Customer;
 import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,9 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = new HashMap<>();
         fields.put("wapi_client_user", Config.wapiUsername());
         fields.put("wapi_client_pass", Config.wapiPassword());
-        fields.put("client_ip", Config.clientIp());
+        if (!StringUtils.isEmpty(Config.clientIp())) {
+            fields.put("client_ip", Config.clientIp());
+        }
         return fields;
     }
 

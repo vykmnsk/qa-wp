@@ -64,8 +64,9 @@ public class APISteps implements En {
                         default:
                             throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
                     }
-                    List betIds = wapi.readBetIds(response);
-                    log.info("Bet IDs=" + betIds.toString());
+                    //TODO must be implemented for both LB and RB
+//                    List betIds = api.readBetIds(response);
+//                    log.info("Bet IDs=" + betIds.toString());
                     balanceAfterBet = api.readNewBalance(response);
                 });
 

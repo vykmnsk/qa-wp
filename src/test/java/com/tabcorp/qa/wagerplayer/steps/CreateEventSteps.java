@@ -26,17 +26,14 @@ public class CreateEventSteps implements En {
     private MarketsPage marketsPage;
     private HeaderPage header;
     private SettlementPage settlementPage;
-    private String category = null;
-    private String subcategory = null;
-    private String eventName = null;
     private int raceNumber = 1;
 
     public CreateEventSteps() {
 
 
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
-            this.subcategory = subcategory;
-            this.category = category;
+            Storage.add(Storage.KEY.CATEGORIES, category);
+            Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
             header = new HeaderPage();
             header.navigateToF3(category, subcategory);
             Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
@@ -49,7 +46,7 @@ public class CreateEventSteps implements En {
                     Assertions.assertThat(evt.keySet()).as("event details").isNotEmpty();
                     List<String> runners = Helpers.generateRunners("Runner_", numberOfRunners);
                     String evtBaseName = (String) Helpers.nonNullGet(evt, "base name");
-                    eventName = Helpers.createUniqueName(evtBaseName);
+                    String eventName = Helpers.createUniqueName(evtBaseName);
                     marketsPage = newEvtPage.enterEventDetails(
                             inMinutes,
                             eventName,
@@ -57,6 +54,7 @@ public class CreateEventSteps implements En {
                             (String) Helpers.nonNullGet(evt, "create market"),
                             runners
                     );
+                    Storage.add(Storage.KEY.EVENT_NAMES, eventName);
                 });
         Then("^I see Create Market page$", () -> {
             marketsPage.verifyLoaded();
@@ -118,7 +116,7 @@ public class CreateEventSteps implements En {
 
             String evtBaseName = evt.get("base name");
             if (null == evtBaseName) evtBaseName = Config.testEventBaseName();
-            eventName = Helpers.createUniqueName(evtBaseName);
+            String eventName = Helpers.createUniqueName(evtBaseName);
 
             String runnersText = (String) Helpers.nonNullGet(evt, "runners");
             List<String> runners = Helpers.extractCSV(runnersText);
@@ -136,6 +134,7 @@ public class CreateEventSteps implements En {
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(raceNumber);
             if (Config.LUXBET.equals(Config.appName())) marketsPage.setHardSoftInterimLimits();
+            Storage.add(Storage.KEY.EVENT_NAMES, eventName);
         });
 
         When("^I result race with the runners and positions$", (DataTable table) -> {
@@ -175,8 +174,12 @@ public class CreateEventSteps implements En {
         And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+
+            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
+            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
+            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
             header = new HeaderPage();
-            header.pickEvent(category, subcategory, eventName);
+            header.pickEvent(cat, subcat, evName);
             header.navigateToF5();
             LiabilityPage liabilityPage = new LiabilityPage();
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
@@ -198,8 +201,11 @@ public class CreateEventSteps implements En {
     
     private void updatePlacePrices(String placePricesCSV, Integer prodId) {
         List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+        String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
+        String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
+        String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
         header = new HeaderPage();
-        header.pickEvent(category, subcategory, eventName);
+        header.pickEvent(cat, subcat, evName);
         header.navigateToF5();
         LiabilityPage liabilityPage = new LiabilityPage();
         liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
@@ -207,9 +213,10 @@ public class CreateEventSteps implements En {
 
     private void resultRace(Map<String, String> winners) {
         header = new HeaderPage();
+        String cat = (String) Storage.removeFirst(Storage.KEY.CATEGORIES);
         String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
-        header.pickEvent(category, subcat, event);
+        header.pickEvent(cat, subcat, event);
         settlementPage = header.navigateToF6();
         settlementPage.resultRace(winners);
     }

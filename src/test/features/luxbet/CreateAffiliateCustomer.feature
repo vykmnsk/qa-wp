@@ -1,4 +1,4 @@
-@luxbet @create-affiliate-customer
+@luxbet-mobile @create-affiliate-customer
 Feature: Create New Affiliate Customer
 
   Scenario Outline: Create Affiliate Customer

@@ -1,14 +1,6 @@
-#Run Tests
-mvn test -Dcucumber.options="--name Login"
-
-#Debug in ItelliJ
-mvn test -DforkMode=never
-
-#Confluence Link
-   [Click-this](http://wiki.corpad.net.local:8090/display/WTG/qa-wagerplayer+code+setup)
-
 #Env vars required
-- WAGERPLAYER_APP_NAME=[luxbet|redbook]
+### for Redbook
+- WAGERPLAYER_APP_NAME=redbook
 - WAGERPLAYER_BASE_URL
 - WAGERPLAYER_USERNAME
 - WAGERPLAYER_PASSWORD
@@ -17,15 +9,41 @@ mvn test -DforkMode=never
 - WAGERPLAYER_WAPI_PASSWORD
 - WAGERPLAYER_CUSTOMER_USERNAME
 - WAGERPLAYER_CUSTOMER_PASSWORD
-- WAGERPLAYER_RUN_MODE=[ DOCKER | anything-else ]
 - WAGERPLAYER_MOBIV2_URL
+- WAGERPLAYER_RUN_MODE=[ DOCKER | anything-else ]
+
+### for Luxbet
+- WAGERPLAYER_APP_NAME=luxbet
+- WAGERPLAYER_BASE_URL
+- WAGERPLAYER_USERNAME
+- WAGERPLAYER_PASSWORD
+- WAGERPLAYER_WAPI_URL
+- WAGERPLAYER_WAPI_USERNAME
+- WAGERPLAYER_WAPI_PASSWORD
+- WAGERPLAYER_CUSTOMER_USERNAME
+- WAGERPLAYER_CUSTOMER_PASSWORD
+- WAGERPLAYER_CLIENT_IP
+- WAGERPLAYER_RUN_MODE=[ DOCKER | anything-else ]
+
+### for LuxbetMobile
+- WAGERPLAYER_APP_NAME=luxbet
+- WAGERPLAYER_WAPI_URL
+- WAGERPLAYER_WAPI_USERNAME=puntclub
+- WAGERPLAYER_LUXMOBILE_URL
+ 
+
+#Run Tests
+- mvn test -Dcucumber.options="--name Login"
+- mvn test -Dcucumber.options="-t @create-customer"
+
+#Debug in ItelliJ
+mvn test -DforkMode=never
 
 # Info
 
 - The base name for races is :  TEST RACE
 - The "Enabled" setting for "Betting" is enabled by 
   default. Hence not part of the feature file.
-
 
 #Docker Run
 
@@ -34,3 +52,6 @@ mvn test -DforkMode=never
 - vnc into localhost:5900 to see the test execution and the passsword is 'secret' . Use safari if there , becasuse it has inbuilt vnc support. vnc://localhost:5900
 - run the tests
 - and then one should be able to see the test runs in the conatiner.
+
+#Confluence Link
+   [Click-this](http://wiki.corpad.net.local:8090/display/WTG/qa-wagerplayer+code+setup)

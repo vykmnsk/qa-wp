@@ -66,7 +66,7 @@ public class Config {
     private static final String ENV_CLIENT_IP = "WAGERPLAYER_CLIENT_IP";
 
     private static String readVerify(String envVarName) {
-        String var = System.getenv((envVarName));
+        String var = System.getenv(envVarName);
         verifyExists(var, envVarName);
         return var;
     }
@@ -87,17 +87,11 @@ public class Config {
         return readVerify(ENV_WAPI_PASSWORD);
     }
 
-    public static String clientIp() {
-        return readVerify(ENV_CLIENT_IP);
-    }
+    public static String customerUsername() { return readVerify(ENV_CUSTOMER_USERNAME); }
 
-    public static String customerUsername() {
-        return readVerify(ENV_CUSTOMER_USERNAME);
-    }
+    public static String customerPassword() { return readVerify(ENV_CUSTOMER_PASSWORD); }
 
-    public static String customerPassword() {
-        return readVerify(ENV_CUSTOMER_PASSWORD);
-    }
+    public static String clientIp() { return System.getenv(ENV_CLIENT_IP); }
 
 
     private static final String ENV_MOBI_V2_URL = "WAGERPLAYER_MOBIV2_URL";
