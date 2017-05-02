@@ -5,6 +5,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +81,16 @@ public class REST {
 
     public static Object verifyAndParseResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
-        assertThat(response.getBody()).as("response body").isNotEmpty();
-        return Configuration.defaultConfiguration().jsonProvider().parse(response.getBody());
+
+        String body = response.getBody();
+        assertThat(body).as("response body").isNotEmpty();
+        try {
+            new JSONParser().parse(body);
+        } catch (ParseException e) {
+            String errorMsg = String.format("Response body is not JSON: %s JSON Parse error: %s", body, e);
+            throw new RuntimeException(errorMsg);
+        }
+        return Configuration.defaultConfiguration().jsonProvider().parse(body);
     }
 
 
