@@ -305,6 +305,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return paymentRef;
     }
 
+    public List readBetIds(Object resp) {
+        JSONArray betIds = JsonPath.read(resp, "$..selections[0].bet_id");
+        return betIds;
+    }
+
     public String getEncryptionKey(String accessToken) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);

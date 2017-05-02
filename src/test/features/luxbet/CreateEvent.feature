@@ -5,7 +5,7 @@ Feature: Create a Luxbet Event
     Given I am logged into WP UI and on Home Page
 
   Scenario Outline: Create Horse Racing event
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     Then I see New Event page is loaded
 
     When I enter event details with <NumberOfRunners> runners, current 'show time' and 'event date/time' in 30 minutes with data
@@ -48,9 +48,11 @@ Feature: Create a Luxbet Event
     And event status is "L"
 
     Examples:
-      | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
-#      | 24              | 1          | 1/4           | 4          |
-#      | 15              | 2          | 1/5           | 3          |
-      | 8               | 3          | 1/5           | 3          |
+      | Category         | Subcategory   | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
+#      |                  |               | 24              | 1          | 1/4           | 4          |
+#      |                  |               | 15              | 2          | 1/5           | 3          |
+      | Horse Racing     | WOLVERHAMPTON | 8               | 3          | 1/5           | 3          |
+      | GREYHOUND RACING | CORK          | 8               | 3          | 1/5           | 3          |
+      | Harness Racing   | ALBION PARK   | 8               | 3          | 1/5           | 3          |
 
 

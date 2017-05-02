@@ -31,4 +31,6 @@ public interface WagerPlayerAPI {
 
     BigDecimal readNewBalance(Object resp);
 
+    List readBetIds(Object resp);
+
 }
