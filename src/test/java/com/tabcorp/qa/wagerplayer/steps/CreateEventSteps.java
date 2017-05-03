@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class CreateEventSteps implements En {
 
-    private static Logger log = LoggerFactory.getLogger(WAPI.class);
+    private static Logger log = LoggerFactory.getLogger(CreateEventSteps.class);
 
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
@@ -36,7 +36,6 @@ public class CreateEventSteps implements En {
             Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
             header = new HeaderPage();
             header.navigateToF3(category, subcategory);
-            Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
         });
 
 
@@ -54,7 +53,6 @@ public class CreateEventSteps implements En {
                             (String) Helpers.nonNullGet(evt, "create market"),
                             runners
                     );
-                    Storage.add(Storage.KEY.EVENT_NAMES, eventName);
                 });
         Then("^I see Create Market page$", () -> {
             marketsPage.verifyLoaded();
@@ -134,7 +132,6 @@ public class CreateEventSteps implements En {
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(raceNumber);
             if (Config.LUXBET.equals(Config.appName())) marketsPage.setHardSoftInterimLimits();
-            Storage.add(Storage.KEY.EVENT_NAMES, eventName);
         });
 
         When("^I result race with the runners and positions$", (DataTable table) -> {
