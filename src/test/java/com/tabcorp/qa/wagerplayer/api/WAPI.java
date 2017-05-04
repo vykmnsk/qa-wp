@@ -286,16 +286,28 @@ public class WAPI implements WagerPlayerAPI {
         return (String) JsonPath.read(resp, RESP_ROOT + ".token");
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
+    private static String getPricePath(String selName, Integer prodId) {
         String mktPath = ".markets.market[0]";
         String selPath = ".selections.selection" + jfilter("name", selName);
         String pricePath = ".prices.price" + jfilter("product_id", prodId.toString());
-        String path = mktPath + selPath + pricePath;
+        return mktPath + selPath + pricePath;
+    }
 
+    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
+        String path = getPricePath(selName, prodId);
         HashMap<KEY, String> sel = new HashMap<>();
         sel.put(KEY.MPID, readPriceAttr(resp, path, BetType.Win.name(), "mpid"));
         sel.put(KEY.WIN_PRICE, readPriceAttr(resp, path, BetType.Win.name(), "precise_price"));
         sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, path, BetType.Place.name(), "precise_price"));
+        return sel;
+    }
+
+    public static Map<KEY, String> readSelectionWithDefaultPrices(Object resp, String selName, Integer prodId) {
+        String path = getPricePath(selName, prodId);
+        HashMap<KEY, String> sel = new HashMap<>();
+        sel.put(KEY.MPID, readPriceAttr(resp, path, BetType.Win.name(), "mpid"));
+        sel.put(KEY.WIN_PRICE, "1.00");
+        sel.put(KEY.PLACE_PRICE, "1.00");
         return sel;
     }
 

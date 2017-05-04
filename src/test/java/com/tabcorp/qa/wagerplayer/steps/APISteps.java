@@ -46,28 +46,17 @@ public class APISteps implements En {
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
                     Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
                     Map<WAPI.KEY, String> sel = wapi.readSelection(resp, runner, prodId);
-
-                    Object response;
-                    switch (betTypeName.toUpperCase()) {
-                        case "WIN":
-                            response = api.placeSingleWinBet(accessToken, prodId,
-                                    sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), stake);
-                            break;
-                        case "PLACE":
-                            response = api.placeSinglePlaceBet(accessToken, prodId,
-                                    sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
-                            break;
-                        case "EACHWAY":
-                            response = api.placeSingleEachwayBet(accessToken, prodId,
-                                    sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
-                            break;
-                        default:
-                            throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
-                    }
-                    List betIds = api.readBetIds(response);
-                    log.info("Bet IDs=" + betIds.toString());
-                    balanceAfterBet = api.readNewBalance(response);
+                    balanceAfterBet = placeSingleBet(betTypeName, prodId, stake, sel);
                 });
+
+        When("^I place a unfixed single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String runner, BigDecimal stake) -> {
+                    Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+                    Object resp = wapi.getEventMarkets((String) Storage.getLast(EVENT_IDS));  // this is always WAPI.
+                    Map<WAPI.KEY, String> sel = wapi.readSelectionWithDefaultPrices(resp, runner, prodId);
+                    balanceAfterBet = placeSingleBet(betTypeName, prodId, stake, sel);
+                });
+
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runnersCSV, BigDecimal stake) -> {
@@ -148,6 +137,29 @@ public class APISteps implements En {
             BigDecimal balanceAfterSettle = api.getBalance(accessToken);
             assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
         });
+
+
+    }
+
+    private BigDecimal placeSingleBet(String betTypeName, Integer prodId, BigDecimal stake, Map<WAPI.KEY, String> sel) {
+        Object reponse;
+        switch (betTypeName.toUpperCase()) {
+            case "WIN":
+                reponse = api.placeSingleWinBet(accessToken, prodId,
+                        sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), stake);
+                break;
+            case "PLACE":
+                reponse = api.placeSinglePlaceBet(accessToken, prodId,
+                        sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
+                break;
+            case "EACHWAY":
+                reponse = api.placeSingleEachwayBet(accessToken, prodId,
+                        sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
+                break;
+            default:
+                throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+        }
+        return api.readNewBalance(reponse);
     }
 
     private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi) {
