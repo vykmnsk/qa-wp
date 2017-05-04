@@ -317,6 +317,27 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return key;
     }
 
+    public String getStoredCardReference(String accessToken) {
+        Map fields = new HashMap<String, Object>();
+        fields.put("access_token", accessToken);
+        Object response = get("/payment/info/stored", fields);
+        String selectedCardReference = JsonPath.read(response, "$.results.stored[0].selected_card_reference");
+        Assertions.assertThat(selectedCardReference).as("Selected card reference is ").isNotEmpty();
+        return selectedCardReference;
+    }
+
+    public void withdrawWithCreditCard(String accessToken, String cardType, BigDecimal withdrawAmount, String selectedCardReference, String withdrawReference) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("payment_method", cardType);
+        fields.put("amount", withdrawAmount);
+        fields.put("selected_card_reference", selectedCardReference);
+        fields.put("withdraw_reference", withdrawReference);
+        Object response = post("/payment/withdraw/stored", fields);
+        String resultCode = JsonPath.read(response, "$.results.result_code");
+        Assertions.assertThat(resultCode).as("Result code is not matching with ").isNotEqualToIgnoringCase("payout-submit-received");
+    }
+
     public void addCardAndDeposit(String accessToken, String paymentReference, String cardEncryption, String cardType, BigDecimal deposit) {
         Map fields = new HashMap<String, Object>();
         fields.put("access_token", accessToken);

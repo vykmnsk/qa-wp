@@ -33,6 +33,9 @@ Feature: Create New Customer
       | ExpiryYear     | 2020             |
       | CardHolderName | Gary Milburn     |
       | CardType       | MC               |
+    Then customer balance is at least $99.00
+    When I withdraw $20.00 using stored "mc" card
+    Then customer balance is decreased by $20.00
 
     Examples:
       | UIorAPI | title | firstName | lastName | dateOfBirth | email                  | street           | city     | suburb         | postCode | country | securityQuestion        | securityAnswer | currency | telephoneNo | building | state | weeklyDepositLimit | timezone | clientIP | manualVerification | amlStatus             |
