@@ -2,7 +2,7 @@
 
 Feature: Create New Customer
 
-  Scenario Outline: Create Customer
+  Scenario Outline: Create Customer with Credit Card
     When I create a new customer via API with data
       | title              | <title>              |
       | firstName          | <firstName>          |

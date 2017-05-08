@@ -1,3 +1,4 @@
+@login
 Feature: Login into WagerPlayer
 
   Scenario: Login with valid credentials

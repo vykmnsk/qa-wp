@@ -19,12 +19,12 @@ services:
         - seleniumhub
       environment:
         -  WAGERPLAYER_APP_NAME=redbook
-        -  WAGERPLAYER_BASE_URL=http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/admin/frames.php
-        -  WAGERPLAYER_MOBIV2_URL=http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/mobi/v2/wev
+        -  WAGERPLAYER_BASE_URL=http://wp.luxaws.com/admin/frames.php
+        -  WAGERPLAYER_MOBIV2_URL=http://wpapi.luxaws.com/mobi/v2/web
         -  WAGERPLAYER_USERNAME=admin
         -  WAGERPLAYER_PASSWORD=luxbet123
         -  WAGERPLAYER_RUN_MODE=DOCKER
-        -  WAGERPLAYER_WAPI_URL=http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/wapi1.php
+        -  WAGERPLAYER_WAPI_URL=http://wpapi.luxaws.com/wapi1.php
         -  WAGERPLAYER_WAPI_PASSWORD=1e55afbd5ee7ed823f4351c63e4c4d39
         -  WAGERPLAYER_WAPI_USERNAME=testapi
         -  WAGERPLAYER_CUSTOMER_USERNAME=monika_01

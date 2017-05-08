@@ -13,23 +13,17 @@ pipeline {
         stage('initialize') {
             steps {
                 checkout scm
-                /********
-                 * Have named the selenium hub node in the docker-compose.yml
-                 * so, can remove the hub by name as part of initial setup.
-                 ********/
             }
         }
 
         stage('test') {
             steps {
-                script {
                     /****************
                      *  sh 'curl -vvv  http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/admin/frames.php'
                      * Just to check if the url was reachable from the jenkins worker.
                      ****************/
                     sh 'docker-compose up -d --force-recreate --build'
                     sh 'exit $(docker wait testservice)'
-                }
             }
         }
     }
