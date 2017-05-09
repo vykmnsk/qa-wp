@@ -84,7 +84,7 @@ public class CreateEventSteps implements En {
             marketsPage.hideMarketManagement();
             marketsPage.showMarketDetails();
             boolean isLive = Helpers.nonNullGet(mkt, "Market Status").equals("Live");
-            boolean isEW = mkt.get("E/W").equals("yes");
+            boolean isEW = mkt.get("E/W").equalsIgnoreCase("yes");
             marketsPage.enterMarketDetail(
                     isLive,
                     (String) Helpers.nonNullGet(mkt, "Bets Allowed"),

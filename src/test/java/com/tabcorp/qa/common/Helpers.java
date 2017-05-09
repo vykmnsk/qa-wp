@@ -90,7 +90,13 @@ public class Helpers {
     }
 
     public static List<String> extractCSV(String csv) {
-        return Arrays.asList(csv.split(",(\\s)*"));
+        char separator = ',';
+        return extractCSV(csv, separator);
+    }
+    public static List<String> extractCSV(String csv, char separator) {
+        List<String> items = Arrays.asList(csv.split(separator + "(\\s)*"));
+        assertThat(items.size()).as("extracted CSV item count").isGreaterThan(1);
+        return items;
     }
 
     public static List<BigDecimal> extractCSVPrices(String pricesCSV) {

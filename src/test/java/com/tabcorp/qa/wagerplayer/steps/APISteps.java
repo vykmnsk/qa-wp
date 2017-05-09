@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,14 +85,27 @@ public class APISteps implements En {
         When("^I place a multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String multiType, String runnersCSV, BigDecimal stake, String flexi) -> {
                     assertThat(multiType.toUpperCase()).as("Multi TypeName input")
-                            .isIn("DOUBLE", "TREBLE", "DOUBLES", "TRIXIE", "PATENT", "4-FOLD", "TREBLES", "YANKEE",
-                                    "LUCKY 15", "5-FOLD", "4-FOLDS", "CANADIAN", "LUCKY 31");
+                            .isIn("DOUBLE,WIN-WIN","DOUBLE,WIN-PLACE","DOUBLE,PLACE-WIN","DOUBLE,PLACE-PLACE",
+                                    "TREBLE", "DOUBLES", "DOUBLES", "TRIXIE", "PATENT", "4-FOLD", "TREBLES",
+                                    "YANKEE", "LUCKY 15", "5-FOLD", "4-FOLDS", "CANADIAN", "LUCKY 31");
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
                     List<String> runners = Helpers.extractCSV(runnersCSV);
                     List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+                    String uuid = null;
+                    if (multiType.contains(",")) {
+                        List<String> doubleMultiTypeInfo = Helpers.extractCSV(multiType);
+                        assertThat(doubleMultiTypeInfo).hasSize(2);
+                        assertThat(doubleMultiTypeInfo.get(0)).isEqualToIgnoringCase("DOUBLE");
+                        List<String> doubleBetTypesStr = Helpers.extractCSV(doubleMultiTypeInfo.get(1), '-');
+                        assertThat(doubleBetTypesStr).hasSize(2);
+                        List<BetType> doubleBetTypes = doubleBetTypesStr.stream().map(str -> BetType.fromName(str)).collect(Collectors.toList());
+                        uuid = wapi.prepareSelectionsForDoubleMultiBet(accessToken, eventIds, prodIds, runners, doubleBetTypes);
+                    } else {
+                        uuid = wapi.prepareSelectionsForMultiBet(accessToken, eventIds, prodIds, runners, multiType);
+                    }
 
-                    Object response = placeMultiBets(multiType, eventIds, prodIds, runners, stake, isFlexi);
+                    Object response = wapi.placeAMultiBet(accessToken, uuid, stake, isFlexi);
                     List betIds = api.readBetIds(response);
                     log.info("Bet IDs=" + betIds.toString());
                     balanceAfterBet = api.readNewBalance(response);
@@ -129,8 +143,13 @@ public class APISteps implements En {
 
         Then("^customer balance is increased by \\$(\\d+.\\d\\d)$", (String payoutText) -> {
             BigDecimal payout = new BigDecimal(payoutText);
-            BigDecimal balanceAfterSettle = api.getBalance(accessToken);
-            assertThat(Helpers.roundOff(balanceAfterSettle.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(payout));
+            class ReloadCheckCustomerBalance implements Runnable {
+                public void run() {
+                    BigDecimal balanceAfterSettle = api.getBalance(accessToken);
+                    assertThat(Helpers.roundOff(balanceAfterSettle.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(payout));
+                }
+            }
+            Helpers.retryOnAssertionFailure(new ReloadCheckCustomerBalance(), 5, 2);
         });
 
         Then("^customer balance is not changed$", () -> {
@@ -142,24 +161,26 @@ public class APISteps implements En {
     }
 
     private BigDecimal placeSingleBet(String betTypeName, Integer prodId, BigDecimal stake, Map<WAPI.KEY, String> sel) {
-        Object reponse;
+        Object response;
         switch (betTypeName.toUpperCase()) {
             case "WIN":
-                reponse = api.placeSingleWinBet(accessToken, prodId,
+                response = api.placeSingleWinBet(accessToken, prodId,
                         sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), stake);
                 break;
             case "PLACE":
-                reponse = api.placeSinglePlaceBet(accessToken, prodId,
+                response = api.placeSinglePlaceBet(accessToken, prodId,
                         sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                 break;
             case "EACHWAY":
-                reponse = api.placeSingleEachwayBet(accessToken, prodId,
+                response = api.placeSingleEachwayBet(accessToken, prodId,
                         sel.get(WagerPlayerAPI.KEY.MPID), sel.get(WagerPlayerAPI.KEY.WIN_PRICE), sel.get(WagerPlayerAPI.KEY.PLACE_PRICE), stake);
                 break;
             default:
                 throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
         }
-        return api.readNewBalance(reponse);
+        List betIds = api.readBetIds(response);
+        log.info("Bet IDs=" + betIds.toString());
+        return api.readNewBalance(response);
     }
 
     private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi) {
@@ -194,11 +215,6 @@ public class APISteps implements En {
             selectionIds.add(selId);
         }
         return wapi.placeExoticBetMultiMarkets(accessToken, prodId, selectionIds, marketIds, stake, isFlexi);
-    }
-
-    private Object placeMultiBets(String multiType, List<String> eventIds, List<Integer> prodIds, List<String> runners, BigDecimal stake, boolean isFlexi) {
-        String uuid = wapi.addSelectionsToMulti(accessToken, eventIds, prodIds, runners, multiType);
-        return wapi.placeAMultiBet(accessToken, uuid, stake, isFlexi);
     }
 
 }

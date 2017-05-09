@@ -5,7 +5,7 @@ Feature: Placing and Settling multi Bets
     Given I am logged into WP UI and on Home Page
     And I am logged into WP API
 
-  Scenario Outline: HORSE Race Multi Double bets
+  Scenario Outline: Racing Multi Double bets
     When I enter specifics category "<CategoryOne>" and subcategory "<SubcategoryOne>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
@@ -54,12 +54,21 @@ Feature: Placing and Settling multi Bets
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | CategoryOne      | SubcategoryOne | CategoryTwo      | SubcategoryTwo | MultiType | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
-      | Horse Racing     | PAKENHAM       | Horse Racing     | SEYMOUR        | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
-      | GREYHOUND RACING | CORK           | GREYHOUND RACING | HOBART         | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
-      | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Double    | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
+      | CategoryOne      | SubcategoryOne | CategoryTwo      | SubcategoryTwo | MultiType          | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
+      | Horse Racing     | PAKENHAM       | Horse Racing     | SEYMOUR        | Double,Win-Win     | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
+      | Horse Racing     | PAKENHAM       | Horse Racing     | SEYMOUR        | Double,Win-Place   | Runner01,Runner11 | 3.00  | N     | 3.00              | 42.75  |
+      | Horse Racing     | PAKENHAM       | Horse Racing     | SEYMOUR        | Double,Place-Win   | Runner01,Runner11 | 3.00  | N     | 3.00              | 77.55  |
+      | Horse Racing     | PAKENHAM       | Horse Racing     | SEYMOUR        | Double,Place-Place | Runner01,Runner11 | 3.00  | N     | 3.00              | 20.09  |
+      | GREYHOUND RACING | CORK           | GREYHOUND RACING | HOBART         | Double,Win-Win     | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
+      | GREYHOUND RACING | CORK           | GREYHOUND RACING | HOBART         | Double,Win-Place   | Runner01,Runner11 | 3.00  | N     | 3.00              | 42.75  |
+      | GREYHOUND RACING | CORK           | GREYHOUND RACING | HOBART         | Double,Place-Win   | Runner01,Runner11 | 3.00  | N     | 3.00              | 77.55  |
+      | GREYHOUND RACING | CORK           | GREYHOUND RACING | HOBART         | Double,Place-Place | Runner01,Runner11 | 3.00  | N     | 3.00              | 20.09  |
+      | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Double,Win-Win     | Runner01,Runner11 | 3.00  | N     | 3.00              | 165.00 |
+      | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Double,Win-Place   | Runner01,Runner11 | 3.00  | N     | 3.00              | 42.75  |
+      | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Double,Place-Win   | Runner01,Runner11 | 3.00  | N     | 3.00              | 77.55  |
+      | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Double,Place-Place | Runner01,Runner11 | 3.00  | N     | 3.00              | 20.09  |
 
-  Scenario Outline: Horse Race Multi Treble/Doubles/Trixie/Patent bets
+  Scenario Outline: Racing Multi Treble/Doubles/Trixie/Patent bets
     When I enter specifics category "<CategoryOne>" and subcategory "<SubcategoryOne>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
@@ -142,7 +151,7 @@ Feature: Placing and Settling multi Bets
       | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00              | 2499.00 |
       | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00              | 2571.00 |
 
-  Scenario Outline: Horse Race Multi 4-Fold/Doubles/Trebles/Yankee/Lucky15 bets
+  Scenario Outline: Racing Multi 4-Fold/Doubles/Trebles/Yankee/Lucky15 bets
     When I enter specifics category "<CategoryOne>" and subcategory "<SubcategoryOne>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
@@ -248,8 +257,7 @@ Feature: Placing and Settling multi Bets
       | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 15423.00 |
       | Harness Racing   | ALBANY         | Harness Racing   | ALBION PARK    | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00              | 15507.00 |
 
-
-  Scenario Outline: Horse Race Multi 5-Fold/Doubles/Trebles/4-Folds/Canadian/Lucky31 bets
+  Scenario Outline: Racing Multi 5-Fold/Doubles/Trebles/4-Folds/Canadian/Lucky31 bets
     When I enter specifics category "<CategoryOne>" and subcategory "<SubcategoryOne>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |

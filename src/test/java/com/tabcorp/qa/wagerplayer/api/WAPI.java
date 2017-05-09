@@ -15,15 +15,18 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.MPID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.PLACE_PRICE;
+import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.WIN_PRICE;
+import static org.assertj.core.api.Assertions.*;
 
 public class WAPI implements WagerPlayerAPI {
 
@@ -214,24 +217,42 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public Object addSelectionToMulti(String sessionId, Integer prodId, String mpid) {
+        return addSelectionToMulti(sessionId, prodId, mpid, null);
+    }
+
+    public Object addSelectionToMulti(String sessionId, Integer prodId, String mpid, BetType bt) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_add_sel_to_multi");
         fields.put("mpid", mpid);
         fields.put("product_id", prodId);
+        if (null != bt) {
+            fields.put("bt", bt.id);
+        }
         return post(fields, false);
     }
 
-    public String addSelectionsToMulti(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, String multiType) {
+    public String prepareSelectionsForDoubleMultiBet(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, List<BetType> betTypes) {
+        List<Integer> sizes = Arrays.asList(eventIds.size(), prodIds.size(), runners.size(), betTypes.size());
+        assertThat(sizes).as("Number of Events, Products, Runners, BetTypes").allMatch(size -> size.equals(2));
+        return prepareSelectionsForMultiBet(sessionId, eventIds, prodIds, runners, "Double", betTypes);
+    }
+
+    public String prepareSelectionsForMultiBet(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, String multiType) {
+        //TODO crate empty list
         List<Integer> sizes = Arrays.asList(eventIds.size(), prodIds.size(), runners.size());
         Integer count = sizes.get(0);
         assertThat(count).as("Multi Selections count").isGreaterThan(1);
         assertThat(sizes).as("Number of Events, Products and Runners").allMatch(count::equals);
+        List<BetType> dummyBetTypes = Collections.nCopies(count,null);
+        return prepareSelectionsForMultiBet(sessionId, eventIds, prodIds, runners, multiType, dummyBetTypes);
+    }
 
+    public String prepareSelectionsForMultiBet(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, String multiType, List<BetType> betTypes) {
         Object resp = null;
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < eventIds.size(); i++) {
             Object marketsResponse = getEventMarkets(eventIds.get(i));
             Map<WAPI.KEY, String> sel = readSelection(marketsResponse, runners.get(i), prodIds.get(i));
-            resp = addSelectionToMulti(sessionId, prodIds.get(i), sel.get(MPID));
+            resp = addSelectionToMulti(sessionId, prodIds.get(i), sel.get(MPID), betTypes.get(i));
             if (i == 0) {  // error shows only for 1 selection
                 String msg = JsonPath.read(resp, RESP_ROOT + ".error[0].error_text");
                 assertThat(msg).isEqualTo("Add more selections for multiple bet types");
@@ -297,8 +318,8 @@ public class WAPI implements WagerPlayerAPI {
         String path = getPricePath(selName, prodId);
         HashMap<KEY, String> sel = new HashMap<>();
         sel.put(KEY.MPID, readPriceAttr(resp, path, BetType.Win.name(), "mpid"));
-        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, path, BetType.Win.name(), "precise_price"));
-        sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, path, BetType.Place.name(), "precise_price"));
+        sel.put(WIN_PRICE, readPriceAttr(resp, path, BetType.Win.name(), "precise_price"));
+        sel.put(PLACE_PRICE, readPriceAttr(resp, path, BetType.Place.name(), "precise_price"));
         return sel;
     }
 

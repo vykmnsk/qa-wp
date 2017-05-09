@@ -5,7 +5,7 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     Given I am logged into WP API
     And I am logged into WP UI and on Home Page
 
-  Scenario Outline: HORSE Race multiple Single bets
+  Scenario Outline: Racing multiple Single bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
@@ -40,7 +40,7 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     Then customer balance is increased by $154.93
 
     Examples:
-      | Category         | Subcategory             |
-      | Horse Racing     | Automation Horse Racing |
-      | GREYHOUND RACING | CORK                    |
-      | Harness Racing   | ALBION PARK             |
+      | Category         | Subcategory                 |
+      | Horse Racing     | Automation Horse Racing     |
+      | GREYHOUND RACING | Automation Greyhound Racing |
+      | Harness Racing   | Automation Harness Racing   |
