@@ -1,16 +1,13 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.wagerplayer.Config;
-import com.tabcorp.qa.wagerplayer.dto.Customer;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
-import java.time.LocalDate;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Map;
 
 public class NewCustomerPage extends AppPage {
 
@@ -122,54 +119,45 @@ public class NewCustomerPage extends AppPage {
         header.verifyPageTitle("Create Customer");
     }
 
-    public void enterCustomerDetails(Customer cust) {
-        new Select(title).selectByValue(cust.title);
-        firstName.sendKeys(cust.firstName);
-        lastName.sendKeys(cust.lastName);
-
-        doBDay.sendKeys(String.valueOf(cust.dob.getDayOfMonth()));
-        doBMonth.sendKeys(String.valueOf(cust.dob.getMonthValue()));
-        doBYear.sendKeys(String.valueOf(cust.dob.getYear()));
-
-        emailID.sendKeys(cust.email);
+    public void enterCustomerDetails(Map<String, String> cust) {
+        new Select(title).selectByValue(cust.get("salutation"));
+        firstName.sendKeys(cust.get("firstname"));
+        lastName.sendKeys(cust.get("lastname"));
+        doBDay.sendKeys(String.valueOf(cust.get("dob-day")));
+        doBMonth.sendKeys(String.valueOf(cust.get("dob-month")));
+        doBYear.sendKeys(String.valueOf(cust.get("dob-year")));
+        emailID.sendKeys(cust.get("email_address"));
         new Select(countryCode).selectByVisibleText("+61");
-        custMobileNo.sendKeys(cust.telephoneNo);
-
-        residentialStreetAddress.sendKeys(cust.street);
-        residentialSuburb.sendKeys(cust.suburb);
-        residentialCity.sendKeys(cust.city);
-        residentialPostCode.sendKeys(cust.postCode);
-        new Select(residentialCountry).selectByVisibleText(cust.country);
-        new Select(residentialTimezone).selectByValue(cust.timezone);
-
+        custMobileNo.sendKeys(cust.get("telephone"));
+        residentialStreetAddress.sendKeys(cust.get("street"));
+        residentialSuburb.sendKeys(cust.get("suburb"));
+        residentialCity.sendKeys(cust.get("city"));
+        residentialPostCode.sendKeys(cust.get("postcode"));
+        new Select(residentialCountry).selectByVisibleText(cust.get("country"));
+        new Select(residentialTimezone).selectByValue(cust.get("timezone"));
         if (Config.REDBOOK.equals(Config.appName())) {
-            mailingBuilding.sendKeys(cust.building);
+            mailingBuilding.sendKeys(cust.get("building"));
         }
-        mailingStreetAddress.sendKeys(cust.street);
-        mailingSuburb.sendKeys(cust.suburb);
-        mailingCity.sendKeys(cust.city);
-        mailingPostCode.sendKeys(cust.postCode);
-        mailingCountry.sendKeys(cust.country);
-
+        mailingStreetAddress.sendKeys(cust.get("street"));
+        mailingSuburb.sendKeys(cust.get("suburb"));
+        mailingCity.sendKeys(cust.get("city"));
+        mailingPostCode.sendKeys(cust.get("postcode"));
+        mailingCountry.sendKeys(cust.get("country"));
         if (Config.LUXBET.equals(Config.appName())) {
-            new Select(residentialState).selectByVisibleText(cust.state);
-            new Select(mailingState).selectByVisibleText(cust.state);
-            if (!cust.weeklyDepositLimit.isEmpty()) {
-                weeklyDepositLimit.sendKeys(cust.weeklyDepositLimit);
+            new Select(residentialState).selectByVisibleText(cust.get("state"));
+            new Select(mailingState).selectByVisibleText(cust.get("state"));
+            if (!cust.get("deposit_limit").isEmpty()) {
+                weeklyDepositLimit.sendKeys(cust.get("deposit_limit"));
             }
         }
-
-        username.sendKeys(cust.username);
-
-        telePassword.sendKeys(cust.telephonePassword);
-        telePasswordConfirmation.sendKeys(cust.telephonePassword);
-        internetPassword.sendKeys(cust.internetPassword);
-        internetPasswordConfirmation.sendKeys(cust.internetPassword);
-
-        new Select(challengeQuestion).selectByVisibleText(cust.securityQuestion);
-        challengeAnswer.sendKeys(cust.securityAnswer);
-
-        new Select(currency).selectByValue(cust.currency);
+        username.sendKeys(cust.get("username"));
+        telePassword.sendKeys(cust.get("password"));
+        telePasswordConfirmation.sendKeys(cust.get("password"));
+        internetPassword.sendKeys(cust.get("password"));
+        internetPasswordConfirmation.sendKeys(cust.get("password"));
+        new Select(challengeQuestion).selectByVisibleText(cust.get("secret_question"));
+        challengeAnswer.sendKeys(cust.get("secret_answer"));
+        new Select(currency).selectByValue(cust.get("currency_code"));
 
         insert.click();
         verifyNoFormErrors();

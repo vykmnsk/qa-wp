@@ -2,7 +2,7 @@
 Feature: Placing and Settling multiple Single bets on a Luxbet event
 
   Background:
-    Given I am logged into WP API
+    Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
 
   Scenario Outline: Racing multiple Single bets
@@ -22,7 +22,6 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
-    And customer balance is at least $20.50
 
     When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
     And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
@@ -30,17 +29,17 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
     And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance is decreased by $31.00
+    Then customer balance is equal to $69.00
 
     When I result race with the runners and positions
       | ROCKING HORSE | 1 |
       | COLORADO MISS | 2 |
       | CADEYRN       | 3 |
     And I settle race
-    Then customer balance is increased by $154.93
+    Then customer balance is equal to $223.93
 
     Examples:
       | Category         | Subcategory                 |
       | Horse Racing     | Automation Horse Racing     |
-      | GREYHOUND RACING | Automation Greyhound Racing |
-      | Harness Racing   | Automation Harness Racing   |
+#      | GREYHOUND RACING | Automation Greyhound Racing |
+#      | Harness Racing   | Automation Harness Racing   |

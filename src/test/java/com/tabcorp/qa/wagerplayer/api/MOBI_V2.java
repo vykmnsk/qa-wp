@@ -4,7 +4,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
-import com.tabcorp.qa.wagerplayer.dto.Customer;
 import net.minidev.json.JSONArray;
 import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +85,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return new BigDecimal(balance);
     }
 
-    public String login(String username, String password) {
+    public String login(String username, String password, String unused) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("username", username);
         fields.put("password", password);
@@ -251,41 +249,15 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return newBalance;
     }
 
-    public String createNewCustomer(Customer customer) {
-        Map<String, Object> fields = new HashMap<>();
-
-        fields.put("username", customer.username);
-        fields.put("firstname", customer.firstName);
-        fields.put("lastname", customer.lastName);
-        fields.put("salutation", customer.title);
-        fields.put("dob", DateTimeFormatter.ISO_LOCAL_DATE.format(customer.dob));
-        fields.put("email_address", customer.email);
-        fields.put("password", customer.password);
-        fields.put("postcode", customer.postCode);
-        fields.put("country", customer.country);
-        fields.put("telephone", customer.telephoneNo);
-        fields.put("secret_question", customer.securityQuestion);
-        fields.put("secret_answer", customer.securityAnswer);
-        fields.put("city", customer.city);
-
-        fields.put("currency_code", customer.currency);
-        fields.put("building", customer.building);
-        fields.put("postal_country", customer.country);
-        fields.put("postal_postcode", customer.postCode);
-        fields.put("suburb", customer.suburb);
-        fields.put("postal_county", customer.suburb);
-        fields.put("street", customer.street);
-        fields.put("manual_verification", customer.manualVerification);
-
-        Object response = post("/customer", fields);
-        log.info("Response for create customer mobi_v2 : " + response);
+    public String createNewCustomer(Map custData) {
+        Object response = post("/customer", custData);
         Integer custId = JsonPath.read(response,"$.success.customer_id");
         log.info("Customer ID=" + custId);
         String msg = JsonPath.read(response, "$.success.message");
         return msg;
     }
 
-    public String readAmlStatus(String accessToken) {
+    public String readAmlStatus(String accessToken, String unused) {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("access_token", accessToken);
         Object response = get("/customer", queryParams);

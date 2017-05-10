@@ -67,12 +67,11 @@ Feature: Single Bets
     And I settle race
     Then customer balance is increased by $<Payout>
 
-    @redbook
     Examples:
       | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
       | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 22.75  | 5.20, 2.10 | 3.90, 1.29  |
 
-    @luxbet
+  @luxbet
     Examples:
       | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
       | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 9.75   | 3.20, 1.10 | 3.90, 1.29  |

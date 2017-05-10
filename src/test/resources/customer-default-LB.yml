@@ -1,0 +1,23 @@
+salutation: Mr
+firstname: Oswald
+lastname: Petrucco
+dob: "1939-05-31"
+telephone: "0421147741"
+street: 142 Tynte Street
+postcode: 5006
+suburb: North Adelaide
+state: SA
+country: AU
+timezone: Australia/Sydney
+currency_code: AUD
+secret_question: Favourite Holiday Spot?
+deposit_limit: 4500.00
+client_ip: 61.9.192.13
+#
+username: <CHANGE_ME>
+password: <CHANGE_ME>
+telephone_password: <CHANGE_ME>
+internet_password: <CHANGE_ME>
+secret_answer: <CHANGE_ME>
+email_address: <CHANGE_ME>
+_email_address_suffix: "@example.com"

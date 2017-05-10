@@ -1,0 +1,25 @@
+salutation: Mr
+firstname: Oswald
+lastname: Petrucco
+dob: "1939-05-31"
+telephone: "0463254781"
+building: Level5
+street: 142 Tynte Street
+city: Adelaide
+postcode: 5006
+country: GB
+currency_code: GBP
+secret_question: Favourite Holiday Spot?
+manual_verification: Y
+#
+postal_postcode: 5006
+postal_county: North Adelaide
+postal_country: GB
+#
+username: <CHANGE_ME>
+password: <CHANGE_ME>
+telephone_password: <CHANGE_ME>
+internet_password: <CHANGE_ME>
+secret_answer: <CHANGE_ME>
+email_address: <CHANGE_ME>
+_email_address_suffix: "@example.com"

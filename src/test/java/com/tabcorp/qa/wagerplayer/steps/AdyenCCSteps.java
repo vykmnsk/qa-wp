@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public class AdyenCCSteps implements En {
-    MOBI_V2 api = new MOBI_V2();
     public AdyenCCSteps() {
         When("^I add credit card to customer and I make a deposit of \\$(\\d+.\\d\\d)$", (BigDecimal deposit,  DataTable table) -> {
             Map<String, String> cardDetails = table.asMap(String.class, String.class);
@@ -24,6 +23,8 @@ public class AdyenCCSteps implements En {
             String cardType = (String) Helpers.nonNullGet(cardDetails, "CardType");
 
             String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+
+            MOBI_V2 api = new MOBI_V2();
             String encryptionKey = api.getEncryptionKey(accessToken);
 
             AdyenPage adyenPage = new AdyenPage();
@@ -43,6 +44,7 @@ public class AdyenCCSteps implements En {
 
         Then("^I withdraw \\$(\\d+.\\d\\d) using stored \"([^\"]*)\" card$", (BigDecimal withdrawAmount, String cardType) -> {
             String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+            MOBI_V2 api = new MOBI_V2();
             String withdrawReference = api.getPaymentRefence(accessToken);
             String storedCardReference = api.getStoredCardReference(accessToken);
             api.withdrawWithCreditCard(accessToken, cardType, withdrawAmount, storedCardReference, withdrawReference);

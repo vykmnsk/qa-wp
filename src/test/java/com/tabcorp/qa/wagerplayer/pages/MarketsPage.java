@@ -72,7 +72,7 @@ public class MarketsPage extends AppPage {
     private WebElement ewChk;
 
     @FindBy(css = ("input#eachway_lock"))
-    private WebElement ewLockedChk;
+    private List<WebElement> ewLockedChks;
 
     @FindBy(css = "#market_settings input[name='race_num']")
     @CacheLookup
@@ -296,8 +296,11 @@ public class MarketsPage extends AppPage {
         new Select(betsAllowedWinSel).selectByVisibleText(betsAllowedWin);
         new Select(betsAllowedPlaceSel).selectByVisibleText(betsAllowedPlace);
         new Select(placeFractionSel).selectByVisibleText(placeFraction);
-        if (ewLockedChk.isSelected()) {
-            ewLockedChk.click();
+        if (ewLockedChks.size() > 0 ) {
+            WebElement box = ewLockedChks.get(0);
+            if (box.isSelected()) {
+                box.click();
+            }
         }
         wait.until(ExpectedConditions.elementToBeClickable(numOfPlacesSel));
         new Select(numOfPlacesSel).selectByVisibleText(numOfPlaces);
