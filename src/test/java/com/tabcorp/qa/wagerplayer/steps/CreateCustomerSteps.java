@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
+import static com.tabcorp.qa.common.Storage.KEY.BALANCE_BEFORE;
 import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,6 +48,14 @@ public class CreateCustomerSteps implements En {
     private static Logger log = LoggerFactory.getLogger(CreateCustomerSteps.class);
 
     public CreateCustomerSteps() {
+        Given("^Existing customer with at least \\$(\\d+\\.\\d\\d) balance is logged in API$", (BigDecimal minBalance) -> {
+            String accessToken = api.login(Config.customerUsername(), Config.customerPassword(), Config.clientIp());
+            BigDecimal currentBalance = api.getBalance(accessToken);
+            Storage.put(BALANCE_BEFORE, currentBalance);
+            assertThat(Helpers.roundOff(currentBalance)).as("Min balance").isGreaterThanOrEqualTo(minBalance);
+            Storage.put(API_ACCESS_TOKEN, accessToken);
+        });
+
         Given("^A new default customer with \\$(\\d+\\.\\d\\d) balance is created and logged in API$", (BigDecimal requiredBalance) -> {
             final String resourcesPath = "src/test/resources/";
 

@@ -17,7 +17,9 @@ public class Storage {
         EVENT_NAMES,
         PRODUCT_IDS,
         API_ACCESS_TOKEN,
-        CUSTOMER
+        CUSTOMER,
+        BALANCE_BEFORE,
+        BALANCE_AFTER_BET
     }
 
     public static void init() {
