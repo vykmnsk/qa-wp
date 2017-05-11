@@ -8,7 +8,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
   Scenario Outline: Horse Race Exotic bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
-      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner 06, Runner07, Runner08 |
+      | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 12.00, 126.00, 3.50, 21.00, 26.00, 3.80, 8.00, 4.40                             |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |

@@ -20,17 +20,15 @@ Feature: Single Bets
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<Deduction>
 
-    When I result race with the runners and positions
-      | Runner01 | 1 |
-      | Runner02 | 2 |
+    When I result race with the runners and positions <WinnerWithPositions>
     And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
     Then customer balance is increased by $<Payout>
 
   @redbook @wip
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices |
-      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  |
-#      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  |
+      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions      |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02" |
+      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02" |
 
 
   Scenario Outline: Horse Race Eachway or Place Single bets
@@ -59,18 +57,15 @@ Feature: Single Bets
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
 
-    When I result race with the runners and positions
-      | Runner01 | 1 |
-      | Runner02 | 2 |
-      | Runner03 | 3 |
+    When I result race with the runners and positions <WinnerWithPositions>
     And I settle race
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
-      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 22.75  | 5.20, 2.10 | 3.90, 1.29  |
+      | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices | WinnerWithPositions                  |
+      | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 22.75  | 5.20, 2.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02, 3:Runner03" |
 
   @luxbet
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices |
-      | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 9.75   | 3.20, 1.10 | 3.90, 1.29  |
+      | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices | WinnerWithPositions                  |
+      | Luxbook DVP Fixed | Place   | Runner01 | 2.50  | 2.50              | 9.75   | 3.20, 1.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02, 3:Runner03" |

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateEventSteps implements En {
 
@@ -202,6 +202,13 @@ public class CreateEventSteps implements En {
             Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
             updatePlacePrices(placePricesCSV, prodId);
         });
+
+        When("^I result race with the runners and positions \"([^\"]*)\"$", (String winnersCSV) -> {
+            List<String> winners = Helpers.extractCSV(winnersCSV);
+            Map<String, String> winnerData = extractWinnersAndPositions(winners);
+            resultRace(winnerData);
+            settleRace();
+        });
     }
     
     private void updatePlacePrices(String placePricesCSV, Integer prodId) {
@@ -237,6 +244,22 @@ public class CreateEventSteps implements En {
         settlementPage.accept();
         settlementPage.settle();
         header.deSelectSettled();
+    }
+
+    /**
+     * Expecting list in format [Position]:[RunnerName]
+     * e.g. 1:Runner01
+     * @param winners
+     * @return
+     */
+    private static Map<String, String> extractWinnersAndPositions(List<String> winners) {
+        Map<String, String> winnerData = new StrictHashMap<>();
+        for (int i = 0; i < winners.size(); i++) {
+            List<String> winnerPosition = Helpers.extractCSV(winners.get(i), ':');
+            assertThat(winnerPosition.size()).as("Expected position and runner name in format[#:name], but found " + winners.get(i)).isEqualTo(2);
+            winnerData.put(winnerPosition.get(1), winnerPosition.get(0));
+        }
+        return winnerData;
     }
 
 }
