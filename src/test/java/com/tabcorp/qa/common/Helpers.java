@@ -94,7 +94,8 @@ public class Helpers {
         return extractCSV(csv, separator);
     }
     public static List<String> extractCSV(String csv, char separator) {
-        List<String> items = Arrays.asList(csv.split(separator + "(\\s)*"));
+        String regex = String.format("(\\s)*%s(\\s)*", separator);
+        List<String> items = Arrays.asList(csv.split(regex));
         assertThat(items.size()).as("extracted CSV item count").isGreaterThan(1);
         return items;
     }
@@ -133,9 +134,14 @@ public class Helpers {
     public static Map<String, String> readTableRow(WebElement table) {
         List<String> headers = collectElementsTexts(table, By.cssSelector("tr th"));
         List<String> data = collectElementsTexts(table, By.cssSelector("tr td"));
-        Map<String, String> row = IntStream.range(0, Math.min(headers.size(), data.size()))
-                .mapToObj(i -> Pair.of(headers.get(i), data.get(i)))
-                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-        return row;
+        return (Map<String, String>) zipToMap(headers, data);
     }
+
+    public static Map zipToMap(List headers, List data) {
+        return IntStream.range(0, Math.min(headers.size(), data.size()))
+                    .mapToObj(i -> Pair.of(headers.get(i), data.get(i)))
+                    .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    }
+
+
 }

@@ -5,7 +5,6 @@ import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
-import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
@@ -17,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class CreateEventSteps implements En {
 
@@ -149,8 +150,15 @@ public class CreateEventSteps implements En {
             settleRace();
         });
 
-        And("^I update Exotic Prices$", () -> {
-            //settlementPage.updateExoticPrices(); //TODO to be done in a different PR
+        And("^I update Exotic Prices$", (DataTable table) -> {
+            List<List<String>> priceData = table.raw();
+            assertThat(priceData.size()).as("price table rows").isGreaterThan(0);
+            for (List<String> priceRow : priceData) {
+                assertThat(priceRow.size()).as("expecting for example: [STAB, Quinella, 6.50]").isEqualTo(3);
+                BigDecimal priceValue = new BigDecimal(priceRow.get(2));
+                assertThat(priceValue).isGreaterThan(new BigDecimal(0));
+            }
+            settlementPage.updateExoticPrices(priceData);
         });
 
         And("^I settle race$", () -> {

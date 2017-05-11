@@ -38,6 +38,9 @@ public class SettlementPage extends AppPage {
     @FindBy(id = "settle")
     WebElement settle;
 
+    @FindBy(css = "td[valign=top] > table#no_padding_table_inner")
+    WebElement exoticsPriceTable;
+
     @FindBy(css = "input[name^=product_prices]")
     List<WebElement> luxbetSettlePrices;
 
@@ -83,7 +86,26 @@ public class SettlementPage extends AppPage {
     }
 
 
-    public void updateSettlePrices(Integer productId, Integer betTypeId, List<BigDecimal> prices){
+    public void updateExoticPrices(List<List<String>> priceData) {
+        List<WebElement> rows = exoticsPriceTable.findElements(By.cssSelector("tbody tr"));
+        WebElement headerRow = rows.stream().filter(r -> r.getText().startsWith("Exotics")).findFirst().orElse(null);
+        List<String> headers = Helpers.collectElementsTexts(headerRow, By.tagName("td"));
+
+        for (List<String> priceEntry : priceData) {
+            String colName = priceEntry.get(0);
+            String rowName = priceEntry.get(1);
+            String value = priceEntry.get(2);
+            WebElement row = rows.stream().filter(r -> r.getText().startsWith(rowName)).findFirst().orElse(null);
+            List<WebElement> inputs = row.findElements(By.tagName("input"));
+            Map<String, WebElement> inputsWithHeaders = Helpers.zipToMap(headers, inputs);
+            WebElement input = inputsWithHeaders.get(colName);
+            input.clear();
+            input.sendKeys(value);
+        }
+        result.click();
+    }
+
+    public void updateSettlePrices(Integer productId, Integer betTypeId, List<BigDecimal> prices) {
         List<WebElement> priceInputs;
         if (Config.REDBOOK.equals(Config.appName())) {
             List<WebElement> hiddenSettlePricesToUpdate = filterWithIds(hiddenSettlePrices, productId, betTypeId);
@@ -94,7 +116,7 @@ public class SettlementPage extends AppPage {
         enterPrices(priceInputs, prices);
     }
 
-    private List<WebElement> filterWithIds(List<WebElement> elems, Integer prodId, Integer betTypeId){
+    private List<WebElement> filterWithIds(List<WebElement> elems, Integer prodId, Integer betTypeId) {
         Predicate<WebElement> containsProdId = el -> nameContainsId(el, prodId);
         Predicate<WebElement> containsProdBetTypeIds = el -> nameContainsId(el, prodId) && nameContainsId(el, betTypeId);
         Predicate<WebElement> containsIds = (betTypeId == BetType.Exotic.id) ? containsProdId : containsProdBetTypeIds;
@@ -113,7 +135,7 @@ public class SettlementPage extends AppPage {
 
     private void enterPrices(List<WebElement> priceInputs, List<BigDecimal> prices) {
         Assertions.assertThat(prices.size()).as("settle price values should fit into UI price inputs").isLessThanOrEqualTo(priceInputs.size());
-        for(int i = 0; i < prices.size(); i++){
+        for (int i = 0; i < prices.size(); i++) {
             WebElement input = priceInputs.get(i);
             String price = prices.get(i).toString();
             input.clear();

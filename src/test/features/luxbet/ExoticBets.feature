@@ -6,7 +6,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     And I am logged into WP API
 
   Scenario Outline: Horse Race Exotic bets
-    When I enter specifics category "Horse Racing" and subcategory "<Subcategory>"
+    When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner 06, Runner07, Runner08 |
       | prices  | 12.00, 126.00, 3.50, 21.00, 26.00, 3.80, 8.00, 4.40                             |
@@ -35,16 +35,20 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Runner03 | 3 |
       | Runner04 | 4 |
     And I update Exotic Prices
+      | STAB | Quinella   | 6.50  |
+      | STAB | Exacta     | 12.75 |
+      | STAB | Trifecta   | 25.45 |
+      | STAB | First Four | 35.00 |
     And I settle race
     Then customer balance is increased by $<Payout>
 
     Examples:
-      | Subcategory   | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |
-      | BALLINA       | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 0.00   |
-      | BALLINA       | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 0.00   |
-      | BALLINA       | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 0.00   |
-      | BALLINA       | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 0.00   |
-      | BALLINA       | NSW First Four  | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 0.00   |
-      | WOLVERHAMPTON | NSW Quinella    | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 0.00   |
-      | WOLVERHAMPTON | NSW Exacta      | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 0.00   |
-      | WOLVERHAMPTON | NSW Trifecta    | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 0.00   |
+      | Category       | Subcategory | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |
+      | Horse Racing   | BALLINA     | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 19.50  |
+      | Horse Racing   | BALLINA     | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 38.25  |
+      | Horse Racing   | BALLINA     | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 76.35  |
+      | Horse Racing   | BALLINA     | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 105.00 |
+      | Harness Racing | ALBANY      | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 19.50  |
+      | Harness Racing | ALBANY      | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 38.25  |
+      | Harness Racing | ALBANY      | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 76.35  |
+      | Harness Racing | ALBANY      | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 105.00 |
