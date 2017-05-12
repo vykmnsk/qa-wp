@@ -3,7 +3,7 @@
 Feature: Placing and Settling multiple Single bets on a Sunbets event
 
   Background:
-    Given I am logged into WP API
+    Given Existing customer with at least $20.00 balance is logged in API
     And I am logged into WP UI and on Home Page
 
   Scenario: Horse Race multiple Single bets
@@ -14,7 +14,6 @@ Feature: Placing and Settling multiple Single bets on a Sunbets event
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | EW    |
-    And customer balance is at least $20.50
 
     When I place a single "Win" bet on the runner "Runner01" for $5.50
     And I place a single "Win" bet on the runner "Runner01" for $3.50

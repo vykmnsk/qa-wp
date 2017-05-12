@@ -2,8 +2,8 @@
 Feature: Placing and Settling multi Bets
 
   Background:
-    Given I am logged into WP UI and on Home Page
-    And I am logged into WP API
+    Given Existing customer with at least $20.00 balance is logged in API
+    And I am logged into WP UI and on Home Page
 
   Scenario Outline: Horse Race Multi bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
@@ -20,7 +20,6 @@ Feature: Placing and Settling multi Bets
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Multi | Win |
       | Betting | Enable Multi | EW  |
-    And customer balance is at least $20.50
 
     When I place "<BetType>" multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>

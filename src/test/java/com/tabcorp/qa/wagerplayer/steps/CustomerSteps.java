@@ -37,7 +37,7 @@ import static com.tabcorp.qa.common.Storage.KEY.BALANCE_BEFORE;
 import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CreateCustomerSteps implements En {
+public class CustomerSteps implements En {
     //for API
     private WagerPlayerAPI api = Config.getAPI();
     private WAPI wapi = new WAPI();
@@ -45,9 +45,9 @@ public class CreateCustomerSteps implements En {
     private HeaderPage header;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-    private static Logger log = LoggerFactory.getLogger(CreateCustomerSteps.class);
+    private static Logger log = LoggerFactory.getLogger(CustomerSteps.class);
 
-    public CreateCustomerSteps() {
+    public CustomerSteps() {
         Given("^Existing customer with at least \\$(\\d+\\.\\d\\d) balance is logged in API$", (BigDecimal minBalance) -> {
             String accessToken = api.login(Config.customerUsername(), Config.customerPassword(), Config.clientIp());
             BigDecimal currentBalance = api.getBalance(accessToken);
@@ -88,6 +88,7 @@ public class CreateCustomerSteps implements En {
 
             String statusMsg = wapi.depositCash(accessToken, requiredBalance);
             assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
+            Storage.put(BALANCE_BEFORE, requiredBalance);
         });
 
         When("^I create a new customer via API with data$", (DataTable table) -> {
@@ -96,7 +97,7 @@ public class CreateCustomerSteps implements En {
             String successMsg = api.createNewCustomer(custData);
             assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
             Storage.put(CUSTOMER, custData);
-            log.info("Created a new customer: " + custData);
+            log.info("New Customer created: " + custData);
         });
 
         When("^I create a new customer via UI with data$", (DataTable table) -> {
@@ -105,6 +106,7 @@ public class CreateCustomerSteps implements En {
             loginGoToCustomersPage();
             newCustPage.enterCustomerDetails(custData);
             Storage.put(CUSTOMER, custData);
+            log.info("New Customer created: " + custData);
         });
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
@@ -151,8 +153,8 @@ public class CreateCustomerSteps implements En {
             String statusMsg = wapi.depositCash(sessionId, cashAmount);
 
             Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-            String currency = (String) Helpers.nonNullGet(custData, "currency_code");
-            assertThat(statusMsg).isEqualToIgnoringCase(cashAmount + " " + currency + " successfully deposited");
+            String expectedMsg = String.format("%s %s successfully deposited", cashAmount, custData.get("currency_code"));
+            assertThat(statusMsg).as("deposit status message").isEqualToIgnoringCase(expectedMsg);
         });
 
         When("^the customer deposits (\\d+\\.\\d\\d) cash via UI$", (BigDecimal cashAmount) -> {
@@ -164,8 +166,7 @@ public class CreateCustomerSteps implements En {
             assertThat(transMsg).contains("successfully");
 
             Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-            String currency = (String) Helpers.nonNullGet(custData, "currency_code");
-            depositPage.verifyTransactionRecord(transMsg, cashAmount, currency);
+            depositPage.verifyTransactionRecord(transMsg, cashAmount, custData.get("currency_code"));
         });
 
     }

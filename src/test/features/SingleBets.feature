@@ -20,15 +20,14 @@ Feature: Single Bets
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<Deduction>
 
-    When I result race with the runners and positions <WinnerWithPositions>
+    When I result race with the runners and positions "<WinnerWithPositions>"
     And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
     Then customer balance is increased by $<Payout>
 
-  @redbook @wip
     Examples:
       | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions      |
-      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02" |
-      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02" |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
+      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
 
 
   Scenario Outline: Horse Race Eachway or Place Single bets
@@ -52,7 +51,6 @@ Feature: Single Bets
       | Place Fraction     | 1/4            |
       | No of Places       | 3              |
     And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
-    And customer balance is at least $20.50
 
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance is decreased by $<BalanceDeductedBy>
