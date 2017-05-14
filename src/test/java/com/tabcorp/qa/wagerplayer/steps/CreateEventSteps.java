@@ -207,7 +207,6 @@ public class CreateEventSteps implements En {
             List<String> winners = Helpers.extractCSV(winnersCSV);
             Map<String, String> winnerData = extractWinnersAndPositions(winners);
             resultRace(winnerData);
-            settleRace();
         });
     }
     
