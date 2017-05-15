@@ -2,8 +2,8 @@
 Feature: Placing and Settling Exotic Bets for a Single Event
 
   Background:
-    Given I am logged into WP UI and on Home Page
-    And I am logged into WP API
+    Given A new default customer with $100.00 balance is created and logged in API
+    And I am logged into WP UI and on Home Page
 
   Scenario Outline: Horse Race Exotic bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
@@ -24,10 +24,9 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "3.20, 21.85, 1.55, 4.75, 5.60, 1.65, 1.80, 1.85" for the first product
-    And customer balance is at least $20.50
 
     When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
-    Then customer balance is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<BalanceDeductedBy>
 
     When I result race with the runners and positions
       | Runner01 | 1 |
@@ -40,7 +39,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | STAB | Trifecta   | 25.45 |
       | STAB | First Four | 35.00 |
     And I settle race
-    Then customer balance is increased by $<Payout>
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
       | Category       | Subcategory | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |

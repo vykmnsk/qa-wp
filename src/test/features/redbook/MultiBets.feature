@@ -22,7 +22,7 @@ Feature: Placing and Settling multi Bets
       | Betting | Enable Multi | EW  |
 
     When I place "<BetType>" multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake>
-    Then customer balance is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<BalanceDeductedBy>
 
     When I result race with the runners and positions
       | Runner01 | 1 |
@@ -35,7 +35,7 @@ Feature: Placing and Settling multi Bets
       | Runner13 | 3 |
     And I settle race
 
-    Then customer balance is increased by $<Payout>
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
       | BetType | MultiType | BetOn             | Stake | BalanceDeductedBy | Payout |

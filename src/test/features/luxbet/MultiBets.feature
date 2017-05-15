@@ -2,8 +2,8 @@
 Feature: Placing and Settling multi Bets
 
   Background:
-    Given I am logged into WP UI and on Home Page
-    And I am logged into WP API
+    Given A new default customer with $100.00 balance is created and logged in API
+    And I am logged into WP UI and on Home Page
 
   Scenario Outline: Racing Multi Double bets
     When I enter specifics category "<CategoryOne>" and subcategory "<SubcategoryOne>"
@@ -44,14 +44,13 @@ Feature: Placing and Settling multi Bets
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
-    And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
-    Then customer balance is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<BalanceDeductedBy>
 
     When I result/settle created event race with winners "Runner01,Runner02,Runner03"
     When I result/settle created event race with winners "Runner11,Runner12,Runner13"
-    Then customer balance is increased by $<Payout>
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
       | CategoryOne      | SubcategoryOne | CategoryTwo      | SubcategoryTwo | MultiType          | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
@@ -126,15 +125,14 @@ Feature: Placing and Settling multi Bets
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
-    And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
-    Then customer balance is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<BalanceDeductedBy>
 
     When I result/settle created event race with winners "Runner01,Runner02,Runner03"
     When I result/settle created event race with winners "Runner11,Runner12,Runner13"
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
-    Then customer balance is increased by $<Payout>
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
       | CategoryOne      | SubcategoryOne | CategoryTwo      | SubcategoryTwo | MultiType | BetOn                      | Stake | Flexi | BalanceDeductedBy | Payout  |
@@ -228,16 +226,15 @@ Feature: Placing and Settling multi Bets
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
-    And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
-    Then customer balance is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<BalanceDeductedBy>
 
     When I result/settle created event race with winners "Runner01,Runner02,Runner03"
     When I result/settle created event race with winners "Runner11,Runner12,Runner13"
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
     When I result/settle created event race with winners "Runner31,Runner32,Runner33"
-    Then customer balance is increased by $<Payout>
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
       | CategoryOne      | SubcategoryOne | CategoryTwo      | SubcategoryTwo | MultiType | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout   |
@@ -353,17 +350,16 @@ Feature: Placing and Settling multi Bets
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
-    And customer balance is at least $20.50
 
     When I place a multi bet "<MultiType>" on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
-    Then customer balance is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<BalanceDeductedBy>
 
     When I result/settle created event race with winners "Runner01,Runner02,Runner03"
     When I result/settle created event race with winners "Runner11,Runner12,Runner13"
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
     When I result/settle created event race with winners "Runner31,Runner32,Runner33"
     When I result/settle created event race with winners "Runner41,Runner42,Runner43"
-    Then customer balance is increased by $<Payout>
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
       | CategoryOne      | SubcategoryOne | CategoryTwo      | SubcategoryTwo | MultiType | BetOn                                        | Stake | Flexi | BalanceDeductedBy | Payout   |

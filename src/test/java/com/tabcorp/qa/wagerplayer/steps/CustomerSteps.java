@@ -169,6 +169,21 @@ public class CustomerSteps implements En {
             depositPage.verifyTransactionRecord(transMsg, cashAmount, custData.get("currency_code"));
         });
 
+        Given("^customer balance is at least \\$(\\d+.\\d\\d)$", (BigDecimal minBalance) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            BigDecimal currentBalance = api.getBalance(accessToken);
+            assertThat(currentBalance).as("current customer balance").isGreaterThanOrEqualTo(minBalance);
+            Storage.put(BALANCE_BEFORE, currentBalance);
+        });
+
+        Then("^customer balance is equal to \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBalance) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            BigDecimal currentBalance = api.getBalance(accessToken);
+            assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
+            Storage.put(BALANCE_BEFORE, currentBalance);
+        });
+
+
     }
 
     private String storedCustomerLogin() {

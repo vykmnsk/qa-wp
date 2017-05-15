@@ -2,7 +2,7 @@
 Feature: Deadheats testing on a Luxbet event
 
   Background:
-    Given I am logged into WP API
+    Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
 
   Scenario Outline: Deadheat at FIRST
@@ -22,7 +22,6 @@ Feature: Deadheats testing on a Luxbet event
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
-    And customer balance is at least $20.50
 
     When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
     And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
@@ -30,7 +29,7 @@ Feature: Deadheats testing on a Luxbet event
     When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
     And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance is decreased by $31.00
+    Then customer balance after bet is decreased by $31.00
 
     When I result race with the runners and positions
       | ROCKING HORSE | 1 |
@@ -38,7 +37,7 @@ Feature: Deadheats testing on a Luxbet event
       | CADEYRN       | 3 |
       | PROSPECT ROAD | 4 |
     And I settle race
-    Then customer balance is increased by $91.28
+    Then customer balance since last bet is increased by $91.28
 
     Examples:
       | Category         | Subcategory             |
@@ -63,7 +62,6 @@ Feature: Deadheats testing on a Luxbet event
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
-    And customer balance is at least $20.50
 
     When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
     And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
@@ -71,7 +69,7 @@ Feature: Deadheats testing on a Luxbet event
     When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
     And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance is decreased by $31.00
+    Then customer balance after bet is decreased by $31.00
 
     When I result race with the runners and positions
       | ROCKING HORSE | 1 |
@@ -79,7 +77,7 @@ Feature: Deadheats testing on a Luxbet event
       | CADEYRN       | 2 |
       | PROSPECT ROAD | 4 |
     And I settle race
-    Then customer balance is increased by $154.93
+    Then customer balance since last bet is increased by $154.93
 
     Examples:
       | Category         | Subcategory             |
@@ -104,7 +102,6 @@ Feature: Deadheats testing on a Luxbet event
       | No of Places       | 3         |
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
-    And customer balance is at least $20.50
 
     When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
     And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
@@ -112,7 +109,7 @@ Feature: Deadheats testing on a Luxbet event
     When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
     And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance is decreased by $31.00
+    Then customer balance after bet is decreased by $31.00
 
     When I result race with the runners and positions
       | ROCKING HORSE | 1 |
@@ -120,7 +117,7 @@ Feature: Deadheats testing on a Luxbet event
       | CADEYRN       | 3 |
       | PROSPECT ROAD | 3 |
     And I settle race
-    Then customer balance is increased by $151.56
+    Then customer balance since last bet is increased by $151.56
 
     Examples:
       | Category         | Subcategory             |

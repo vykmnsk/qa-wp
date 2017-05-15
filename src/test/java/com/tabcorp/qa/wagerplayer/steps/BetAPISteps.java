@@ -24,28 +24,15 @@ import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.WIN_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class APISteps implements En {
-    private static Logger log = LoggerFactory.getLogger(APISteps.class);
+public class BetAPISteps implements En {
+    private static Logger log = LoggerFactory.getLogger(BetAPISteps.class);
 
     private BigDecimal balanceAfterBet;
     private WagerPlayerAPI api = Config.getAPI();
     private WAPI wapi = new WAPI();
 
-    public APISteps() {
-        Given("^I am logged into WP API$", () -> {
-            String accessToken = api.login(Config.customerUsername(), Config.customerPassword(), Config.clientIp());
-            assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
-            Storage.put(API_ACCESS_TOKEN, accessToken);
-        });
-
-        Given("^customer balance is at least \\$(\\d+.\\d\\d)$", (BigDecimal minBalance) -> {
-            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-            BigDecimal currentBalance = api.getBalance(accessToken);
-            assertThat(currentBalance).as("current customer balance").isGreaterThanOrEqualTo(minBalance);
-            Storage.put(BALANCE_BEFORE, currentBalance);
-        });
-
-        When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+    public BetAPISteps() {
+         When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
@@ -140,33 +127,22 @@ public class APISteps implements En {
 
                 });
 
-        Then("^customer balance is equal to \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBalance) -> {
-            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-            BigDecimal actualBalance = api.getBalance(accessToken);
-            assertThat(Helpers.roundOff(actualBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
-        });
-
-        Then("^customer balance is decreased by \\$(\\d+\\.\\d\\d)$", (BigDecimal diff) -> {
+        Then("^customer balance after bet is decreased by \\$(\\d+\\.\\d\\d)$", (BigDecimal diff) -> {
             BigDecimal balanceBefore = (BigDecimal) Storage.get(BALANCE_BEFORE);
             assertThat(Helpers.roundOff(balanceBefore.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
         });
 
-        Then("^customer balance is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diff) -> {
+        Then("^customer balance since last bet is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diff) -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             class CheckCustomerBalance implements Runnable {
                 public void run() {
-                    BigDecimal balanceAfterSettle = api.getBalance(accessToken);
-                    assertThat(Helpers.roundOff(balanceAfterSettle.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
+                    BigDecimal balanceNow = api.getBalance(accessToken);
+                    assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
                 }
             }
             Helpers.retryOnAssertionFailure(new CheckCustomerBalance(), 5, 2);
         });
 
-        Then("^customer balance is not changed$", () -> {
-            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-            BigDecimal balanceAfterSettle = api.getBalance(accessToken);
-            assertThat(Helpers.roundOff(balanceAfterSettle)).isEqualTo(Helpers.roundOff(balanceAfterBet));
-        });
     }
 
 
