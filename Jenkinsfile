@@ -9,29 +9,75 @@ pipeline {
     }
 
     stages {
-
         stage('initialize') {
             steps {
                 checkout scm
             }
         }
 
-        stage('test') {
+        /****************
+         *  sh 'curl -vvv  http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/admin/frames.php'
+         * Just to check if the url was reachable from the jenkins worker.
+         ****************/
+
+        stage('install maven dependencies') {
             steps {
-                    /****************
-                     *  sh 'curl -vvv  http://wp1-e-wploa-1k3cf5zurx16s-1221313599.eu-west-1.elb.amazonaws.com/admin/frames.php'
-                     * Just to check if the url was reachable from the jenkins worker.
-                     ****************/
-                    sh 'docker-compose up -d --force-recreate --build'
-                    sh 'exit $(docker wait testservice)'
+                sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
+                sh 'exit $(docker wait testservice)'
+            }
+
+            post {
+                always{
+                    sh 'docker-compose logs testservice'
+                }
             }
         }
+
+        stage('login tests') {
+            steps {
+                sh 'TEST_TAGS="-t @login" docker-compose up -d  --force-recreate --build'
+                sh 'exit $(docker wait testservice)'
+            }
+
+            post {
+                always {
+                    sh 'docker-compose logs testservice'
+                }
+            }
+        }
+
+        stage('create customer ui tests') {
+            steps {
+                sh 'TEST_TAGS="-t @redbook -t @ui -t @create-customer -t ~@credit-card" docker-compose up -d  --force-recreate --build'
+                sh 'exit $(docker wait testservice)'
+            }
+
+            post {
+                always {
+                    sh 'docker-compose logs testservice'
+                }
+            }
+        }
+
+        stage('create customer api tests') {
+            steps {
+                sh 'TEST_TAGS="-t @redbook -t @api -t @create-customer -t ~@credit-card" docker-compose up -d  --force-recreate --build'
+                sh 'exit $(docker wait testservice)'
+            }
+
+            post {
+                always {
+                    sh 'docker-compose logs testservice'
+                }
+            }
+        }
+
+
     }
 
     post {
 
         always {
-            sh 'docker logs testservice'
             sh 'docker-compose down'
         }
 

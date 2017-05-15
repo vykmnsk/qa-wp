@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
-mvn test -Dcucumber.options="-t @create-customer -t @redbook -t @ui -t ~@credit-card"
-mvn test -Dcucumber.options="-t @login"
+echo "TEST TAGS: --> " ${TEST_TAGS}
 
-# Devs working on the fix affected testcases below :
-
-#mvn test -Dcucumber.options="-t @create-customer -t @redbook -t @api"
-#mvn test -Dcucumber.options="-t @redbook -t @create-customer -t @credit-card -t @api"
-
+if [ "${TEST_TAGS}" == "" ]
+then
+     echo "empty test tags. nothing to run"
+elif [ "${TEST_TAGS}" == "install-dependencies" ]
+then
+     echo "installing mvn dependencies"
+     mvn clean install -DskipTests=true
+else
+     echo "running '${TEST_TAGS}' tag"
+     sh -c  "mvn test -Dcucumber.options='${TEST_TAGS}'"
+fi

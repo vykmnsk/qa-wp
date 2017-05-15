@@ -29,3 +29,4 @@ services:
         -  WAGERPLAYER_WAPI_USERNAME=testapi
         -  WAGERPLAYER_CUSTOMER_USERNAME=monika_01
         -  WAGERPLAYER_CUSTOMER_PASSWORD=luxbet321
+        -  TEST_TAGS=${TEST_TAGS}
