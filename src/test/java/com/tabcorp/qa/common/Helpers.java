@@ -95,11 +95,11 @@ public class Helpers {
         char separator = ',';
         return extractCSV(csv, separator);
     }
+
     public static List<String> extractCSV(String csv, char separator) {
+        assertThat(csv).as("CSV value").isNotBlank();
         String regex = String.format("(\\s)*%s(\\s)*", separator);
-        List<String> items = Arrays.asList(csv.split(regex));
-        assertThat(items.size()).as("extracted CSV item count").isGreaterThan(1);
-        return items;
+        return Arrays.asList(csv.split(regex));
     }
 
     public static List<BigDecimal> extractCSVPrices(String pricesCSV) {

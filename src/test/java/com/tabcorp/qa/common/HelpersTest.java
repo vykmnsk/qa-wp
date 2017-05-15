@@ -99,6 +99,27 @@ public class HelpersTest {
         }
     }
 
+    @Test(expected = AssertionError.class)
+    public void canAssertOnEmptyCSV() {
+        Helpers.extractCSV(" ");
+    }
+
+    @Test
+    public void canExtractSingleCSV() {
+       String input = "12";
+       List<String> expected = Arrays.asList("12");
+       List<String> actual = Helpers.extractCSV(input);
+       assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void canExtractCSVWithWhitespaces() {
+        String input = "Black Caviar; White Lady";
+        List<String> expected = Arrays.asList("Black Caviar", "White Lady");
+        List<String> actual = Helpers.extractCSV(input, ';');
+        assertThat(actual).isEqualTo(expected);
+    }
+
     @Test
     public void canZipToMap() {
         List<String> headers = Arrays.asList("ONE", "TWO", "THREE");
