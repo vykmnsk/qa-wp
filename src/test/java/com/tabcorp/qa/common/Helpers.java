@@ -6,13 +6,18 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -146,4 +151,8 @@ public class Helpers {
     }
 
 
+    public static Map<String, String> loadYamlResource(String filename) {
+        InputStream input = Helpers.class.getClassLoader().getResourceAsStream(filename);
+        return (Map<String, String>) (new Yaml()).load(input);
+    }
 }

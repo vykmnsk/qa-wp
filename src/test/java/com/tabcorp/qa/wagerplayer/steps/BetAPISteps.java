@@ -134,22 +134,18 @@ public class BetAPISteps implements En {
 
         Then("^customer balance since last bet is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diff) -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-            class CheckCustomerBalance implements Runnable {
-                public void run() {
+            Helpers.retryOnAssertionFailure(() -> {
                     BigDecimal balanceNow = api.getBalance(accessToken);
                     assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
-                }
-            }
-            Helpers.retryOnAssertionFailure(new CheckCustomerBalance(), 5, 2);
+                },5, 2);
         });
-
     }
 
 
     private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, boolean useDefaultPrices) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
         String wapiSessionId;
-        if (Config.REDBOOK.equals(Config.appName())){
+        if (Config.isRedbook()){
             wapiSessionId = wapi.login();
         } else {
             wapiSessionId = accessToken;

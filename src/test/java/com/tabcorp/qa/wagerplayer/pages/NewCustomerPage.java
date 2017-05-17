@@ -135,7 +135,7 @@ public class NewCustomerPage extends AppPage {
         residentialPostCode.sendKeys(cust.get("postcode"));
         new Select(residentialCountry).selectByVisibleText(cust.get("country"));
         new Select(residentialTimezone).selectByValue(cust.get("timezone"));
-        if (Config.REDBOOK.equals(Config.appName())) {
+        if (Config.isRedbook()) {
             mailingBuilding.sendKeys(cust.get("building"));
         }
         mailingStreetAddress.sendKeys(cust.get("street"));
@@ -143,7 +143,7 @@ public class NewCustomerPage extends AppPage {
         mailingCity.sendKeys(cust.get("city"));
         mailingPostCode.sendKeys(cust.get("postcode"));
         mailingCountry.sendKeys(cust.get("country"));
-        if (Config.LUXBET.equals(Config.appName())) {
+        if (Config.isLuxbet()) {
             new Select(residentialState).selectByVisibleText(cust.get("state"));
             new Select(mailingState).selectByVisibleText(cust.get("state"));
             if (!cust.get("deposit_limit").isEmpty()) {

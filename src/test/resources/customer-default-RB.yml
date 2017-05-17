@@ -23,3 +23,10 @@ internet_password: <CHANGE_ME>
 secret_answer: <CHANGE_ME>
 email_address: <CHANGE_ME>
 _email_address_suffix: "@example.com"
+
+CardNumber : "5577000055770004"
+CVC: "737"
+ExpiryMonth: "10"
+ExpiryYear: "2020"
+CardHolderName: Gary Milburn
+CardType: MC

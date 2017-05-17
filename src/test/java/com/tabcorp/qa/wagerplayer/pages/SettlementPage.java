@@ -107,7 +107,7 @@ public class SettlementPage extends AppPage {
 
     public void updateSettlePrices(Integer productId, Integer betTypeId, List<BigDecimal> prices) {
         List<WebElement> priceInputs;
-        if (Config.REDBOOK.equals(Config.appName())) {
+        if (Config.isRedbook()) {
             List<WebElement> hiddenSettlePricesToUpdate = filterWithIds(hiddenSettlePrices, productId, betTypeId);
             priceInputs = findCorrespondingPriceInputs(hiddenSettlePricesToUpdate, priceSelector);
         } else {

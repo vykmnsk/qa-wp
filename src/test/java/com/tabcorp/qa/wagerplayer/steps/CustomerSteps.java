@@ -1,11 +1,13 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.tabcorp.qa.adyen.pages.AdyenPage;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
 import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.mobile.pages.LuxbetMobilePage;
 import com.tabcorp.qa.wagerplayer.Config;
+import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
@@ -16,18 +18,16 @@ import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -41,6 +41,7 @@ public class CustomerSteps implements En {
     //for API
     private WagerPlayerAPI api = Config.getAPI();
     private WAPI wapi = new WAPI();
+    private MOBI_V2 mobi = new MOBI_V2();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
@@ -57,23 +58,15 @@ public class CustomerSteps implements En {
         });
 
         Given("^A new default customer with \\$(\\d+\\.\\d\\d) balance is created and logged in API$", (BigDecimal requiredBalance) -> {
-            final String resourcesPath = "src/test/resources/";
-
             final String filename;
-            if (Config.REDBOOK.equals(Config.appName())) {
+            if (Config.isRedbook()) {
                 filename = "customer-default-RB.yml";
-            } else if (Config.LUXBET.equals(Config.appName())){
+            } else if (Config.isLuxbet()) {
                 filename = "customer-default-LB.yml";
             } else {
                 throw new RuntimeException("Unknown App name=" + Config.appName());
             }
-            InputStream input;
-            try {
-                input = new FileInputStream(new File(resourcesPath + filename));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            Map<String, String> custRaw = (Map<String, String>) (new Yaml()).load(input);
+            Map<String, String> custRaw = Helpers.loadYamlResource(filename);
             Map<String, String> custData = adjustCustomerData(custRaw);
 
             String successMsg = api.createNewCustomer(custData);
@@ -86,8 +79,22 @@ public class CustomerSteps implements En {
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
             Storage.put(API_ACCESS_TOKEN, accessToken);
 
-            String statusMsg = wapi.depositCash(accessToken, requiredBalance);
-            assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
+            if (Config.isLuxbet()) {
+                String statusMsg = wapi.depositCash(accessToken, requiredBalance);
+                assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
+            } else if (Config.isRedbook()) {
+                addCCMakeDeposit(
+                        custData.get("CardNumber"),
+                        custData.get("CVC"),
+                        custData.get("ExpiryMonth"),
+                        custData.get("ExpiryYear"),
+                        custData.get("CardHolderName"),
+                        custData.get("CardType"),
+                        requiredBalance);
+            } else {
+                throw new RuntimeException("Unknown App name=" + Config.appName());
+            }
+
             Storage.put(BALANCE_BEFORE, requiredBalance);
         });
 
@@ -111,27 +118,20 @@ public class CustomerSteps implements En {
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             customersPage.verifyLoaded();
-
-            class ReloadCheckAMLStatus implements Runnable {
-                public void run() {
-                    header.refreshPage();
+            Helpers.retryOnAssertionFailure(()-> {
                     String actualAmlStatus = customersPage.readAMLStatus();
                     Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
-                }
-            }
-            Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 3);
+                }, 5, 3);
         });
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             String accessToken = storedCustomerLogin();
             String clientIp = storedCustomerClientIP();
-            class ReloadCheckAMLStatus implements Runnable {
-                public void run() {
+
+            Helpers.retryOnAssertionFailure(()-> {
                     String actualAmlStatus = api.readAmlStatus(accessToken, clientIp);
                     assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
-                }
-            }
-            Helpers.retryOnAssertionFailure(new ReloadCheckAMLStatus(), 5, 2);
+                }, 5, 2);
             Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
@@ -169,6 +169,28 @@ public class CustomerSteps implements En {
             depositPage.verifyTransactionRecord(transMsg, cashAmount, custData.get("currency_code"));
         });
 
+        When("^I add credit card to customer and I make a deposit of \\$(\\d+.\\d\\d)$", (BigDecimal deposit, DataTable table) -> {
+            Map<String, String> cardInfoInput = table.asMap(String.class, String.class);
+            StrictHashMap<String, String> cardInfo = new StrictHashMap<>();
+            cardInfo.putAll(cardInfoInput);
+            addCCMakeDeposit(
+                    cardInfo.get("CardNumber"),
+                    cardInfo.get("CVC"),
+                    cardInfo.get("ExpiryMonth"),
+                    cardInfo.get("ExpiryYear"),
+                    cardInfo.get("CardHolderName"),
+                    cardInfo.get("CardType"),
+                    deposit);
+        });
+
+        Then("^I withdraw \\$(\\d+.\\d\\d) using stored \"([^\"]*)\" card$", (BigDecimal withdrawAmount, String cardType) -> {
+            String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+            MOBI_V2 api = new MOBI_V2();
+            String withdrawReference = api.getPaymentRefence(accessToken);
+            String storedCardReference = api.getStoredCardReference(accessToken);
+            api.withdrawWithCreditCard(accessToken, cardType, withdrawAmount, storedCardReference, withdrawReference);
+        });
+
         Given("^customer balance is at least \\$(\\d+.\\d\\d)$", (BigDecimal minBalance) -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             BigDecimal currentBalance = api.getBalance(accessToken);
@@ -182,19 +204,39 @@ public class CustomerSteps implements En {
             assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
             Storage.put(BALANCE_BEFORE, currentBalance);
         });
+    }
 
+    private void addCCMakeDeposit(String cardNumber, String cvc, String expMonth, String expYear, String cardHolderName, String cardType, BigDecimal deposit) {
+        List<String> cardNumbers = Arrays.asList(cardNumber, cvc, expMonth, expYear);
+        assertThat(cardNumbers).as("Card data contains only numbers").allMatch(NumberUtils::isNumber);
+        Helpers.verifyNotExpired(Integer.parseInt(expMonth), Integer.parseInt(expYear));
 
+        String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+        String encryptionKey = mobi.getEncryptionKey(accessToken);
+
+        AdyenPage adyenPage = new AdyenPage();
+        adyenPage.load();
+        String cardEncryption = adyenPage.getCardEncryption(
+                encryptionKey,
+                cardNumber,
+                cvc,
+                expMonth,
+                expYear,
+                cardHolderName
+        );
+        String paymentReference = mobi.getPaymentRefence(accessToken);
+        mobi.addCardAndDeposit(accessToken, paymentReference, cardEncryption, cardType, deposit);
     }
 
     private String storedCustomerLogin() {
         Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
         String clientIp = storedCustomerClientIP();
-        return api.login(custData.get("username"),  custData.get("password"), clientIp);
+        return api.login(custData.get("username"), custData.get("password"), clientIp);
     }
 
     private String storedCustomerClientIP() {
         Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-        return Config.LUXBET.equals(Config.appName()) ? custData.get("client_ip") : null;
+        return Config.isLuxbet() ? custData.get("client_ip") : null;
     }
 
     private Map<String, String> adjustCustomerData(Map<String, String> custInput) {

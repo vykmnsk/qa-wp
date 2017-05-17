@@ -2,7 +2,7 @@
 Feature: Single Bets
 
   Background:
-    Given Existing customer with at least $20.00 balance is logged in API
+    Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
 
   Scenario Outline: Horse Race Win Single bets
@@ -24,10 +24,9 @@ Feature: Single Bets
     And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
     Then customer balance since last bet is increased by $<Payout>
 
-    @wip
     Examples:
       | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions      |
-#      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
       | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
 
 

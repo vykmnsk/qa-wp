@@ -28,7 +28,7 @@ Feature: Create New Customer
 
     When I add credit card to customer and I make a deposit of $<depositAmount>
       | CardNumber     | 5577000055770004 |
-      | Cvc            | 737              |
+      | CVC            | 737              |
       | ExpiryMonth    | 10               |
       | ExpiryYear     | 2020             |
       | CardHolderName | Gary Milburn     |

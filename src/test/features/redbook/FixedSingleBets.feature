@@ -3,7 +3,7 @@
 Feature: Placing and Settling multiple Single bets on a Sunbets event
 
   Background:
-    Given Existing customer with at least $20.00 balance is logged in API
+    Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
 
   Scenario: Horse Race multiple Single bets
