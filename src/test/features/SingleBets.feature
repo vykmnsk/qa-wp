@@ -24,13 +24,17 @@ Feature: Single Bets
     And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
     Then customer balance since last bet is increased by $<Payout>
 
+  @smoke
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions      |
+      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions    |
       | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
+  @wip
+    Examples:
+      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions    |
       | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
 
 
-  Scenario Outline: Horse Race Eachway or Place Single bets
+  Scenario Outline: Horse Race Place or EachWay Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
@@ -59,6 +63,7 @@ Feature: Single Bets
     And I settle race
     Then customer balance since last bet is increased by $<Payout>
 
+  @smoke
     Examples:
       | ProductName       | BetType | BetOn    | Stake | BalanceDeductedBy | Payout | WinPrices  | PlacePrices | WinnerWithPositions                  |
       | Luxbook DVP Fixed | EachWay | Runner01 | 2.50  | 5.00              | 22.75  | 5.20, 2.10 | 3.90, 1.29  | "1:Runner01, 2:Runner02, 3:Runner03" |

@@ -9,9 +9,17 @@ pipeline {
     }
 
     stages {
-        stage('initialize') {
+        stage('checkout & install dependencies') {
             steps {
                 checkout scm
+                sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
+                sh 'exit $(docker wait testservice)'
+            }
+
+            post {
+                always {
+                    sh 'docker-compose logs testservice'
+                }
             }
         }
 
@@ -20,20 +28,7 @@ pipeline {
          * Just to check if the url was reachable from the jenkins worker.
          ****************/
 
-        stage('install maven dependencies') {
-            steps {
-                sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
-                sh 'exit $(docker wait testservice)'
-            }
-
-            post {
-                always{
-                    sh 'docker-compose logs testservice'
-                }
-            }
-        }
-
-        stage('login tests') {
+        stage('common : login tests') {
             steps {
                 sh 'TEST_TAGS="-t @login" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
@@ -46,9 +41,9 @@ pipeline {
             }
         }
 
-        stage('create customer ui tests') {
+        stage('redbook smoke test : create event') {
             steps {
-                sh 'TEST_TAGS="-t @redbook -t @ui -t @create-customer -t ~@credit-card" docker-compose up -d  --force-recreate --build'
+                sh 'TEST_TAGS="-t @smoke -t @ui -t @redbook -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 
@@ -59,9 +54,9 @@ pipeline {
             }
         }
 
-        stage('create customer api tests') {
+        stage('common: create customer ui tests') {
             steps {
-                sh 'TEST_TAGS="-t @redbook -t @api -t @create-customer -t ~@credit-card" docker-compose up -d  --force-recreate --build'
+                sh 'TEST_TAGS="-t @redbook -t @ui -t @create-customer -t @cash-deposit" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 
@@ -72,6 +67,18 @@ pipeline {
             }
         }
 
+        stage('common smoke test : single-bet tests') {
+            steps {
+                sh 'TEST_TAGS="-t @smoke -t @single-bets -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
+                sh 'exit $(docker wait testservice)'
+            }
+
+            post {
+                always {
+                    sh 'docker-compose logs testservice'
+                }
+            }
+        }
 
     }
 

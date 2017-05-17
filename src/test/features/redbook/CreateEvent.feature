@@ -1,4 +1,4 @@
-@ui @redbook
+@ui @redbook @smoke
 Feature: Creating a Sunbets Event
 
   Background:
