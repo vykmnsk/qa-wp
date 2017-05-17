@@ -105,6 +105,18 @@ public class MarketsPage extends AppPage {
 
     @FindBy(css = "select[name='add_product_id[]']")
     private List<WebElement> addProductElems;
+
+    @FindBy(css = "input[type=text][name^='position[']")
+    public List<WebElement> runnerPositions;
+
+    By runnerScratchCheckboxSelector = By.cssSelector("input[type='checkbox'][name^='market_action[']");
+
+    @FindBy(css = ("input[id=f4_manage_button]"))
+    public WebElement statusButton;
+
+    @FindBy(css = ("input[name=refund][src='images/button_scratch.gif']"))
+    public WebElement scratchButton;
+
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
     private static Logger log = LoggerFactory.getLogger(MarketsPage.class);
@@ -146,6 +158,11 @@ public class MarketsPage extends AppPage {
                 new SimpleEntry<>(Arrays.asList("Defaults", "Display", "Web"), "[2][is_default]"),
                 new SimpleEntry<>(Arrays.asList("Defaults", "Display", "F2"), "[1][is_default]")
         ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
+    }
+
+    public void load() {
+        driver.switchTo().defaultContent();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
     private List<List<String>> defaultProductSettings() {
@@ -295,13 +312,13 @@ public class MarketsPage extends AppPage {
         }
         new Select(betsAllowedWinSel).selectByVisibleText(betsAllowedWin);
         new Select(betsAllowedPlaceSel).selectByVisibleText(betsAllowedPlace);
-        new Select(placeFractionSel).selectByVisibleText(placeFraction);
         if (ewLockedChks.size() > 0 ) {
             WebElement box = ewLockedChks.get(0);
             if (box.isSelected()) {
                 box.click();
             }
         }
+        new Select(placeFractionSel).selectByVisibleText(placeFraction);
         wait.until(ExpectedConditions.elementToBeClickable(numOfPlacesSel));
         new Select(numOfPlacesSel).selectByVisibleText(numOfPlaces);
         if (!ewChk.isSelected() && isEW) {
@@ -326,5 +343,24 @@ public class MarketsPage extends AppPage {
 
     public String readEventID() {
         return eventId.getAttribute("value");
+    }
+
+    public void scratchRunners(List<String> positions) {
+        for (String pos : positions) {
+            WebElement scratchPosTextbox = runnerPositions.stream()
+                    .filter(chk -> chk.getAttribute("value").equals(pos)).findFirst()
+                    .orElse(null);
+            Assertions.assertThat(scratchPosTextbox).withFailMessage("Did not find a text box with scratch position=" + pos).isNotNull();
+            WebElement containerRow = findParent(findParent(scratchPosTextbox));
+            Assertions.assertThat(containerRow.getTagName()).as("Pos container row").isEqualTo("tr");
+            WebElement scratchCheckbox = containerRow.findElement(runnerScratchCheckboxSelector);
+            scratchCheckbox.click();
+            Assertions.assertThat(scratchCheckbox.isSelected()).as("Scratch checkbox is ticked").isTrue();
+        }
+        wait.until(ExpectedConditions.visibilityOf(statusButton));
+        statusButton.click();
+        wait.until(ExpectedConditions.visibilityOf(scratchButton));
+        scratchButton.click();
+        acceptAlert();
     }
 }

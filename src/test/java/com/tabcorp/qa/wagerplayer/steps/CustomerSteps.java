@@ -41,7 +41,6 @@ public class CustomerSteps implements En {
     //for API
     private WagerPlayerAPI api = Config.getAPI();
     private WAPI wapi = new WAPI();
-    private MOBI_V2 mobi = new MOBI_V2();
     //for UI
     private HeaderPage header;
     private CustomersPage customersPage;
@@ -211,6 +210,7 @@ public class CustomerSteps implements En {
         assertThat(cardNumbers).as("Card data contains only numbers").allMatch(NumberUtils::isNumber);
         Helpers.verifyNotExpired(Integer.parseInt(expMonth), Integer.parseInt(expYear));
 
+        final MOBI_V2 mobi = new MOBI_V2();
         String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
         String encryptionKey = mobi.getEncryptionKey(accessToken);
 

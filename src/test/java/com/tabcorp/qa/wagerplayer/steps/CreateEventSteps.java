@@ -8,6 +8,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,6 +171,18 @@ public class CreateEventSteps implements En {
             settleRace();
         });
 
+        When("^I can see the following deduction details on settlement page$", (DataTable table) -> {
+            List<List<String>> deductionDetails = table.raw();
+            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
+            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
+            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
+            header = new HeaderPage();
+            header.pickEvent(cat, subcat, evName);
+            header.navigateToF6();
+            settlementPage = new SettlementPage();
+            settlementPage.verifyRunnerDeductions(deductionDetails);
+        });
+
         When("^I settle the race with Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
             parseUpdateSettlePrices(winPricesCSV, BetType.Win);
             parseUpdateSettlePrices(placePricesCSV, BetType.Place);
@@ -201,6 +214,18 @@ public class CreateEventSteps implements En {
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
             Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
             updatePlacePrices(placePricesCSV, prodId);
+        });
+
+        When("^I scratch the runners at position\\(s\\) \"([^\"]*)\"$", (String runnerPositionsCSV) -> {
+            List<String> runnerPositions = Helpers.extractCSV(runnerPositionsCSV);
+            Assertions.assertThat(runnerPositions).as("Runner positions should be numbers").allMatch(NumberUtils::isNumber);
+            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
+            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
+            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
+            header = new HeaderPage();
+            header.pickEvent(cat, subcat, evName);
+            header.navigateToF4();
+            marketsPage.scratchRunners(runnerPositions);
         });
 
         When("^I result race with the runners and positions \"([^\"]*)\"$", (String winnersCSV) -> {

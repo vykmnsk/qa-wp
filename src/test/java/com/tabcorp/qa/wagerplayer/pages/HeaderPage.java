@@ -81,6 +81,14 @@ public class HeaderPage extends AppPage {
         f3.click();
     }
 
+    public MarketsPage navigateToF4() {
+        switchToHeaderFrame();
+        f4.click();
+        MarketsPage marketsPage = new MarketsPage();
+        marketsPage.load();
+        return marketsPage;
+    }
+
     public LiabilityPage navigateToF5() {
         switchToHeaderFrame();
         f5.click();

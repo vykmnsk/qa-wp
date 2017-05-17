@@ -41,5 +41,5 @@ Feature: Placing and Settling multiple Single bets on a Luxbet event
     Examples:
       | Category         | Subcategory                 |
       | Horse Racing     | Automation Horse Racing     |
-#      | GREYHOUND RACING | Automation Greyhound Racing |
-#      | Harness Racing   | Automation Harness Racing   |
+      | GREYHOUND RACING | Automation Greyhound Racing |
+      | Harness Racing   | Automation Harness Racing   |

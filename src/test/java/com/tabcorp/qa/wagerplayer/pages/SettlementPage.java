@@ -3,6 +3,7 @@ package com.tabcorp.qa.wagerplayer.pages;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
+import cucumber.api.DataTable;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -11,10 +12,14 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SettlementPage extends AppPage {
     @FindBy(css = "table[id^='results_table_']")
@@ -46,6 +51,10 @@ public class SettlementPage extends AppPage {
 
     @FindBy(css = ".f6_settle_live_products input[type=hidden][id='precise_price']")
     List<WebElement> hiddenSettlePrices;
+
+    @FindBy(css = ("table[id=deductions_table] > tbody > tr"))
+    List<WebElement> deductionsRows;
+
     private By priceSelector = By.cssSelector("input[id^='price']");
 
     public void load() {
@@ -141,6 +150,24 @@ public class SettlementPage extends AppPage {
             input.clear();
             input.sendKeys(price);
         }
+    }
+
+    public void verifyRunnerDeductions(List<List<String>> expectedDeductions) {
+        By textInputSelector = By.cssSelector("td input[type=text]");
+        Predicate<WebElement> containsTextInputs = el -> el.findElements(textInputSelector).size() > 0;
+        List<WebElement> dataRows =deductionsRows.stream().filter(containsTextInputs).collect(Collectors.toList());
+
+        List<List<String>> actualDeductions = new LinkedList<>();
+        for (WebElement row : dataRows) {
+            String text = row.getText();
+            List<WebElement> inputs = row.findElements(textInputSelector);
+            List<String> rowValues = Stream.concat(
+                    Stream.of(text),
+                    inputs.stream().map(i -> i.getAttribute("value"))
+                ).collect(Collectors.toList());
+            actualDeductions.add(rowValues);
+        }
+        assertThat(actualDeductions).as("Deductions data").isEqualTo(expectedDeductions);
     }
 
 }
