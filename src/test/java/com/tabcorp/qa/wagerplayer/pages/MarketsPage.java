@@ -117,6 +117,9 @@ public class MarketsPage extends AppPage {
     @FindBy(css = ("input[name=refund][src='images/button_scratch.gif']"))
     public WebElement scratchButton;
 
+    @FindBy(css =("input[name=betfair_place_back_limit]"))
+    public WebElement placeBackLimit;
+
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
     private static Logger log = LoggerFactory.getLogger(MarketsPage.class);
@@ -312,6 +315,8 @@ public class MarketsPage extends AppPage {
         }
         new Select(betsAllowedWinSel).selectByVisibleText(betsAllowedWin);
         new Select(betsAllowedPlaceSel).selectByVisibleText(betsAllowedPlace);
+        wait.until(ExpectedConditions.visibilityOf(placeBackLimit));
+        scrollTo(placeBackLimit);
         if (ewLockedChks.size() > 0 ) {
             WebElement box = ewLockedChks.get(0);
             if (box.isSelected()) {
