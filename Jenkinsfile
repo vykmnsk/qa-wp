@@ -66,20 +66,6 @@ pipeline {
                 }
             }
         }
-
-        stage('common smoke test : single-bet tests') {
-            steps {
-                sh 'TEST_TAGS="-t @smoke -t @single-bets -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
-                sh 'exit $(docker wait testservice)'
-            }
-
-            post {
-                always {
-                    sh 'docker-compose logs testservice'
-                }
-            }
-        }
-
     }
 
     post {
