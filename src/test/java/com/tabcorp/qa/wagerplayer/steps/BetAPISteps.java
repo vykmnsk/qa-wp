@@ -22,6 +22,7 @@ import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.MPID;
 import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.PLACE_PRICE;
 import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.WIN_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
 
 
 public class BetAPISteps implements En {
@@ -80,9 +81,13 @@ public class BetAPISteps implements En {
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
                     List<String> runners = Helpers.extractCSV(runnersCSV);
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-                    String uuid = null;
+                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+                    assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
+
+                    List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
+
+                    String uuid;
                     if (multiType.contains(",")) {
                         List<String> doubleMultiTypeInfo = Helpers.extractCSV(multiType);
                         assertThat(doubleMultiTypeInfo).hasSize(2);
@@ -90,41 +95,33 @@ public class BetAPISteps implements En {
                         List<String> doubleBetTypesStr = Helpers.extractCSV(doubleMultiTypeInfo.get(1), '-');
                         assertThat(doubleBetTypesStr).hasSize(2);
                         List<BetType> doubleBetTypes = doubleBetTypesStr.stream().map(str -> BetType.fromName(str)).collect(Collectors.toList());
-                        uuid = wapi.prepareSelectionsForDoubleMultiBet(accessToken, eventIds, prodIds, runners, doubleBetTypes);
+                        uuid = wapi.prepareSelectionsForDoubleMultiBet(accessToken, selections, prodIds, doubleBetTypes);
                     } else {
-                        uuid = wapi.prepareSelectionsForMultiBet(accessToken, eventIds, prodIds, runners, multiType);
+                        uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType);
                     }
 
-                    Object response = wapi.placeAMultiBet(accessToken, uuid, stake, isFlexi);
+                    Object response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
                     List betIds = api.readBetIds(response);
                     log.info("Bet IDs=" + betIds.toString());
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
-        When("^I place \"([^\"]*)\" multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
-                (String betTypeName, String multiType, String runnersCVS, BigDecimal stake) -> {
+        When("^I place multi bet \"Double (Win|Eachway)+\" on the runners \"([^\"]+)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String runnersCVS, BigDecimal stake) -> {
+                    assertThat(Config.isRedbook()).as("step runs only REDBOOK").isTrue();
+                    final String multiType = "Double";
+                    final BetType betType = BetType.fromName(betTypeName);
+
                     List<String> runners = Helpers.extractCSV(runnersCVS);
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-                    Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-                    assertThat(eventIds.size()).isEqualTo(runners.size());
+                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+                    assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
 
-                    List<Map<WAPI.KEY, String>> selections = new ArrayList();
-                    for (int i = 0; i < runners.size(); i++) {
-                        Object marketsResponse = wapi.getEventMarkets(accessToken, eventIds.get(i));
-                        Map<WAPI.KEY, String> sel = wapi.readSelection(marketsResponse, runners.get(i), prodId);
-                        selections.add(sel);
-                    }
+                    List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
 
-                    betTypeName = Helpers.toTitleCase(betTypeName);
-                    Integer betTypeId = BetType.valueOf(betTypeName).id;
-
-                    Object betResponse;
-                    MOBI_V2 mobi_v2 = new MOBI_V2();
-                    betResponse = mobi_v2.placeMultiBet(accessToken, prodId,
-                            selections, betTypeId, multiType, stake);
-                    balanceAfterBet = api.readNewBalance(betResponse);
-
+                    Object response = ((MOBI_V2) api).placeMultiBet(accessToken, selections, multiType, betType, stake);
+                    balanceAfterBet = api.readNewBalance(response);
                 });
 
         Then("^customer balance after bet is decreased by \\$(\\d+\\.\\d\\d)$", (BigDecimal diff) -> {

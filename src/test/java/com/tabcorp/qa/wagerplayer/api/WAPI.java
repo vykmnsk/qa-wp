@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -199,39 +200,38 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields, false);
     }
 
-    public String prepareSelectionsForDoubleMultiBet(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, List<BetType> betTypes) {
-        List<Integer> sizes = Arrays.asList(eventIds.size(), prodIds.size(), runners.size(), betTypes.size());
-        assertThat(sizes).as("Number of Events, Products, Runners, BetTypes").allMatch(size -> size.equals(2));
-        return prepareSelectionsForMultiBet(sessionId, eventIds, prodIds, runners, "Double", betTypes);
+    public String prepareSelectionsForDoubleMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
+        List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size(), betTypes.size());
+        assertThat(sizes).as("Number of Selections, Products and BetTypes").allMatch(size -> size.equals(2));
+        return prepareSelectionsForMultiBet(sessionId, selections, prodIds,"Double", betTypes);
     }
 
-    public String prepareSelectionsForMultiBet(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, String multiType) {
-        //TODO crate empty list
-        List<Integer> sizes = Arrays.asList(eventIds.size(), prodIds.size(), runners.size());
+    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, String multiType) {
+        List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size());
         Integer count = sizes.get(0);
         assertThat(count).as("Multi Selections count").isGreaterThan(1);
-        assertThat(sizes).as("Number of Events, Products and Runners").allMatch(count::equals);
+        assertThat(sizes).as("Number of Selections and Products").allMatch(count::equals);
         List<BetType> dummyBetTypes = Collections.nCopies(count,null);
-        return prepareSelectionsForMultiBet(sessionId, eventIds, prodIds, runners, multiType, dummyBetTypes);
+        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, multiType, dummyBetTypes);
     }
 
-    public String prepareSelectionsForMultiBet(String sessionId, List<String> eventIds, List<Integer> prodIds, List<String> runners, String multiType, List<BetType> betTypes) {
-        Object resp = null;
-        for (int i = 0; i < eventIds.size(); i++) {
-            Object marketsResponse = getEventMarkets(sessionId, eventIds.get(i));
-            Map<WAPI.KEY, String> sel = readSelection(marketsResponse, runners.get(i), prodIds.get(i));
-            resp = addSelectionToMulti(sessionId, prodIds.get(i), sel.get(KEY.MPID), betTypes.get(i));
+    private String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, String multiType, List<BetType> betTypes) {
+        assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
+        Object response = null;
+        for (int i = 0; i < selections.size(); i++) {
+            String selectionId = selections.get(i).get(KEY.MPID);
+            response = addSelectionToMulti(sessionId, prodIds.get(i), selectionId, betTypes.get(i));
             if (i == 0) {  // error shows only for 1 selection
-                String msg = JsonPath.read(resp, RESP_ROOT + ".error[0].error_text");
+                String msg = JsonPath.read(response, RESP_ROOT + ".error[0].error_text");
                 assertThat(msg).isEqualTo("Add more selections for multiple bet types");
             }
         }
-        JSONArray uuidsFound = JsonPath.read(resp, RESP_ROOT + ".multiple" + jfilter("name", multiType) + ".uuid");
+        JSONArray uuidsFound = JsonPath.read(response, RESP_ROOT + ".multiple" + jfilter("name", multiType) + ".uuid");
         assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(1);
         return uuidsFound.get(0).toString();
     }
 
-    public Object placeAMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {
+    public Object placeMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("placing_multiple", 1);
@@ -280,6 +280,16 @@ public class WAPI implements WagerPlayerAPI {
         String selPath = ".selections.selection" + jfilter("name", selName);
         String pricePath = ".prices.price" + jfilter("product_id", prodId.toString());
         return mktPath + selPath + pricePath;
+    }
+
+    public List<Map<WAPI.KEY, String>> getMultiEventSelections(String sessionId, List<String> eventIds, List<String> runners, List<Integer> prodIds) {
+        List<Map<WAPI.KEY, String>> selections = new ArrayList<>();
+        for (int i = 0; i < eventIds.size(); i++) {
+            Object resp = getEventMarkets(sessionId, eventIds.get(i));
+            Map<WAPI.KEY, String> sel = readSelection(resp, runners.get(i), prodIds.get(i));
+            selections.add(sel);
+        }
+        return selections;
     }
 
     public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {

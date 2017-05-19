@@ -168,7 +168,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return checkoutBet(obj.toJSONString());
     }
 
-    public Object placeMultiBet(String accessToken, Integer productId, List<Map<WAPI.KEY, String>> selections, Integer betType, String multiType, BigDecimal stake) {
+    public Object placeMultiBet(String accessToken, List<Map<WAPI.KEY, String>> selections, String multiType, BetType betType, BigDecimal stake) {
         JSONObject betPayload = new JSONObject();
         JSONArray selectionsObj = new JSONArray();
         JSONArray selection = new JSONArray();
@@ -183,11 +183,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
             selPrices = new JSONObject();
             options = new JSONObject();
 
-            options.put("bet_type", betType);
+            options.put("bet_type", betType.id);
             options.put("include_in_multi", 1);
 
             selPrices.put("win_price", sel.get(KEY.WIN_PRICE));
-            selPrices.put("win_price", sel.get(KEY.PLACE_PRICE));
+            selPrices.put("place_price", sel.get(KEY.PLACE_PRICE));
 
 
             selectionsData.put("type", "single");
@@ -203,7 +203,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         selectionsData = new JSONObject();
         options = new JSONObject();
 
-        options.put("bet_type", betType);
+        options.put("bet_type", betType.id);
 
         selectionsData.put("type", "multi");
         selectionsData.put("stake", stake);
