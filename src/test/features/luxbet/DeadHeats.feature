@@ -5,11 +5,11 @@ Feature: Deadheats testing on a Luxbet event
     Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
 
-  Scenario Outline: Deadheat at FIRST
+  Scenario Outline: Deadheat at <type>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
-      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                           |
+      | prices  | <WinPrices>                                                                                                                    |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -21,106 +21,28 @@ Feature: Deadheats testing on a Luxbet event
       | Place Fraction     | -         |
       | No of Places       | 3         |
       | E/W                | yes       |
-    And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
+    And I update fixed place prices "<PlacePrices>"
 
     When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
-    And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
     And I place a single "Win" bet on the runner "WHITE LADY" for $3.50
     When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
     And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
     And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance after bet is decreased by $31.00
+    And I place a single "Eachway" bet on the runner "PROSPECT ROAD" for $2.50
+    Then customer balance after bet is decreased by $32.50
 
-    When I result race with the runners and positions
-      | ROCKING HORSE | 1 |
-      | COLORADO MISS | 1 |
-      | CADEYRN       | 3 |
-      | PROSPECT ROAD | 4 |
+    When I result race with the runners and positions "<WinnerWithPositions>"
     And I settle race
-    Then customer balance since last bet is increased by $91.28
+    Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category         | Subcategory             |
-      | Horse Racing     | Automation Horse Racing |
-      | GREYHOUND RACING | CORK                    |
-      | Harness Racing   | ALBION PARK             |
-
-  Scenario Outline: Deadheat at SECOND
-    When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
-      | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
-      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                           |
-    And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Enable Single | Win   |
-      | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
-    And I enter market details
-      | Market Status      | Live      |
-      | Bets Allowed       | WIN Yes   |
-      | Bets Allowed Place | PLACE DVP |
-      | Place Fraction     | -         |
-      | No of Places       | 3         |
-      | E/W                | yes       |
-    And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
-
-    When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
-    And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
-    And I place a single "Win" bet on the runner "WHITE LADY" for $3.50
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
-    And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance after bet is decreased by $31.00
-
-    When I result race with the runners and positions
-      | ROCKING HORSE | 1 |
-      | COLORADO MISS | 2 |
-      | CADEYRN       | 2 |
-      | PROSPECT ROAD | 4 |
-    And I settle race
-    Then customer balance since last bet is increased by $154.93
-
-    Examples:
-      | Category         | Subcategory             |
-      | Horse Racing     | Automation Horse Racing |
-      | GREYHOUND RACING | CORK                    |
-      | Harness Racing   | ALBION PARK             |
-
-  Scenario Outline: Deadheat at THIRD
-    When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
-      | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
-      | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                           |
-    And I enable "Luxbook DVP Fixed" product settings
-      | Betting | Enable Single | Win   |
-      | Betting | Enable Single | Place |
-      | Betting | Enable Single | EW    |
-    And I enter market details
-      | Market Status      | Live      |
-      | Bets Allowed       | WIN Yes   |
-      | Bets Allowed Place | PLACE DVP |
-      | Place Fraction     | -         |
-      | No of Places       | 3         |
-      | E/W                | yes       |
-    And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
-
-    When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
-    And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
-    And I place a single "Win" bet on the runner "WHITE LADY" for $3.50
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
-    And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    Then customer balance after bet is decreased by $31.00
-
-    When I result race with the runners and positions
-      | ROCKING HORSE | 1 |
-      | COLORADO MISS | 2 |
-      | CADEYRN       | 3 |
-      | PROSPECT ROAD | 3 |
-    And I settle race
-    Then customer balance since last bet is increased by $151.56
-
-    Examples:
-      | Category         | Subcategory             |
-      | Horse Racing     | Automation Horse Racing |
-      | GREYHOUND RACING | CORK                    |
-      | Harness Racing   | ALBION PARK             |
+      | type   | Category         | Subcategory             | WinPrices                                                            | PlacePrices                                                | WinnerWithPositions                                          | Payout |
+      | FIRST  | Horse Racing     | Automation Horse Racing | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 1:COLORADO MISS, 3:CADEYRN, 4:PROSPECT ROAD | 65.03  |
+      | FIRST  | GREYHOUND RACING | CORK                    | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 1:COLORADO MISS, 3:CADEYRN, 4:PROSPECT ROAD | 65.03  |
+      | FIRST  | Harness Racing   | ALBION PARK             | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 1:COLORADO MISS, 3:CADEYRN, 4:PROSPECT ROAD | 65.03  |
+      | SECOND | Horse Racing     | Automation Horse Racing | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 2:CADEYRN, 4:PROSPECT ROAD | 102.43 |
+      | SECOND | GREYHOUND RACING | CORK                    | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 2:CADEYRN, 4:PROSPECT ROAD | 102.43 |
+      | SECOND | Harness Racing   | ALBION PARK             | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 2:CADEYRN, 4:PROSPECT ROAD | 102.43 |
+      | THIRD  | Horse Racing     | Automation Horse Racing | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 3:CADEYRN, 3:PROSPECT ROAD | 102.31 |
+      | THIRD  | GREYHOUND RACING | CORK                    | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 3:CADEYRN, 3:PROSPECT ROAD | 102.31 |
+      | THIRD  | Harness Racing   | ALBION PARK             | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 3:CADEYRN, 3:PROSPECT ROAD | 102.31 |
