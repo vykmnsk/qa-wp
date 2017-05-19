@@ -1,8 +1,8 @@
 package com.tabcorp.qa.common;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-public class StrictHashMap<K, V> extends HashMap<K, V> {
+public class StrictHashMap<K, V> extends LinkedHashMap<K, V> {
 
     public V get(Object key) {
         if (!super.containsKey(key)) {
