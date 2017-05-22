@@ -1,7 +1,6 @@
 package com.tabcorp.qa.wagerplayer.api;
 
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
@@ -21,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WAPI implements WagerPlayerAPI {
 
@@ -46,37 +45,30 @@ public class WAPI implements WagerPlayerAPI {
         return fields;
     }
 
-    private static Object post(Map<String, Object> fields) {
+    private ReadContext post(Map<String, Object> fields) {
         return post(fields, true);
     }
 
-    private static Object post(Map<String, Object> fields, boolean checkErros) {
+    private ReadContext post(Map<String, Object> fields, boolean checkErrors) {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
-        verifyJSONRoot(resp);
-        if (checkErros) verifyNoErrors(resp, fields);
-        return resp;
+        ReadContext ctx = parseVerifyJSON(resp, RESP_ROOT);
+        if (checkErrors) verifyNoErrors(ctx, fields);
+        return ctx;
     }
 
-    private static void verifyJSONRoot(Object resp) {
-        try {
-            JsonPath.read(resp, RESP_ROOT);
-        } catch (PathNotFoundException e) {
-            fail(String.format("Response JSON seems invalid: %s, %s", resp.toString(), e.getMessage()));
-        }
-    }
-
-    private static void verifyNoErrors(Object resp, Object req) {
-        JSONArray errors = JsonPath.read(resp, "$..error");
+    private static void verifyNoErrors(ReadContext ctx, Object req) {
+        JSONArray errors = ctx.read("$..error");
         assertThat(errors).as("Errors in response when sending " + req).isEmpty();
     }
 
-    static Object postWithQueryStrings(Map<String, Object> fields, Pair<String, List<String>> pair) {
+    private ReadContext postWithQueryStrings(Map<String, Object> fields, Pair<String, List<String>> pair) {
         fields.put("output_type", "json");
         Object resp = REST.postWithQueryStrings(URL, fields, pair);
         String reqText = String.format("%s %s", fields, pair);
-        verifyNoErrors(resp, reqText);
-        return resp;
+        ReadContext ctx = parseVerifyJSON(resp, RESP_ROOT);
+        verifyNoErrors(ctx, reqText);
+        return ctx;
     }
 
     public String login(){
@@ -89,17 +81,16 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("customer_username", username);
         fields.put("customer_password", password);
         fields.put("client_ip", clientIp);
-        Object resp = post(fields);
-        return JsonPath.read(resp, RESP_ROOT + ".login[0].session_id");
+        return post(fields).read(RESP_ROOT + ".login[0].session_id");
     }
 
     public String createNewCustomer(Map custData) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_insert_customer");
         fields.putAll(custData);
-        Object resp = post(fields);
-        Integer custId = JsonPath.read(resp, RESP_ROOT + ".success.customer_id");
-        String msg = JsonPath.read(resp, RESP_ROOT + ".success.message");
+        ReadContext resp = post(fields);
+        Integer custId = resp.read(RESP_ROOT + ".success.customer_id");
+        String msg = resp.read(RESP_ROOT + ".success.message");
         log.info("Customer ID=" + custId);
         return msg;
     }
@@ -108,9 +99,9 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_deposit");
         fields.put("amount", cashAmount);
-        Object resp = post(fields);
-        String msg = JsonPath.read(resp, RESP_ROOT + ".account[0].message");
-        int transId = JsonPath.read(resp, RESP_ROOT + ".account[0].transaction_id");
+        ReadContext resp = post(fields);
+        String msg = resp.read(RESP_ROOT + ".account[0].message");
+        int transId = resp.read(RESP_ROOT + ".account[0].transaction_id");
         log.info("Deposit Status message=" + msg);
         log.info("Deposit Transaction ID=" + transId);
         return msg;
@@ -119,12 +110,11 @@ public class WAPI implements WagerPlayerAPI {
     public BigDecimal getBalance(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_balance");
-        Object resp = post(fields);
-        String balance = JsonPath.read(resp, RESP_ROOT + ".account[0].balance");
+        String balance = post(fields).read(RESP_ROOT + ".account[0].balance");
         return new BigDecimal(balance);
     }
 
-    public Object placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
+    public ReadContext placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Win.id);
@@ -135,7 +125,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public Object placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
+    public ReadContext placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Place.id);
@@ -146,7 +136,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public Object placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
+    public ReadContext placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Eachway.id);
@@ -158,7 +148,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public Object placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi) {
+    public ReadContext placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
@@ -168,7 +158,7 @@ public class WAPI implements WagerPlayerAPI {
         return postWithQueryStrings(fields, Pair.of("slot[1][selection][]", selectionIds));
     }
 
-    public Object placeExoticBetMultiMarkets(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, boolean flexi) {
+    public ReadContext placeExoticBetMultiMarkets(String sessionId, Integer productId, List<String> selectionIds, List<String> marketIds, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
@@ -185,11 +175,11 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public Object addSelectionToMulti(String sessionId, Integer prodId, String mpid) {
+    public ReadContext addSelectionToMulti(String sessionId, Integer prodId, String mpid) {
         return addSelectionToMulti(sessionId, prodId, mpid, null);
     }
 
-    public Object addSelectionToMulti(String sessionId, Integer prodId, String mpid, BetType bt) {
+    public ReadContext addSelectionToMulti(String sessionId, Integer prodId, String mpid, BetType bt) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_add_sel_to_multi");
         fields.put("mpid", mpid);
@@ -217,21 +207,21 @@ public class WAPI implements WagerPlayerAPI {
 
     private String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, String multiType, List<BetType> betTypes) {
         assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
-        Object response = null;
+        ReadContext response = null;
         for (int i = 0; i < selections.size(); i++) {
             String selectionId = selections.get(i).get(KEY.MPID);
             response = addSelectionToMulti(sessionId, prodIds.get(i), selectionId, betTypes.get(i));
             if (i == 0) {  // error shows only for 1 selection
-                String msg = JsonPath.read(response, RESP_ROOT + ".error[0].error_text");
+                String msg = response.read(RESP_ROOT + ".error[0].error_text");
                 assertThat(msg).isEqualTo("Add more selections for multiple bet types");
             }
         }
-        JSONArray uuidsFound = JsonPath.read(response, RESP_ROOT + ".multiple" + jfilter("name", multiType) + ".uuid");
+        JSONArray uuidsFound = response.read(RESP_ROOT + ".multiple" + jfilter("name", multiType) + ".uuid");
         assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(1);
         return uuidsFound.get(0).toString();
     }
 
-    public Object placeMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {
+    public ReadContext placeMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("placing_multiple", 1);
@@ -240,18 +230,18 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public BigDecimal readNewBalance(Object resp) {
-        Object val = JsonPath.read(resp, RESP_ROOT + ".bet[0].new_balance");
+    public BigDecimal readNewBalance(ReadContext resp) {
+        Object val = resp.read( RESP_ROOT + ".bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
     }
 
-    public List readBetIds(Object resp) {
-        JSONArray betIds = JsonPath.read(resp, RESP_ROOT + ".bet[*].bet_id");
+    public List readBetIds(ReadContext resp) {
+        JSONArray betIds = resp.read(RESP_ROOT + ".bet[*].bet_id");
         return betIds;
     }
 
-    public Object getEventMarkets(String sessionId, String evtId) {
+    public ReadContext getEventMarkets(String sessionId, String evtId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_markets");
         fields.put("eid", evtId);
@@ -263,46 +253,48 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
         fields.put("client_ip", clientIp);
-        Object resp = post(fields);
-        return (String) JsonPath.read(resp, RESP_ROOT + ".account[0].aml_status");
+        return (String) post(fields).read(RESP_ROOT + ".account[0].aml_status");
     }
-
 
     public String generateAffiliateLoginToken(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_generate_login_token");
-        Object resp = post(fields);
-        return (String) JsonPath.read(resp, RESP_ROOT + ".token");
-    }
-
-    private static String getPricePath(String selName, Integer prodId) {
-        String mktPath = ".markets.market[0]";
-        String selPath = ".selections.selection" + jfilter("name", selName);
-        String pricePath = ".prices.price" + jfilter("product_id", prodId.toString());
-        return mktPath + selPath + pricePath;
+        return (String) post(fields).read(RESP_ROOT + ".token");
     }
 
     public List<Map<WAPI.KEY, String>> getMultiEventSelections(String sessionId, List<String> eventIds, List<String> runners, List<Integer> prodIds) {
         List<Map<WAPI.KEY, String>> selections = new ArrayList<>();
         for (int i = 0; i < eventIds.size(); i++) {
-            Object resp = getEventMarkets(sessionId, eventIds.get(i));
+            ReadContext resp = getEventMarkets(sessionId, eventIds.get(i));
             Map<WAPI.KEY, String> sel = readSelection(resp, runners.get(i), prodIds.get(i));
             selections.add(sel);
         }
         return selections;
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId) {
+    public Map<KEY, String> readSelection(ReadContext resp, String selName, Integer prodId) {
         return readSelection(resp, selName, prodId, true);
     }
 
-    public static Map<KEY, String> readSelection(Object resp, String selName, Integer prodId, boolean withPrices) {
-        String path = getPricePath(selName, prodId);
+    public Map<KEY, String> readSelection(ReadContext resp, String selName, Integer prodId, boolean withPrices) {
+        String mktPath = RESP_ROOT + ".markets.market[0]";
+        String selPath = mktPath + ".selections.selection" + jfilter("name", selName);
+        String pricePath = selPath + ".prices.price";
+        String prodPricePath = pricePath + jfilter("product_id", prodId.toString());
+        Map market = resp.read(mktPath);
+        JSONArray selections = resp.read(selPath);
+        JSONArray prices = resp.read(pricePath);
+        JSONArray productPrices = resp.read(prodPricePath);
+        assertThat(market).as("No markets found at path=" + mktPath).isNotEmpty();
+        assertThat(selections).as("No selections for market=" + market).isNotEmpty();
+        assertThat(prices).as("No prices in selection=" + selections).isNotEmpty();
+        assertThat(productPrices).as(String.format("No price for product=%s: other prices: %s", prodId, prices)).isNotEmpty();
+
         HashMap<KEY, String> sel = new HashMap<>();
-        sel.put(KEY.MPID, readPriceAttr(resp, path, BetType.Win.name(), "mpid"));
+        sel.put(KEY.MPID, readPriceAttr(resp, prodPricePath, BetType.Win.name(), "mpid"));
         if (withPrices) {
-            sel.put(KEY.WIN_PRICE, readPriceAttr(resp, path, BetType.Win.name(), "precise_price"));
-            sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, path, BetType.Place.name(), "precise_price"));
+            sel.put(KEY.WIN_PRICE, readPriceAttr(resp, prodPricePath, BetType.Win.name(), "precise_price"));
+            sel.put(KEY.PLACE_PRICE, readPriceAttr(resp, prodPricePath, BetType.Place.name(), "precise_price"));
         } else {
             sel.put(KEY.WIN_PRICE, "1.00");
             sel.put(KEY.PLACE_PRICE, "1.00");
@@ -310,39 +302,41 @@ public class WAPI implements WagerPlayerAPI {
         return sel;
     }
 
-    public List<String> readSelectionIds(Object resp, String marketId, List<String> selectionNames) {
+    public List<String> readSelectionIds(ReadContext resp, String marketId, List<String> selectionNames) {
         return selectionNames.stream().map(sn -> readSelectionId(resp, marketId, sn)).collect(Collectors.toList());
     }
 
-    public String readSelectionId(Object resp, String marketId, String selectionName) {
+    public String readSelectionId(ReadContext resp, String marketId, String selectionName) {
         String mktPath = ".markets.market" + jfilter("id", marketId);
         String selPath = ".selections.selection" + jfilter("name", selectionName);
-        return readOneAttr(resp, mktPath + selPath, "id");
+        return readAttrOneOnly(resp, mktPath + selPath, "id");
     }
 
-    public String readMarketId(Object resp, String mktName) {
+    public String readMarketId(ReadContext resp, String mktName) {
         String mktPath = ".markets.market" + jfilter("name", mktName);
-        return readOneAttr(resp, mktPath, "id");
+        return readAttrOneOnly(resp, mktPath, "id");
     }
 
-    private static String readPriceAttr(Object resp, String pricePath, String betTypeName, String attrName) {
+    private static String readPriceAttr(ReadContext resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
-        //qTODO hack to bypass broken WAPI for Redbook
-//        JSONArray attrs = JsonPath.read(resp, RESP_ROOT + path + "." + attrName);
-//        if (attrs.size() != 1 && BetType.Place.name().equals(betTypeName)) {
-//            return "1";
-//        }
-        return readOneAttr(resp, path, attrName);
+        // TODO shall we consider returning 1.0?
+        // return readAttrOrElse(resp, path, attrName, "1");
+        return readAttrOneOnly(resp, path, attrName);
     }
 
-    private static String readOneAttr(Object resp, String basePath, String attrName) {
-        String path = RESP_ROOT + basePath + "." + attrName;
-        JSONArray attrs = JsonPath.read(resp, path);
-        assertThat(attrs.size())
-                .as(String.format("expected to find one attribute '%s' at path='%s'", attrName, path))
-                .isEqualTo(1);
-        String attr = String.valueOf(attrs.get(0));
-        assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
+    private static String readAttrOrElse(ReadContext resp, String basePath, String attrName, String orElse) {
+        String attr = orElse;
+        JSONArray attrs = resp.read(basePath + "." + attrName);
+        if (attrs.size() > 0) {
+            attr = String.valueOf(attrs.get(0));
+            assertThat(attr).as("attribute '%s' at path='%s'").isNotEmpty();
+        }
+        return attr;
+    }
+
+    private static String readAttrOneOnly(ReadContext resp, String basePath, String attrName) {
+        String attr = readAttrOrElse(resp, basePath, attrName, null);
+        assertThat(attr).as(String.format("expected to find one attribute '%s' at path='%s'", attrName, basePath));
         return attr;
     }
 

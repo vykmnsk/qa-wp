@@ -1,9 +1,15 @@
 package com.tabcorp.qa.wagerplayer.api;
 
 
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.ReadContext;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.fail;
 
 public interface WagerPlayerAPI {
     enum KEY {
@@ -16,20 +22,31 @@ public interface WagerPlayerAPI {
 
     BigDecimal getBalance(String sessionToken);
 
-    Object placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake);
+    ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake);
 
-    Object placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake);
+    ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake);
 
-    Object placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
+    ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
 
-    Object placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
+    ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
 
     String createNewCustomer(Map custData);
 
     String  readAmlStatus(String accessToken, String clientIp);
 
-    BigDecimal readNewBalance(Object resp);
+    BigDecimal readNewBalance(ReadContext resp);
 
-    List readBetIds(Object resp);
+    List readBetIds(ReadContext resp);
+
+    default ReadContext parseVerifyJSON(Object json, String rootPath){
+        ReadContext ctx = null;
+        try {
+            ctx = JsonPath.parse(json);
+            ctx.read(rootPath);
+        } catch (PathNotFoundException e) {
+            fail(String.format("Response JSON seems invalid: %s, %s", json.toString(), e.getMessage()));
+        }
+        return ctx;
+    }
 
 }

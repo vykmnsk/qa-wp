@@ -28,7 +28,7 @@ Feature: Single Bets
     Examples:
       | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions    |
       | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |
-  @wip
+
     Examples:
       | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | WinnerWithPositions    |
       | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | 1:Runner01, 2:Runner02 |

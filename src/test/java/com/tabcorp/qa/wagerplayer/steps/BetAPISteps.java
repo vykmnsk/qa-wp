@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
+import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
@@ -18,11 +19,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
-import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.MPID;
-import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.PLACE_PRICE;
-import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.WIN_PRICE;
+import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
 
 
 public class BetAPISteps implements En {
@@ -68,7 +66,7 @@ public class BetAPISteps implements En {
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-                    Object response = placeExoticBetMultEvents(accessToken, eventIds, prodId, runners, stake, isFlexi);
+                    ReadContext response = placeExoticBetMultEvents(accessToken, eventIds, prodId, runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
@@ -100,7 +98,7 @@ public class BetAPISteps implements En {
                         uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType);
                     }
 
-                    Object response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
+                    ReadContext response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
                     List betIds = api.readBetIds(response);
                     log.info("Bet IDs=" + betIds.toString());
                     balanceAfterBet = api.readNewBalance(response);
@@ -120,7 +118,7 @@ public class BetAPISteps implements En {
 
                     List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
 
-                    Object response = ((MOBI_V2) api).placeMultiBet(accessToken, selections, multiType, betType, stake);
+                    ReadContext response = ((MOBI_V2) api).placeMultiBet(accessToken, selections, multiType, betType, stake);
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
@@ -147,10 +145,10 @@ public class BetAPISteps implements En {
         } else {
             wapiSessionId = accessToken;
         }
-        Object resp = wapi.getEventMarkets(wapiSessionId, eventId);
+        ReadContext resp = wapi.getEventMarkets(wapiSessionId, eventId);
         Map<WAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, useDefaultPrices);
 
-        Object response;
+        ReadContext response;
         switch (betTypeName.toUpperCase()) {
             case "WIN":
                 response = api.placeSingleWinBet(accessToken, prodId,
@@ -179,28 +177,28 @@ public class BetAPISteps implements En {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
         Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
         String eventId = (String) Storage.getLast(EVENT_IDS);
-        Object response = placeExoticBetOneEvent(accessToken, eventId, prodId, runners, stake, isFlexi);
+        ReadContext response = placeExoticBetOneEvent(accessToken, eventId, prodId, runners, stake, isFlexi);
         List betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds.toString());
         return api.readNewBalance(response);
     }
 
-    private Object placeExoticBetOneEvent(String accessToken, String eventId, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
-        Object resp = wapi.getEventMarkets(accessToken, eventId);
+    private ReadContext placeExoticBetOneEvent(String accessToken, String eventId, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
+        ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
         String marketId = wapi.readMarketId(resp, "Racing Live");
         List<String> selectionIds = wapi.readSelectionIds(resp, marketId, runners);
         return api.placeExoticBet(accessToken, prodId, selectionIds, marketId, stake, isFlexi);
     }
 
-    private Object placeExoticBetMultEvents(String accessToken, List<String> eventIds, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
+    private ReadContext placeExoticBetMultEvents(String accessToken, List<String> eventIds, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
         assertThat(eventIds.size()).as("Events count must match Runners count").isEqualTo(runners.size());
         List<String> marketIds = new ArrayList<>();
         List<String> selectionIds = new ArrayList<>();
         for (int i = 0; i < runners.size(); i++) {
-            Object marketsResponse = wapi.getEventMarkets(accessToken, eventIds.get(i));
-            String marketId = wapi.readMarketId(marketsResponse, "Racing Live");
+            ReadContext mktResp = wapi.getEventMarkets(accessToken, eventIds.get(i));
+            String marketId = wapi.readMarketId(mktResp, "Racing Live");
             marketIds.add(marketId);
-            String selId = wapi.readSelectionId(marketsResponse, marketId, runners.get(i));
+            String selId = wapi.readSelectionId(mktResp, marketId, runners.get(i));
             selectionIds.add(selId);
         }
         return wapi.placeExoticBetMultiMarkets(accessToken, prodId, selectionIds, marketIds, stake, isFlexi);

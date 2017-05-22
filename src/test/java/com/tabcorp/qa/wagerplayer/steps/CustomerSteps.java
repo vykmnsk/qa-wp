@@ -118,6 +118,7 @@ public class CustomerSteps implements En {
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             customersPage.verifyLoaded();
             Helpers.retryOnAssertionFailure(()-> {
+                    header.refreshPage();
                     String actualAmlStatus = customersPage.readAMLStatus();
                     Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
                 }, 5, 3);
