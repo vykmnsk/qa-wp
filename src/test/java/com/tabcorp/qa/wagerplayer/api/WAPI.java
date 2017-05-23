@@ -33,9 +33,6 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = new HashMap<>();
         fields.put("wapi_client_user", Config.wapiUsername());
         fields.put("wapi_client_pass", Config.wapiPassword());
-        if (!StringUtils.isEmpty(Config.clientIp())) {
-            fields.put("client_ip", Config.clientIp());
-        }
         return fields;
     }
 
@@ -80,7 +77,9 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("action", "account_login");
         fields.put("customer_username", username);
         fields.put("customer_password", password);
-        fields.put("client_ip", clientIp);
+        if (!StringUtils.isEmpty(Config.clientIp())) {
+            fields.put("client_ip", Config.clientIp());
+        }
         return post(fields).read(RESP_ROOT + ".login[0].session_id");
     }
 
@@ -249,10 +248,9 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public String readAmlStatus(String sessionId, String clientIp) {
+    public String readAmlStatus(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
-        fields.put("client_ip", clientIp);
         return (String) post(fields).read(RESP_ROOT + ".account[0].aml_status");
     }
 

@@ -1,4 +1,4 @@
-@luxbet @DeadHeats
+@luxbet @dead-heats
 Feature: Deadheats testing on a Luxbet event
 
   Background:

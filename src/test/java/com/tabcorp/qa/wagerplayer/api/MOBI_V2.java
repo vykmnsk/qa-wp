@@ -264,7 +264,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return msg;
     }
 
-    public String readAmlStatus(String accessToken, String unused) {
+    public String readAmlStatus(String accessToken) {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("access_token", accessToken);
         ReadContext response = get("/customer", queryParams);

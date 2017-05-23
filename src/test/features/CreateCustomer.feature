@@ -25,10 +25,11 @@ Feature: Create New Customer
     Then the customer AML status in <UIorAPI> is updated to <amlStatus>
     And the customer deposits <depositAmount> cash via <UIorAPI>
 
-  @redbook @api
-    Examples:
-      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city     | suburb | postcode | state | country | timezone | secret_question         | currency_code | deposit_limit | client_ip | manual_verification | amlStatus             | depositAmount |
-      | API     | Mr         | Oswald    | Petrucco | 1939-05-31 | @example.com          | 0463254781 | Level5   | 142 Tynte Street | Adelaide | N/A    | 5006     | N/A   | GB      | N/A      | Favourite Holiday Spot? | GBP           | N/A           | N/A       | Y                   | active_-_kyc_verified | 10000.00      |
+# TODO remove? WAPI::account_deposit doesnt work in Redbook
+#  @redbook @api
+#    Examples:
+#      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city     | suburb | postcode | state | country | timezone | secret_question         | currency_code | deposit_limit | client_ip | manual_verification | amlStatus             | depositAmount |
+#      | API     | Mr         | Oswald    | Petrucco | 1939-05-31 | @example.com          | 0463254781 | Level5   | 142 Tynte Street | Adelaide | N/A    | 5006     | N/A   | GB      | N/A      | Favourite Holiday Spot? | GBP           | N/A           | N/A       | Y                   | active_-_kyc_verified | 10000.00      |
 #      | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0421147741 | Level5   | 13a Alan Ave     | SEAFORTH | N/A    | 2092     | N/A   | IRL     | N/A      | Favourite Holiday Spot? | EUR           | N/A           | N/A       | N                   | UNVERIFIED            | 10000.00      |
 
   @luxbet @api

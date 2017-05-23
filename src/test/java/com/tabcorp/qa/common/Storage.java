@@ -34,6 +34,14 @@ public class Storage {
         return Helpers.nonNullGet(map, key);
     }
 
+    public static Object getOrElse(KEY key, Object orElse) {
+        if (map.containsKey(key)) {
+            return map.get(key);
+        } else {
+            return orElse;
+        }
+    }
+
     public static void add(KEY key, Object value) {
         Deque<Object> entries;
         entries = (null == map.get(key)) ? new LinkedList<>() : (Deque) map.get(key);

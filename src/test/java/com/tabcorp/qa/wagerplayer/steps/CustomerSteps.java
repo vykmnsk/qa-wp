@@ -121,22 +121,20 @@ public class CustomerSteps implements En {
                     header.refreshPage();
                     String actualAmlStatus = customersPage.readAMLStatus();
                     Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
-                }, 5, 3);
+                }, 10, 3);
         });
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
-            String accessToken = storedCustomerLogin();
-            String clientIp = storedCustomerClientIP();
-
+            String accessToken = loginStoredCustomer();
             Helpers.retryOnAssertionFailure(()-> {
-                    String actualAmlStatus = api.readAmlStatus(accessToken, clientIp);
+                    String actualAmlStatus = api.readAmlStatus(accessToken);
                     assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
-                }, 5, 2);
+                }, 10, 2);
             Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
         Then("^the affiliate customer should be able to login to mobile site successfully$", () -> {
-            String sessionId = storedCustomerLogin();
+            String sessionId = loginStoredCustomer();
             String mobileAccessToken = wapi.generateAffiliateLoginToken(sessionId);
 
             LuxbetMobilePage lmp = new LuxbetMobilePage();
@@ -149,7 +147,7 @@ public class CustomerSteps implements En {
             String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
 
             //TODO implement depositCash in MOBI and remove the following login
-            String sessionId = storedCustomerLogin();
+            String sessionId = loginStoredCustomer();
             String statusMsg = wapi.depositCash(sessionId, cashAmount);
 
             Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
@@ -229,15 +227,16 @@ public class CustomerSteps implements En {
         mobi.addCardAndDeposit(accessToken, paymentReference, cardEncryption, cardType, deposit);
     }
 
-    private String storedCustomerLogin() {
+    private String loginStoredCustomer() {
+        String storedToken = (String) Storage.getOrElse(KEY.API_ACCESS_TOKEN, null);
+        if (null != storedToken) {
+            return storedToken;
+        }
         Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-        String clientIp = storedCustomerClientIP();
-        return api.login(custData.get("username"), custData.get("password"), clientIp);
-    }
-
-    private String storedCustomerClientIP() {
-        Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-        return Config.isLuxbet() ? custData.get("client_ip") : null;
+        String clientIp = Config.isLuxbet() ? custData.get("client_ip") : null;
+        String newToken = api.login(custData.get("username"), custData.get("password"), clientIp);
+        Storage.put(KEY.API_ACCESS_TOKEN, newToken);
+        return newToken;
     }
 
     private Map<String, String> adjustCustomerData(Map<String, String> custInput) {

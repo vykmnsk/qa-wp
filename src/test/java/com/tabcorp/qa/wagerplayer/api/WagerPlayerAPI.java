@@ -32,7 +32,7 @@ public interface WagerPlayerAPI {
 
     String createNewCustomer(Map custData);
 
-    String  readAmlStatus(String accessToken, String clientIp);
+    String  readAmlStatus(String accessToken);
 
     BigDecimal readNewBalance(ReadContext resp);
 
