@@ -8,6 +8,17 @@ pipeline {
         label 'java18'
     }
 
+    options {
+        disableConcurrentBuilds()
+        retry(1)
+    }
+
+    triggers {
+        // Times needs to be specified in UTC
+        cron('0 20 * * 1-5')
+        pollSCM('*/2 * * * *')
+    }
+
     stages {
         stage('checkout & install dependencies') {
             steps {
