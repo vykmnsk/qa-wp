@@ -8,12 +8,14 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
+import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,7 +33,7 @@ public class BetAPISteps implements En {
     private WAPI wapi = new WAPI();
 
     public BetAPISteps() {
-         When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+        When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
@@ -73,7 +75,7 @@ public class BetAPISteps implements En {
         When("^I place a multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String multiType, String runnersCSV, BigDecimal stake, String flexi) -> {
                     assertThat(multiType.toUpperCase()).as("Multi TypeName input")
-                            .isIn("DOUBLE,WIN-WIN","DOUBLE,WIN-PLACE","DOUBLE,PLACE-WIN","DOUBLE,PLACE-PLACE",
+                            .isIn("DOUBLE,WIN-WIN", "DOUBLE,WIN-PLACE", "DOUBLE,PLACE-WIN", "DOUBLE,PLACE-PLACE",
                                     "TREBLE", "DOUBLES", "DOUBLES", "TRIXIE", "PATENT", "4-FOLD", "TREBLES",
                                     "YANKEE", "LUCKY 15", "5-FOLD", "4-FOLDS", "CANADIAN", "LUCKY 31");
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
@@ -130,23 +132,40 @@ public class BetAPISteps implements En {
         Then("^customer balance since last bet is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diff) -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             Helpers.retryOnAssertionFailure(() -> {
-                    BigDecimal balanceNow = api.getBalance(accessToken);
-                    assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
-                },5, 2);
+                BigDecimal balanceNow = api.getBalance(accessToken);
+                assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
+            }, 10, 4);
         });
-    }
 
+        Then("^I verify status and payout of bets placed on runners$", (DataTable table) -> {
+            List<List<String>> expectedBetData = table.raw();
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            List<Integer> placedBetIds = (List<Integer>) Storage.get(BET_IDS);
+            assertThat(expectedBetData.size()).as("Bet Data Input table must match placed bets").isEqualTo(placedBetIds.size());
+            for (int i = 0; i < expectedBetData.size(); i++) {
+                List<String> expectedBet = expectedBetData.get(i);
+                assertThat(expectedBet.size()).as("expecting for example: [ROCKING HORSE, Refunded, 0.00]").isEqualTo(3);
+                Map<WagerPlayerAPI.KEY, String> actualBetData = wapi.getBetDetails(placedBetIds.get(i), accessToken);
+                List<String> actualBet = Arrays.asList(
+                        actualBetData.get(RUNNER_NAME),
+                        actualBetData.get(BET_STATUS),
+                        actualBetData.get(BET_PAYOUT));
+                assertThat(actualBet).isEqualTo(expectedBet);
+            }
+        });
+
+    }
 
     private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, boolean useDefaultPrices) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
         String wapiSessionId;
-        if (Config.isRedbook()){
+        if (Config.isRedbook()) {
             wapiSessionId = wapi.login();
         } else {
             wapiSessionId = accessToken;
         }
         ReadContext resp = wapi.getEventMarkets(wapiSessionId, eventId);
-        Map<WAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, useDefaultPrices);
+        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, useDefaultPrices);
 
         ReadContext response;
         switch (betTypeName.toUpperCase()) {
@@ -165,7 +184,8 @@ public class BetAPISteps implements En {
             default:
                 throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
         }
-        List betIds = api.readBetIds(response);
+        List<Integer> betIds = api.readBetIds(response);
+        betIds.forEach(betId -> Storage.add(BET_IDS, betId));
         log.info("Bet IDs=" + betIds.toString());
         return api.readNewBalance(response);
     }

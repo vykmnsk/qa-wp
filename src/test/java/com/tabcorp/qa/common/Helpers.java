@@ -27,13 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Helpers {
     private static Logger log = LoggerFactory.getLogger(Helpers.class);
 
-    public static int randomBetweenInclusive(int min, int max){
+    public static int randomBetweenInclusive(int min, int max) {
         return (new Random()).nextInt(max - min + 1) + min;
     }
 
-    public static List<BigDecimal> generateRandomPrices(int min, int upTo, int count){
+    public static List<BigDecimal> generateRandomPrices(int min, int upTo, int count) {
         List<BigDecimal> prices = new ArrayList<>();
-        for (int i=0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             int dollars = randomBetweenInclusive(min, upTo - 1);
             int cents = randomBetweenInclusive(0, 99);
             String priceText = String.format("%d.%02d", dollars, cents);
@@ -45,12 +45,12 @@ public class Helpers {
 
     public static List<String> generateRunners(String initial, int count) {
         List<String> runners = new ArrayList(count);
-        for(int i = 0; i < count; i++,  runners.add(initial + i));
+        for (int i = 0; i < count; i++, runners.add(initial + i)) ;
         return runners;
     }
 
     public static String toTitleCase(String name) {
-        return (name.substring(0,1).toUpperCase()) + (name.substring(1));
+        return (name.substring(0, 1).toUpperCase()) + (name.substring(1));
     }
 
     public static String norm(String input) {
@@ -72,11 +72,11 @@ public class Helpers {
 
     public static String getUriOfResource(String fileName) {
         ClassLoader classLoader = Helpers.class.getClassLoader();
-        String path  = classLoader.getResource(fileName).getPath();
+        String path = classLoader.getResource(fileName).getPath();
         return new File(path).toURI().toString();
     }
 
-    public static Object nonNullGet(Map map, Object key){
+    public static Object nonNullGet(Map map, Object key) {
         assertThat(map.get(key))
                 .withFailMessage("Map key='%s' does not exist in: %s", key, map.keySet())
                 .isNotNull();
@@ -92,7 +92,7 @@ public class Helpers {
         assertThat(lastValidDate).as("CC month=%d year=%d is expired", expMonth, expYear).isAfterOrEqualTo(today);
     }
 
-    public static String createUniqueName(String baseName){
+    public static String createUniqueName(String baseName) {
         return String.format("%s %d", baseName, randomBetweenInclusive(1000, 9999));
     }
 
@@ -114,7 +114,7 @@ public class Helpers {
 
     public static BigDecimal roundOff(BigDecimal value) {
         int decimalPlaces = 2;
-        return value.setScale(decimalPlaces,BigDecimal.ROUND_HALF_UP);
+        return value.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP);
     }
 
     public static void retryOnAssertionFailure(Runnable block, int maxTries, int sleepSeconds) {
@@ -132,7 +132,7 @@ public class Helpers {
         throw new RuntimeException(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
     }
 
-    public static List<String> collectElementsTexts(WebElement parent, By childrenSelector){
+    public static List<String> collectElementsTexts(WebElement parent, By childrenSelector) {
         return parent.findElements(childrenSelector)
                 .stream().map(e -> e.getText().trim())
                 .collect(Collectors.toList());
@@ -144,10 +144,16 @@ public class Helpers {
         return (Map<String, String>) zipToMap(headers, data);
     }
 
-    public static Map zipToMap(List headers, List data) {
-        return IntStream.range(0, Math.min(headers.size(), data.size()))
-                    .mapToObj(i -> Pair.of(headers.get(i), data.get(i)))
-                    .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    public static Map zipToMap(List keys, List values) {
+        return IntStream.range(0, Math.min(keys.size(), values.size()))
+                .mapToObj(i -> Pair.of(keys.get(i), values.get(i)))
+                .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    }
+
+    public static List<Pair> zipToPairs(List keys, List values) {
+        return IntStream.range(0, Math.min(keys.size(), values.size()))
+                .mapToObj(i -> Pair.of(keys.get(i), values.get(i)))
+                .collect(Collectors.toList());
     }
 
 

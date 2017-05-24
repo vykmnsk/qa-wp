@@ -15,7 +15,10 @@ public interface WagerPlayerAPI {
     enum KEY {
         MPID,
         WIN_PRICE,
-        PLACE_PRICE
+        PLACE_PRICE,
+        RUNNER_NAME,
+        BET_STATUS,
+        BET_PAYOUT
     }
 
     String login(String username, String password, String clientIp);

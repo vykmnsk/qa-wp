@@ -1,8 +1,10 @@
 package com.tabcorp.qa.wagerplayer.api;
 
+import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +70,7 @@ public class WAPI implements WagerPlayerAPI {
         return ctx;
     }
 
-    public String login(){
+    public String login() {
         return login(Config.customerUsername(), Config.customerPassword(), Config.clientIp());
     }
 
@@ -111,6 +113,18 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("action", "bet_get_balance");
         String balance = post(fields).read(RESP_ROOT + ".account[0].balance");
         return new BigDecimal(balance);
+    }
+
+    public Map<KEY, String> getBetDetails(Integer betId, String sessionId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_get_bet");
+        fields.put("bet_id", betId);
+        ReadContext resp = post(fields);
+        HashMap<KEY, String> bet = new HashMap<>();
+        bet.put(KEY.RUNNER_NAME, resp.read(RESP_ROOT + ".bet.selections.betdetail[0].side"));
+        bet.put(KEY.BET_STATUS, resp.read(RESP_ROOT + ".bet.status"));
+        bet.put(KEY.BET_PAYOUT, resp.read(RESP_ROOT + ".bet.bet_win"));
+        return  bet;
     }
 
     public ReadContext placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {

@@ -3,7 +3,7 @@ package com.tabcorp.qa.wagerplayer.pages;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
-import cucumber.api.DataTable;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -55,6 +55,9 @@ public class SettlementPage extends AppPage {
     @FindBy(css = ("table[id=deductions_table] > tbody > tr"))
     List<WebElement> deductionsRows;
 
+    @FindBy(css = ("td[align=left] table#no_padding_table_inner"))
+    WebElement resultPricesTable;
+
     private By priceSelector = By.cssSelector("input[id^='price']");
 
     public void load() {
@@ -85,12 +88,14 @@ public class SettlementPage extends AppPage {
     public void accept() {
         load();
         wait.until(ExpectedConditions.visibilityOf(accept));
+        scrollTo(accept);
         accept.click();
     }
 
     public void settle() {
         load();
         wait.until(ExpectedConditions.visibilityOf(settle));
+        scrollTo(settle);
         settle.click();
     }
 
@@ -155,7 +160,7 @@ public class SettlementPage extends AppPage {
     public void verifyRunnerDeductions(List<List<String>> expectedDeductions) {
         By textInputSelector = By.cssSelector("td input[type=text]");
         Predicate<WebElement> containsTextInputs = el -> el.findElements(textInputSelector).size() > 0;
-        List<WebElement> dataRows =deductionsRows.stream().filter(containsTextInputs).collect(Collectors.toList());
+        List<WebElement> dataRows = deductionsRows.stream().filter(containsTextInputs).collect(Collectors.toList());
 
         List<List<String>> actualDeductions = new LinkedList<>();
         for (WebElement row : dataRows) {
@@ -164,10 +169,38 @@ public class SettlementPage extends AppPage {
             List<String> rowValues = Stream.concat(
                     Stream.of(text),
                     inputs.stream().map(i -> i.getAttribute("value"))
-                ).collect(Collectors.toList());
+            ).collect(Collectors.toList());
             actualDeductions.add(rowValues);
         }
         assertThat(actualDeductions).as("Deductions data").isEqualTo(expectedDeductions);
+    }
+
+    public void updateFixedPrices(List<BigDecimal> winPrices, List<BigDecimal> placePrices) {
+        final String fixedProdName = "Luxbook DVP";
+        final By inputSelector = By.cssSelector("td > input[type=text]");
+
+        List<WebElement> allRows = resultPricesTable.findElements(By.tagName("tr"));
+        List<String> headers = Helpers.collectElementsTexts(allRows.get(0), By.cssSelector("td.base_product_heading"));
+        List<WebElement> inputRows = allRows.stream()
+                .filter(r -> r.findElements(inputSelector).size() > 0)
+                .collect(Collectors.toList());
+        assertThat(inputRows.size()).isEqualTo(winPrices.size()).isEqualTo(placePrices.size());
+
+        for (int i = 0; i < inputRows.size(); i++) {
+            List<WebElement> rowInputs = inputRows.get(i).findElements(inputSelector);
+            List<Pair> inputsWithHeaders = Helpers.zipToPairs(headers, rowInputs);
+            List<WebElement> fixedInputs = inputsWithHeaders.stream()
+                    .filter(pair -> ((String) pair.getKey()).startsWith(fixedProdName))
+                    .map(p -> (WebElement) p.getValue()).collect(Collectors.toList());
+            assertThat(fixedInputs.size()).isEqualTo(2);
+            WebElement winFixedInput = fixedInputs.get(0);
+            WebElement placeFixedInput = fixedInputs.get(1);
+            winFixedInput.clear();
+            winFixedInput.sendKeys(winPrices.get(i).toString());
+            placeFixedInput.clear();
+            placeFixedInput.sendKeys(placePrices.get(i).toString());
+        }
+        result.click();
     }
 
 }

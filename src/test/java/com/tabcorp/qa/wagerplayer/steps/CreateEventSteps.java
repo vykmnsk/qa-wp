@@ -136,9 +136,29 @@ public class CreateEventSteps implements En {
             if (Config.isLuxbet()) marketsPage.setHardSoftInterimLimits();
         });
 
+        And("^I update Exotic Prices$", (DataTable table) -> {
+            List<List<String>> priceData = table.raw();
+            assertThat(priceData.size()).as("price table rows").isGreaterThan(0);
+            for (List<String> priceRow : priceData) {
+                assertThat(priceRow.size()).as("expecting for example: [STAB, Quinella, 6.50]").isEqualTo(3);
+                BigDecimal priceValue = new BigDecimal(priceRow.get(2));
+                assertThat(priceValue).isGreaterThan(new BigDecimal(0));
+            }
+            settlementPage.updateExoticPrices(priceData);
+        });
+
         When("^I result race with the runners and positions$", (DataTable table) -> {
             Map<String, String> winners = table.asMap(String.class, String.class);
             resultRace(winners);
+        });
+
+        When("^I result race with Fixed Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            assertThat(winPrices).as(BetType.Win.name() + " prices cucumber input").isNotEmpty();
+            assertThat(placePrices).as(BetType.Place.name() + " prices cucumber input").isNotEmpty();
+            assertThat(winPrices.size()).as("Win and Place prices count match").isEqualTo(placePrices.size());
+            settlementPage.updateFixedPrices(winPrices, placePrices);
         });
 
         When("^I result/settle created event race with winners \"([^\"]*)\"$", (String winnersCSV) -> {
@@ -149,17 +169,6 @@ public class CreateEventSteps implements En {
             }
             resultRace(winnerData);
             settleRace();
-        });
-
-        And("^I update Exotic Prices$", (DataTable table) -> {
-            List<List<String>> priceData = table.raw();
-            assertThat(priceData.size()).as("price table rows").isGreaterThan(0);
-            for (List<String> priceRow : priceData) {
-                assertThat(priceRow.size()).as("expecting for example: [STAB, Quinella, 6.50]").isEqualTo(3);
-                BigDecimal priceValue = new BigDecimal(priceRow.get(2));
-                assertThat(priceValue).isGreaterThan(new BigDecimal(0));
-            }
-            settlementPage.updateExoticPrices(priceData);
         });
 
         And("^I settle race$", () -> {
