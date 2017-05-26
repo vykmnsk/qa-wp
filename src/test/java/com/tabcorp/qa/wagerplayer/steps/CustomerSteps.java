@@ -15,6 +15,7 @@ import com.tabcorp.qa.wagerplayer.pages.DepositPage;
 import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
 import com.tabcorp.qa.wagerplayer.pages.LoginPage;
 import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
+import com.tabcorp.qa.wagerplayer.pages.PromotionPage;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -117,19 +118,19 @@ public class CustomerSteps implements En {
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             customersPage.verifyLoaded();
-            Helpers.retryOnAssertionFailure(()-> {
-                    header.refreshPage();
-                    String actualAmlStatus = customersPage.readAMLStatus();
-                    Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
-                }, 10, 3);
+            Helpers.retryOnAssertionFailure(() -> {
+                header.refreshPage();
+                String actualAmlStatus = customersPage.readAMLStatus();
+                Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
+            }, 10, 3);
         });
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             String accessToken = loginStoredCustomer();
-            Helpers.retryOnAssertionFailure(()-> {
-                    String actualAmlStatus = api.readAmlStatus(accessToken);
-                    assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
-                }, 10, 2);
+            Helpers.retryOnAssertionFailure(() -> {
+                String actualAmlStatus = api.readAmlStatus(accessToken);
+                assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
+            }, 10, 2);
             Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
@@ -167,6 +168,16 @@ public class CustomerSteps implements En {
             depositPage.verifyTransactionRecord(transMsg, cashAmount, custData.get("currency_code"));
         });
 
+        When("^I activate promotion code \"([^\"]*)\" for default customer in WP with activation note \"([^\"]*)\"", (String promoCode, String activationNote) -> {
+            header = new HeaderPage();
+            customersPage = header.navigateToF11();
+            Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
+            customersPage.searchCustomer(custData.get("username"));
+            PromotionPage promotionPage = customersPage.openPromotionWindow();
+            promotionPage.verifyLoaded();
+            promotionPage.activatePromotion(promoCode, activationNote);
+        });
+
         When("^I add credit card to customer and I make a deposit of \\$(\\d+.\\d\\d)$", (BigDecimal deposit, DataTable table) -> {
             Map<String, String> cardInfoInput = table.asMap(String.class, String.class);
             StrictHashMap<String, String> cardInfo = new StrictHashMap<>();
@@ -202,6 +213,13 @@ public class CustomerSteps implements En {
             assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
             Storage.put(BALANCE_BEFORE, currentBalance);
         });
+
+        Then("^customer bonus bet balance is equal to \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBalance) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            BigDecimal currentBalance = wapi.getBonusBalance(accessToken);
+            assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
+        });
+
     }
 
     private void addCCMakeDeposit(String cardNumber, String cvc, String expMonth, String expYear, String cardHolderName, String cardType, BigDecimal deposit) {
@@ -271,4 +289,5 @@ public class CustomerSteps implements En {
         newCustPage = customersPage.insertNew();
         newCustPage.verifyLoaded();
     }
+
 }

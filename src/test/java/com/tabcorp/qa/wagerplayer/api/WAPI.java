@@ -1,10 +1,8 @@
 package com.tabcorp.qa.wagerplayer.api;
 
-import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
-import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -115,6 +113,13 @@ public class WAPI implements WagerPlayerAPI {
         return new BigDecimal(balance);
     }
 
+    public BigDecimal getBonusBalance(String sessionId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_get_balance");
+        String balance = post(fields).read(RESP_ROOT + ".account[0].bonus_balance");
+        return new BigDecimal(balance);
+    }
+
     public Map<KEY, String> getBetDetails(Integer betId, String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_bet");
@@ -124,10 +129,21 @@ public class WAPI implements WagerPlayerAPI {
         bet.put(KEY.RUNNER_NAME, resp.read(RESP_ROOT + ".bet.selections.betdetail[0].side"));
         bet.put(KEY.BET_STATUS, resp.read(RESP_ROOT + ".bet.status"));
         bet.put(KEY.BET_PAYOUT, resp.read(RESP_ROOT + ".bet.bet_win"));
-        return  bet;
+        return bet;
     }
 
-    public ReadContext placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake) {
+    private Map<String, Object> bonusBetFields(String sessionId, Integer bbFlag, String mpid, BetType betType){
+        Map<String, Object> fields = new HashMap<>();
+        if (bbFlag.equals(1)) {
+            fields.put("free_bet_code", getBonusBetCode(sessionId, mpid, betType.id));
+        } else if (bbFlag.equals(2)) {
+            fields.put("free_bet_code", "::_::");
+        }
+        fields.put("stake_source", bbFlag);
+        return fields;
+    }
+
+    public ReadContext placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Win.id);
@@ -135,10 +151,13 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
         fields.put("amount", stake);
+        if (bonusBetFlag > 0) {
+            fields.putAll(bonusBetFields(sessionId, bonusBetFlag, mpid, BetType.Win));
+        }
         return post(fields);
     }
 
-    public ReadContext placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake) {
+    public ReadContext placeSinglePlaceBet(String sessionId, Integer productId, String mpid, String placePrice, BigDecimal stake, Integer bonusBetFlag) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Place.id);
@@ -146,10 +165,13 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("mpid", mpid);
         fields.put("place_price", placePrice);
         fields.put("amount", stake);
+        if (bonusBetFlag > 0) {
+            fields.putAll(bonusBetFields(sessionId, bonusBetFlag, mpid, BetType.Place));
+        }
         return post(fields);
     }
 
-    public ReadContext placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
+    public ReadContext placeSingleEachwayBet(String sessionId, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake, Integer bonusBetFlag) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Eachway.id);
@@ -158,7 +180,19 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("win_price", winPrice);
         fields.put("place_price", placePrice);
         fields.put("amount", stake);
+        if (bonusBetFlag > 0) {
+            fields.putAll(bonusBetFields(sessionId, bonusBetFlag, mpid, BetType.Eachway));
+        }
         return post(fields);
+    }
+
+    private String getBonusBetCode(String sessionId, String mpid, Integer betType) {
+        Map<String, Object> bbFields = wapiAuthFields(sessionId);
+        bbFields.put("action", "bet_bonus_bet_allowed");
+        bbFields.put("mpid", mpid);
+        bbFields.put("bet_type", betType);
+        ReadContext resp = post(bbFields);
+        return resp.read(RESP_ROOT + ".bonus_bets[0].bonus_bet[0].free_bet_code");
     }
 
     public ReadContext placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi) {
@@ -206,7 +240,7 @@ public class WAPI implements WagerPlayerAPI {
     public String prepareSelectionsForDoubleMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
         List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size(), betTypes.size());
         assertThat(sizes).as("Number of Selections, Products and BetTypes").allMatch(size -> size.equals(2));
-        return prepareSelectionsForMultiBet(sessionId, selections, prodIds,"Double", betTypes);
+        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, "Double", betTypes);
     }
 
     public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, String multiType) {
@@ -214,7 +248,7 @@ public class WAPI implements WagerPlayerAPI {
         Integer count = sizes.get(0);
         assertThat(count).as("Multi Selections count").isGreaterThan(1);
         assertThat(sizes).as("Number of Selections and Products").allMatch(count::equals);
-        List<BetType> dummyBetTypes = Collections.nCopies(count,null);
+        List<BetType> dummyBetTypes = Collections.nCopies(count, null);
         return prepareSelectionsForMultiBet(sessionId, selections, prodIds, multiType, dummyBetTypes);
     }
 
@@ -244,7 +278,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public BigDecimal readNewBalance(ReadContext resp) {
-        Object val = resp.read( RESP_ROOT + ".bet[0].new_balance");
+        Object val = resp.read(RESP_ROOT + ".bet[0].new_balance");
         BigDecimal newBalance = new BigDecimal(val.toString());
         return newBalance;
     }

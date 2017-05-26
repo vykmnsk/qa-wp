@@ -114,13 +114,4 @@ public class DepositPage extends AppPage {
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
-    private void switchToNewWindow(List<String> oldWindows) {
-        String newWindow = driver.getWindowHandles().stream()
-                .filter(w -> !oldWindows.contains(w))
-                .findFirst().orElse(null);
-        Assertions.assertThat(newWindow).isNotNull();
-        driver.switchTo().window(newWindow);
-        driver.switchTo().defaultContent();
-    }
-
 }

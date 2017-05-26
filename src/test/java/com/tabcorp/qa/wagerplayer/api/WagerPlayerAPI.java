@@ -25,11 +25,11 @@ public interface WagerPlayerAPI {
 
     BigDecimal getBalance(String sessionToken);
 
-    ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake);
+    ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag);
 
-    ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake);
+    ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake, Integer bonusBetFlag);
 
-    ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake);
+    ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake, Integer bonusBetFlag);
 
     ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
 

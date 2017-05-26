@@ -18,6 +18,18 @@ public class CustomersPage extends AppPage{
     @FindBy(css = "img[src='images/button_deposit.gif']")
     private WebElement depositButton;
 
+    @FindBy(css = "input[value=promotion]")
+    private WebElement promotionButton;
+
+    @FindBy(css = "a[title$=options]")
+    public WebElement options;
+
+    @FindBy(css = "input[name=username]")
+    public WebElement customerUsername;
+
+    @FindBy(css = "input[value='Go']")
+    public WebElement go;
+
     final String statusLabel = "AML Status:";
 
     public void load() {
@@ -54,5 +66,18 @@ public class CustomersPage extends AppPage{
         DepositPage dp = new DepositPage();
         dp.load();
         return dp;
+    }
+
+    public void searchCustomer(String customerName) {
+        options.click();
+        customerUsername.sendKeys(customerName);
+        go.click();
+    }
+
+    public PromotionPage openPromotionWindow() {
+        promotionButton.click();
+        PromotionPage pp = new PromotionPage();
+        pp.load();
+        return pp;
     }
 }

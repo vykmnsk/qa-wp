@@ -105,7 +105,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return accessToken;
     }
 
-    public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake) {
+    public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
@@ -116,7 +116,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return checkoutBet(betPayload);
     }
 
-    public ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake) {
+    public ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 
@@ -128,7 +128,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return checkoutBet(betPayload);
     }
 
-    public ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake) {
+    public ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
 

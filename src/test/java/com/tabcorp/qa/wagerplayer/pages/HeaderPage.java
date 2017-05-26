@@ -1,5 +1,6 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
+import com.tabcorp.qa.common.Helpers;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -70,10 +71,13 @@ public class HeaderPage extends AppPage {
     }
 
     public void pickEvent(String catVal, String subcatVal, String eventVal) {
-        pickCategories(catVal, subcatVal);
-        wait.until(ExpectedConditions.visibilityOf(event));
-        wait.until(ExpectedConditions.textToBePresentInElement(event, eventVal));
-        (new Select(event)).selectByVisibleText(eventVal);
+        Helpers.retryOnAssertionFailure(()-> {
+            pickCategories(catVal, subcatVal);
+            wait.until(ExpectedConditions.visibilityOf(event));
+            wait.until(ExpectedConditions.textToBePresentInElement(event, eventVal));
+            (new Select(event)).selectByVisibleText(eventVal);
+            Assertions.assertThat(event.getText()).as("Event Name").contains(eventVal);
+        }, 5, 1);
     }
 
     public void navigateToF3(String catVal, String subcatVal) {

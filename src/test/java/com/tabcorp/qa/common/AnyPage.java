@@ -16,6 +16,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class AnyPage {
     public WebDriver driver;
     public WebDriverWait wait;
@@ -72,6 +74,15 @@ public class AnyPage {
 
     public void acceptAlert() {
         driver.switchTo().alert().accept();
+    }
+
+    public void switchToNewWindow(List<String> oldWindows) {
+        String newWindow = driver.getWindowHandles().stream()
+                .filter(w -> !oldWindows.contains(w))
+                .findFirst().orElse(null);
+        assertThat(newWindow).isNotNull();
+        driver.switchTo().window(newWindow);
+        driver.switchTo().defaultContent();
     }
 
 }

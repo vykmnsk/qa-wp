@@ -37,14 +37,25 @@ public class BetAPISteps implements En {
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
-                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, false);
+                    Integer bonusBetFlag = 0;
+                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
+                });
+
+        When("^I place a bonus single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d) with bonus wallet as \"([Y|N])\"$",
+                (String betTypeName, String runner, BigDecimal stake, String bonusWalletOption) -> {
+                    boolean useBonusWallet = "Y".equalsIgnoreCase(bonusWalletOption);
+                    Integer bonusBetFlag = useBonusWallet ? 2 : 1;
+                    String evId = (String) Storage.getLast(EVENT_IDS);
+                    Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
                 });
 
         When("^I place a unfixed single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
-                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, true);
+                    Integer bonusBetFlag = 0;
+                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
                 });
 
 
@@ -156,7 +167,7 @@ public class BetAPISteps implements En {
 
     }
 
-    private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, boolean useDefaultPrices) {
+    private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
         String wapiSessionId;
         if (Config.isRedbook()) {
@@ -171,15 +182,15 @@ public class BetAPISteps implements En {
         switch (betTypeName.toUpperCase()) {
             case "WIN":
                 response = api.placeSingleWinBet(accessToken, prodId,
-                        selection.get(MPID), selection.get(WIN_PRICE), stake);
+                        selection.get(MPID), selection.get(WIN_PRICE), stake, bonusBetflag);
                 break;
             case "PLACE":
                 response = api.placeSinglePlaceBet(accessToken, prodId,
-                        selection.get(MPID), selection.get(PLACE_PRICE), stake);
+                        selection.get(MPID), selection.get(PLACE_PRICE), stake, bonusBetflag);
                 break;
             case "EACHWAY":
                 response = api.placeSingleEachwayBet(accessToken, prodId,
-                        selection.get(MPID), selection.get(WIN_PRICE), selection.get(PLACE_PRICE), stake);
+                        selection.get(MPID), selection.get(WIN_PRICE), selection.get(PLACE_PRICE), stake, bonusBetflag);
                 break;
             default:
                 throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
