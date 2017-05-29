@@ -47,11 +47,15 @@ Feature: Create a Luxbet Event
     Then I can see success status with message "Market display updated"
     And event status is "L"
 
+  @smoke
+    Examples:
+      | Category     | Subcategory   | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
+      | Horse Racing | WOLVERHAMPTON | 8               | 3          | 1/5           | 3          |
+
     Examples:
       | Category         | Subcategory   | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
 #      |                  |               | 24              | 1          | 1/4           | 4          |
 #      |                  |               | 15              | 2          | 1/5           | 3          |
-      | Horse Racing     | WOLVERHAMPTON | 8               | 3          | 1/5           | 3          |
       | GREYHOUND RACING | CORK          | 8               | 3          | 1/5           | 3          |
       | Harness Racing   | ALBION PARK   | 8               | 3          | 1/5           | 3          |
 

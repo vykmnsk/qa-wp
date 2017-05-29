@@ -41,9 +41,13 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     And I settle race
     Then customer balance since last bet is increased by $<Payout>
 
+    @smoke
     Examples:
       | Category       | Subcategory | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |
       | Horse Racing   | BALLINA     | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 19.50  |
+
+    Examples:
+      | Category       | Subcategory | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |
       | Horse Racing   | BALLINA     | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 38.25  |
       | Horse Racing   | BALLINA     | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 76.35  |
       | Horse Racing   | BALLINA     | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 105.00 |

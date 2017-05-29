@@ -5,6 +5,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
 
+  @smoke
   Scenario: Deductions for 3 place 1 scratched runner
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details

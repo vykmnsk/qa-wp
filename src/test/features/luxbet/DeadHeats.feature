@@ -35,9 +35,13 @@ Feature: Deadheats testing on a Luxbet event
     And I settle race
     Then customer balance since last bet is increased by $<Payout>
 
+    @smoke
     Examples:
       | type   | Category         | Subcategory             | WinPrices                                                            | PlacePrices                                                | WinnerWithPositions                                          | Payout |
       | FIRST  | Horse Racing     | Automation Horse Racing | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 1:COLORADO MISS, 3:CADEYRN, 4:PROSPECT ROAD | 65.03  |
+
+    Examples:
+      | type   | Category         | Subcategory             | WinPrices                                                            | PlacePrices                                                | WinnerWithPositions                                          | Payout |
       | FIRST  | GREYHOUND RACING | CORK                    | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 1:COLORADO MISS, 3:CADEYRN, 4:PROSPECT ROAD | 65.03  |
       | FIRST  | Harness Racing   | ALBION PARK             | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 1:COLORADO MISS, 3:CADEYRN, 4:PROSPECT ROAD | 65.03  |
       | SECOND | Horse Racing     | Automation Horse Racing | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00 | 2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65 | 1:ROCKING HORSE, 2:COLORADO MISS, 2:CADEYRN, 4:PROSPECT ROAD | 102.43 |

@@ -63,8 +63,13 @@ Feature: Bonus Bets
     And I settle race
     Then customer balance is equal to $<custBalance>
 
-  @luxbet
+  @smoke
     Examples:
       | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street       | city | suburb   | postcode | state | country | timezone         | promo_code | secret_question         | currency_code | client_ip   | manual_verification | amlStatus        | depositAmount | bonusWallet | bonusBetBalance | custBalance |
       | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave | N/A  | SEAFORTH | 2092     | NSW   | AU      | Australia/Sydney | bbauto     | Favourite Holiday Spot? | AUD           | 61.9.192.13 | N/A                 | account_verified | 1000.00       | N           | 0.00            | 1185.00     |
+
+
+  @luxbet
+    Examples:
+      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street       | city | suburb   | postcode | state | country | timezone         | promo_code | secret_question         | currency_code | client_ip   | manual_verification | amlStatus        | depositAmount | bonusWallet | bonusBetBalance | custBalance |
       | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave | N/A  | SEAFORTH | 2092     | NSW   | AU      | Australia/Sydney | bbauto     | Favourite Holiday Spot? | AUD           | 61.9.192.13 | N/A                 | account_verified | 1000.00       | Y           | 90.00           | 1018.50     |
