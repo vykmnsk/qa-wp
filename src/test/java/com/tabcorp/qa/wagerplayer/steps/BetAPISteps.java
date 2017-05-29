@@ -144,7 +144,7 @@ public class BetAPISteps implements En {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             Helpers.retryOnAssertionFailure(() -> {
                 BigDecimal balanceNow = api.getBalance(accessToken);
-                assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
+                assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).as("Customer Balance increased by").isEqualTo(Helpers.roundOff(diff));
             }, 10, 4);
         });
 

@@ -147,57 +147,6 @@ public class CreateEventSteps implements En {
             settlementPage.updateExoticPrices(priceData);
         });
 
-        When("^I result race with the runners and positions$", (DataTable table) -> {
-            Map<String, String> winners = table.asMap(String.class, String.class);
-            resultRace(winners);
-        });
-
-        When("^I result race with Fixed Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
-            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
-            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            assertThat(winPrices).as(BetType.Win.name() + " prices cucumber input").isNotEmpty();
-            assertThat(placePrices).as(BetType.Place.name() + " prices cucumber input").isNotEmpty();
-            assertThat(winPrices.size()).as("Win and Place prices count match").isEqualTo(placePrices.size());
-            settlementPage.updateFixedPrices(winPrices, placePrices);
-        });
-
-        When("^I result/settle created event race with winners \"([^\"]*)\"$", (String winnersCSV) -> {
-            List<String> winners = Helpers.extractCSV(winnersCSV);
-            Map<String, String> winnerData = new StrictHashMap<>();
-            for (int i = 0; i < winners.size(); i++) {
-                winnerData.put(winners.get(i), String.valueOf(i + 1));
-            }
-            resultRace(winnerData);
-            settleRace();
-        });
-
-        And("^I settle race$", () -> {
-            settleRace();
-        });
-
-        When("^I settle race with Exotic prices \"([\\d.,\\s]*)\"$", (String pricesCSV) -> {
-            parseUpdateSettlePrices(pricesCSV, BetType.Exotic);
-            settleRace();
-        });
-
-        When("^I can see the following deduction details on settlement page$", (DataTable table) -> {
-            List<List<String>> deductionDetails = table.raw();
-            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
-            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
-            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
-            header = new HeaderPage();
-            header.pickEvent(cat, subcat, evName);
-            header.navigateToF6();
-            settlementPage = new SettlementPage();
-            settlementPage.verifyRunnerDeductions(deductionDetails);
-        });
-
-        When("^I settle the race with Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
-            parseUpdateSettlePrices(winPricesCSV, BetType.Win);
-            parseUpdateSettlePrices(placePricesCSV, BetType.Place);
-            settleRace();
-        });
-
         And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
@@ -217,12 +166,12 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            updatePlacePrices(placePricesCSV, prodId);
+            updatePlacePricesOnF5(placePricesCSV, prodId);
         });
 
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
             Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
-            updatePlacePrices(placePricesCSV, prodId);
+            updatePlacePricesOnF5(placePricesCSV, prodId);
         });
 
         When("^I scratch the runners at position\\(s\\) \"([^\"]*)\"$", (String runnerPositionsCSV) -> {
@@ -237,14 +186,78 @@ public class CreateEventSteps implements En {
             marketsPage.scratchRunners(runnerPositions);
         });
 
+        When("^I result race with Fixed Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            assertThat(winPrices).as(BetType.Win.name() + " prices cucumber input").isNotEmpty();
+            assertThat(placePrices).as(BetType.Place.name() + " prices cucumber input").isNotEmpty();
+            assertThat(winPrices.size()).as("Win and Place prices count match").isEqualTo(placePrices.size());
+            settlementPage.updateFixedPrices(winPrices, placePrices);
+        });
+
+        When("^I can see the following deduction details on settlement page$", (DataTable table) -> {
+            List<List<String>> deductionDetails = table.raw();
+            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
+            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
+            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
+            header = new HeaderPage();
+            header.pickEvent(cat, subcat, evName);
+            header.navigateToF6();
+            settlementPage = new SettlementPage();
+            settlementPage.verifyRunnerDeductions(deductionDetails);
+        });
+
+        When("^I result event with winners \"([^\"]*)\"$", (String winnersCSV) -> {
+            Map<String, String> winnerPosMap = extractWinnersAddPositions(winnersCSV);
+            resultRace(winnerPosMap);
+        });
+
+        When("^I result/settle created event race with winners \"([^\"]*)\"$", (String winnersCSV) -> {
+            Map<String, String> winnerPosMap = extractWinnersAddPositions(winnersCSV);
+            resultRace(winnerPosMap);
+            settleRace();
+        });
+
+        When("^I result race with the runners and positions$", (DataTable table) -> {
+            Map<String, String> winnerPosMap = table.asMap(String.class, String.class);
+            resultRace(winnerPosMap);
+        });
+
         When("^I result race with the runners and positions \"([^\"]*)\"$", (String winnersCSV) -> {
-            List<String> winners = Helpers.extractCSV(winnersCSV);
-            Map<String, String> winnerData = extractWinnersAndPositions(winners);
-            resultRace(winnerData);
+            // Expecting list in format [Position]:[RunnerName]. e.g. 1:Runner01
+            List<String> posWinnerPairs = Helpers.extractCSV(winnersCSV);
+            Map<String, String> winnerPosMap = posWinnerPairs.stream()
+                    .map(pw -> Helpers.extractCSV(pw, ':'))
+                    .collect(Collectors.toMap(p -> p.get(1), p -> p.get(0)));
+             resultRace(winnerPosMap);
+        });
+
+        And("^I settle race$", () -> {
+            settleRace();
+        });
+
+        When("^I settle race with Exotic prices \"([\\d.,\\s]*)\"$", (String pricesCSV) -> {
+            parseUpdateSettlePrices(pricesCSV, BetType.Exotic);
+            settleRace();
+        });
+
+        When("^I settle the race with Win prices \"([\\d.,\\s]*)\" and Place prices \"([\\d.,\\s]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+            parseUpdateSettlePrices(winPricesCSV, BetType.Win);
+            parseUpdateSettlePrices(placePricesCSV, BetType.Place);
+            settleRace();
         });
     }
-    
-    private void updatePlacePrices(String placePricesCSV, Integer prodId) {
+
+    private Map<String, String> extractWinnersAddPositions(String winnersCSV) {
+        List<String> winners = Helpers.extractCSV(winnersCSV);
+        Map<String, String> winnerPosMap = new StrictHashMap<>();
+        for (int i = 0; i < winners.size(); i++) {
+            winnerPosMap.put(winners.get(i), String.valueOf(i + 1));
+        }
+        return winnerPosMap;
+    }
+
+    private void updatePlacePricesOnF5(String placePricesCSV, Integer prodId) {
         List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
         String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
         String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
@@ -277,22 +290,6 @@ public class CreateEventSteps implements En {
         settlementPage.accept();
         settlementPage.settle();
         header.deSelectSettled();
-    }
-
-    /**
-     * Expecting list in format [Position]:[RunnerName]
-     * e.g. 1:Runner01
-     * @param winners
-     * @return
-     */
-    private static Map<String, String> extractWinnersAndPositions(List<String> winners) {
-        Map<String, String> winnerData = new StrictHashMap<>();
-        for (int i = 0; i < winners.size(); i++) {
-            List<String> winnerPosition = Helpers.extractCSV(winners.get(i), ':');
-            assertThat(winnerPosition.size()).as("Expected position and runner name in format[#:name], but found " + winners.get(i)).isEqualTo(2);
-            winnerData.put(winnerPosition.get(1), winnerPosition.get(0));
-        }
-        return winnerData;
     }
 
 }

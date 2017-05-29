@@ -32,16 +32,13 @@ Feature: Placing and Settling multi Bets
       | Betting | Display Price | Place |
 
     When I place multi bet "Double <BetType>" on the runners "<BetOn>" for $<Stake>
-    Then customer balance after bet is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<Deduction>
 
-    When I result race with the runners and positions "<WinnerWithPositionsEvent1>"
-    And I settle race
-    When I result race with the runners and positions "<WinnerWithPositionsEvent2>"
-    And I settle race
-
+    When I result/settle created event race with winners "Runner01, Runner02, Runner03"
+    When I result/settle created event race with winners "Runner11, Runner12, Runner13"
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | BetType | BetOn              | Stake | BalanceDeductedBy | Payout | WinnerWithPositionsEvent1          | WinnerWithPositionsEvent2          |
-      | Win     | Runner01, Runner11 | 3.00  | 3.00              | 7.59   | 1:Runner01, 2:Runner02, 3:Runner03 | 1:Runner11, 2:Runner12, 3:Runner13 |
-      | Eachway | Runner01, Runner11 | 3.00  | 6.00              | 10.59  | 1:Runner01, 2:Runner02, 3:Runner03 | 1:Runner11, 2:Runner12, 3:Runner13 |
+      | BetType | BetOn              | Stake | Deduction | Payout |
+      | Win     | Runner01, Runner11 | 3.00  | 3.00      | 7.59   |
+      | Eachway | Runner01, Runner11 | 3.00  | 6.00      | 10.59  |

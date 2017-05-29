@@ -1,5 +1,5 @@
-@luxbet @single-bets @fixed-single-bets
-Feature: Placing and Settling multiple Single bets on a Luxbet event
+@luxbet @several-single-bets
+Feature: Placing and Settling several Single bets on the same event
 
   Background:
     Given A new default customer with $100.00 balance is created and logged in API
