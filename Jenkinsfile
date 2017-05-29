@@ -2,6 +2,9 @@
 @Library('potatocannon-global')
 import au.com.tabcorp.potatocannon.*
 
+def USERNAME = "tabcorp-qa-bot"
+def ENCRYPTED_API_KEY = "AQECAHhggPTequCEJZiWje2nomwraogaydeiw6VFPgL4Kmh9JQAAAKswgagGCSqGSIb3DQEHBqCBmjCBlwIBADCBkQYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzW6c5WzBP2mJddsXICARCAZJmeAANoGnXwV0srjY3M3JKo03i6PwqZwsoCYxjoF9Nh7Oswzhueq2ktoetTqglOqeV2JuZjgsCxd1dfFzkyntdaXqwT/bPkP2ApeHAVH+KX4PtHMjlJzgb4sk4PJ7/z6QvdXbk="
+
 pipeline {
 
     agent {
@@ -15,7 +18,7 @@ pipeline {
 
     triggers {
         // Times needs to be specified in UTC
-        cron('0 20 * * 1-5')
+        cron('0 22 * * *')
         pollSCM('*/2 * * * *')
     }
 
@@ -77,12 +80,30 @@ pipeline {
                 }
             }
         }
+
+        stage('publish') {
+
+            steps {
+
+                script {
+                    addDockerAuth {
+                        username = USERNAME
+                        password = ENCRYPTED_API_KEY
+                        repo = "redbook-docker-dev.artifacts.tabdigital.com.au"
+                    }
+                }
+
+
+                sh 'make create'
+                sh 'make publish'
+            }
+        }
     }
 
     post {
 
         always {
-            sh 'docker-compose down'
+            sh 'docker-compose down --remove-orphans'
         }
 
         success {
