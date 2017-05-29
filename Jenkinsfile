@@ -25,6 +25,7 @@ pipeline {
     stages {
         stage('checkout & install dependencies') {
             steps {
+//                sh 'docker-compose down'
                 checkout scm
                 sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
@@ -83,6 +84,10 @@ pipeline {
 
         stage('publish') {
 
+            when {
+                branch 'master'
+            }
+
             steps {
 
                 script {
@@ -103,7 +108,7 @@ pipeline {
     post {
 
         always {
-            sh 'docker-compose down --remove-orphans'
+            sh 'docker-compose down'
         }
 
         success {
