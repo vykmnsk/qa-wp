@@ -16,24 +16,25 @@ Feature: Single Bets
       | Betting | Enable Single | EW    |
       | Betting | Display Price | Win   |
       | Betting | Display Price | Place |
+    And I update fixed win prices "<WinPrices>"
 
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction>
 
-    When I result event with winners "<Winners>"
-    And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
+    When I result/settle created event race with winners "<Winners>"
     Then customer balance since last bet is increased by $<Payout>
 
   @smoke
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | Winners            |
-      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 2.75   | 4.20, 4.10 | 3.90, 1.29  | Runner01, Runner02 |
+      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | Winners            |
+      | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 2.50      | 10.50  | 4.20, 4.10 | Runner01, Runner02 |
 
     Examples:
-      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | PlacePrices | Winners            |
-      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | 3.90, 1.29  | Runner01, Runner02 |
+      | ProductName       | BetType | BetOn    | Stake | Deduction | Payout | WinPrices  | Winners            |
+      | Luxbook DVP Fixed | Win     | Runner02 | 2.50  | 2.50      | 0.00   | 2.20, 5.10 | Runner01, Runner02 |
 
-  Scenario Outline: Horse Race Place or EachWay Single bet
+
+  Scenario Outline: Horse Race <BetType> Single bet
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
@@ -53,11 +54,12 @@ Feature: Single Bets
       | Bets Allowed Place | PLACE Fraction |
       | Place Fraction     | 1/4            |
       | No of Places       | 3              |
+    And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
+
     When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction>
 
-    When I result event with winners "<Winners>"
-    And I settle the race with Win prices "<WinPrices>" and Place prices "<PlacePrices>"
+    When I result/settle created event race with winners "<Winners>"
     Then customer balance since last bet is increased by $<Payout>
 
   @smoke

@@ -24,9 +24,9 @@ public class CreateEventSteps implements En {
 
     private static Logger log = LoggerFactory.getLogger(CreateEventSteps.class);
 
+    private HeaderPage header = new HeaderPage();
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
-    private HeaderPage header;
     private SettlementPage settlementPage;
     private int raceNumber = 1;
 
@@ -36,7 +36,6 @@ public class CreateEventSteps implements En {
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
             Storage.add(Storage.KEY.CATEGORIES, category);
             Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
-            header = new HeaderPage();
             header.navigateToF3(category, subcategory);
         });
 
@@ -147,41 +146,44 @@ public class CreateEventSteps implements En {
             settlementPage.updateExoticPrices(priceData);
         });
 
-        And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+        And("^I update fixed win prices \"([^\"]*)\"$", (String winPricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
-            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-
-            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
-            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
-            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
-            header = new HeaderPage();
-            header.pickEvent(cat, subcat, evName);
-            header.navigateToF5();
-            LiabilityPage liabilityPage = new LiabilityPage();
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            liabilityPage.updatePrices(prodId, BetType.Win.id, winPrices);
-            liabilityPage.updatePrices(prodId, BetType.Place.id, placePrices);
-
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Win.id, winPrices);
         });
 
         And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            updatePlacePricesOnF5(placePricesCSV, prodId);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Place.id, placePrices);
         });
 
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
             Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
-            updatePlacePricesOnF5(placePricesCSV, prodId);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Place.id, placePrices);
+        });
+
+        And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Win.id, winPrices);
+            lp.updatePrices(prodId, BetType.Place.id, placePrices);
         });
 
         When("^I scratch the runners at position\\(s\\) \"([^\"]*)\"$", (String runnerPositionsCSV) -> {
             List<String> runnerPositions = Helpers.extractCSV(runnerPositionsCSV);
             Assertions.assertThat(runnerPositions).as("Runner positions should be numbers").allMatch(NumberUtils::isNumber);
-            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
-            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
-            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
-            header = new HeaderPage();
-            header.pickEvent(cat, subcat, evName);
+            reloadLastEvent();
             header.navigateToF4();
             marketsPage.scratchRunners(runnerPositions);
         });
@@ -197,11 +199,7 @@ public class CreateEventSteps implements En {
 
         When("^I can see the following deduction details on settlement page$", (DataTable table) -> {
             List<List<String>> deductionDetails = table.raw();
-            String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
-            String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
-            String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
-            header = new HeaderPage();
-            header.pickEvent(cat, subcat, evName);
+            reloadLastEvent();
             header.navigateToF6();
             settlementPage = new SettlementPage();
             settlementPage.verifyRunnerDeductions(deductionDetails);
@@ -248,6 +246,13 @@ public class CreateEventSteps implements En {
         });
     }
 
+    private void reloadLastEvent() {
+        String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
+        String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
+        String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
+        header.pickEvent(cat, subcat, evName);
+    }
+
     private Map<String, String> extractWinnersAddPositions(String winnersCSV) {
         List<String> winners = Helpers.extractCSV(winnersCSV);
         Map<String, String> winnerPosMap = new StrictHashMap<>();
@@ -257,20 +262,7 @@ public class CreateEventSteps implements En {
         return winnerPosMap;
     }
 
-    private void updatePlacePricesOnF5(String placePricesCSV, Integer prodId) {
-        List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-        String cat = (String) Storage.getLast(Storage.KEY.CATEGORIES);
-        String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
-        String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
-        header = new HeaderPage();
-        header.pickEvent(cat, subcat, evName);
-        header.navigateToF5();
-        LiabilityPage liabilityPage = new LiabilityPage();
-        liabilityPage.updatePrices(Integer.valueOf(prodId), BetType.Place.id, placePrices);
-    }
-
     private void resultRace(Map<String, String> winners) {
-        header = new HeaderPage();
         String cat = (String) Storage.removeFirst(Storage.KEY.CATEGORIES);
         String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
