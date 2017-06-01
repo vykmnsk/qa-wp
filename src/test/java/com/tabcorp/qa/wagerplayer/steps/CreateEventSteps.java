@@ -24,7 +24,7 @@ public class CreateEventSteps implements En {
 
     private static Logger log = LoggerFactory.getLogger(CreateEventSteps.class);
 
-    private HeaderPage header = new HeaderPage();
+    private HeaderPage header;
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
     private SettlementPage settlementPage;
@@ -36,6 +36,7 @@ public class CreateEventSteps implements En {
         When("^I enter specifics category \"([^\"]*)\" and subcategory \"([^\"]*)\"$", (String category, String subcategory) -> {
             Storage.add(Storage.KEY.CATEGORIES, category);
             Storage.add(Storage.KEY.SUBCATEGORIES, subcategory);
+            header = new HeaderPage();
             header.navigateToF3(category, subcategory);
         });
 
