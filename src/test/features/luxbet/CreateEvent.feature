@@ -1,20 +1,20 @@
 @ui @luxbet
-Feature: Create a Luxbet Event
+Feature: Create Luxbet Events in WagerPlayer UI
 
   Background:
     Given I am logged into WP UI and on Home Page
 
-  Scenario Outline: Create Horse Racing event
+  Scenario Outline: Create Event: <Category> | <Subcategory> | <NumOfRunners> runners
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     Then I see New Event page is loaded
 
-    When I enter event details with <NumberOfRunners> runners, current 'show time' and 'event date/time' in 30 minutes with data
+    When I enter event details with <NumOfRunners> runners, current 'show time' and 'event date/time' in 30 minutes with data
       | base name       | <RaceNumber>: TEST RACE |
       | bet in run type | Both Allowed            |
       | create market   | Racing Live             |
     Then I see Create Market page
 
-    When I enter random prices matching <NumberOfRunners>
+    When I enter random prices matching <NumOfRunners>
     Then I can see success status with message "Market Created"
 
     When I update race number to "<RaceNumber>"
@@ -49,14 +49,12 @@ Feature: Create a Luxbet Event
 
   @smoke
     Examples:
-      | Category     | Subcategory   | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
-      | Horse Racing | WOLVERHAMPTON | 8               | 3          | 1/5           | 3          |
+      | Category     | Subcategory   | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
+      | Horse Racing | WOLVERHAMPTON | 8               | 1          | 1/5           | 3          |
 
     Examples:
-      | Category         | Subcategory   | NumberOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
-#      |                  |               | 24              | 1          | 1/4           | 4          |
-#      |                  |               | 15              | 2          | 1/5           | 3          |
-      | GREYHOUND RACING | CORK          | 8               | 3          | 1/5           | 3          |
-      | Harness Racing   | ALBION PARK   | 8               | 3          | 1/5           | 3          |
+      | Category         | Subcategory   | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
+      | Greyhound Racing | GUNNEDAH          | 15               | 2          | 1/5           | 3          |
+      | Harness Racing   | ALBION PARK   | 24               | 3          | 1/4           | 4          |
 
 
