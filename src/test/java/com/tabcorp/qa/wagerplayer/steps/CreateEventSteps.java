@@ -225,10 +225,12 @@ public class CreateEventSteps implements En {
         When("^I result race with the runners and positions \"([^\"]*)\"$", (String winnersCSV) -> {
             // Expecting list in format [Position]:[RunnerName]. e.g. 1:Runner01
             List<String> posWinnerPairs = Helpers.extractCSV(winnersCSV);
-            Map<String, String> winnerPosMap = posWinnerPairs.stream()
-                    .map(pw -> Helpers.extractCSV(pw, ':'))
-                    .collect(Collectors.toMap(p -> p.get(1), p -> p.get(0)));
-             resultRace(winnerPosMap);
+            StrictHashMap<String, String> winnerPosMap = new StrictHashMap<>();
+            for (String pairToken : posWinnerPairs) {
+                List<String> pair = Helpers.extractCSV(pairToken, ':');
+                winnerPosMap.put(pair.get(1), pair.get(0));
+            }
+            resultRace(winnerPosMap);
         });
 
         And("^I settle race$", () -> {

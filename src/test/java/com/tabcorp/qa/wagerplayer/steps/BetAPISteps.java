@@ -142,10 +142,15 @@ public class BetAPISteps implements En {
 
         Then("^customer balance since last bet is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diff) -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            final BigDecimal balBefore = balanceAfterBet;
+
+            //array here because lambda expr has to be able to update it from inside
+            final BigDecimal[] balNow = new BigDecimal[1];
             Helpers.retryOnAssertionFailure(() -> {
-                BigDecimal balanceNow = api.getBalance(accessToken);
-                assertThat(Helpers.roundOff(balanceNow.subtract(balanceAfterBet))).as("Customer Balance increased by").isEqualTo(Helpers.roundOff(diff));
+                balNow[0] = api.getBalance(accessToken);
+                assertThat(Helpers.roundOff(balNow[0])).as("Customer balance hasn't changed").isNotEqualTo(Helpers.roundOff(balBefore));
             }, 10, 4);
+            assertThat(Helpers.roundOff(balNow[0].subtract(balBefore))).as("Customer Balance increased by").isEqualTo(Helpers.roundOff(diff));
         });
 
         Then("^I verify status and payout of bets placed on runners$", (DataTable table) -> {
