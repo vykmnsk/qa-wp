@@ -38,12 +38,12 @@ Feature: Placing and Settling several Single bets on the same event
     And I settle race
     Then customer balance is equal to $223.93
 
-    @smoke
+  @smoke
     Examples:
-      | Category         | Subcategory                 |
-      | Horse Racing     | Automation Horse Racing     |
+      | Category     | Subcategory             |
+      | Horse Racing | Automation Horse Racing |
 
     Examples:
       | Category         | Subcategory                 |
-      | GREYHOUND RACING | Automation Greyhound Racing |
+      | Greyhound Racing | Automation Greyhound Racing |
       | Harness Racing   | Automation Harness Racing   |

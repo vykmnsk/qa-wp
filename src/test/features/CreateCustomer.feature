@@ -39,8 +39,8 @@ Feature: Create New Customer
 
   @luxbet @api
     Examples:
-      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city | suburb         | postcode | state | country | timezone         | secret_question         | currency_code | deposit_limit | client_ip   | manual_verification | amlStatus        | depositAmount |
-      | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave     | N/A  | SEAFORTH       | 2092     | NSW   | AU      | Australia/Sydney | Favourite Holiday Spot? | AUD           |               | 61.9.192.13 | N/A                 | account_verified | 10000.00      |
+      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street       | city | suburb   | postcode | state | country | timezone         | secret_question         | currency_code | deposit_limit | client_ip   | manual_verification | amlStatus        | depositAmount |
+      | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave | N/A  | SEAFORTH | 2092     | NSW   | AU      | Australia/Sydney | Favourite Holiday Spot? | AUD           |               | 61.9.192.13 | N/A                 | account_verified | 10000.00      |
 
   @redbook @ui
     Examples:
@@ -49,8 +49,8 @@ Feature: Create New Customer
 
   @luxbet @ui @smoke
     Examples:
-      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city     | suburb         | postcode | state           | country   | timezone         | secret_question         | currency_code | deposit_limit | client_ip   | manual_verification | amlStatus        | depositAmount |
-      | UI      | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave     | SEAFORTH | SEAFORTH       | 2092     | New South Wales | Australia | Australia/Sydney | Favourite Holiday Spot? | AUD           |               | 61.9.192.13 | N/A                 | Account Verified | 10000.00      |
+      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street       | city     | suburb   | postcode | state           | country   | timezone         | secret_question         | currency_code | deposit_limit | client_ip   | manual_verification | amlStatus        | depositAmount |
+      | UI      | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave | SEAFORTH | SEAFORTH | 2092     | New South Wales | Australia | Australia/Sydney | Favourite Holiday Spot? | AUD           |               | 61.9.192.13 | N/A                 | Account Verified | 10000.00      |
 
   @luxbet @ui
     Examples:
