@@ -140,17 +140,20 @@ public class BetAPISteps implements En {
             assertThat(Helpers.roundOff(balanceBefore.subtract(balanceAfterBet))).isEqualTo(Helpers.roundOff(diff));
         });
 
-        Then("^customer balance since last bet is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diff) -> {
+        Then("^customer balance since last bet is increased by \\$(\\d+.\\d\\d)$", (BigDecimal diffInput) -> {
+            final BigDecimal difference = Helpers.roundOff(diffInput);
+            final BigDecimal balBefore = Helpers.roundOff(balanceAfterBet);
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-            final BigDecimal balBefore = balanceAfterBet;
 
             //array here because lambda expr has to be able to update it from inside
             final BigDecimal[] balNow = new BigDecimal[1];
             Helpers.retryOnAssertionFailure(() -> {
-                balNow[0] = api.getBalance(accessToken);
-                assertThat(Helpers.roundOff(balNow[0])).as("Customer balance hasn't changed").isNotEqualTo(Helpers.roundOff(balBefore));
+                balNow[0] = Helpers.roundOff(api.getBalance(accessToken));
+                if (! difference.equals(new BigDecimal("0.00"))) {
+                    assertThat(balNow[0]).as("Customer balance hasn't changed").isNotEqualTo(balBefore);
+                }
             }, 10, 4);
-            assertThat(Helpers.roundOff(balNow[0].subtract(balBefore))).as("Customer Balance increased by").isEqualTo(Helpers.roundOff(diff));
+            assertThat(balNow[0].subtract(balBefore)).as("Customer Balance increased by").isEqualTo(difference);
         });
 
         Then("^I verify status and payout of bets placed on runners$", (DataTable table) -> {

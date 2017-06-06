@@ -45,16 +45,17 @@ public class LiabilityPage extends AppPage {
         return marketPrices.stream().filter(containsBetId).filter(containsProdId).collect(Collectors.toList());
     }
 
-    private void enterPrices(List<WebElement> priceCells, List<BigDecimal> prices) {
-        assertThat(priceCells.size()).as("Price values should have equivalent UI inputs").isGreaterThanOrEqualTo(prices.size());
-        for(int i = 0; i < prices.size(); i++) {
-            WebElement input = priceCells.get(i);
-            String price = prices.get(i).toString();
-            doubleClick(input);
+    private void enterPrices(List<WebElement> priceCells, List<BigDecimal> priceValues) {
+        assertThat(priceCells.size()).as("Price values should have equivalent UI inputs").isGreaterThanOrEqualTo(priceValues.size());
+        for(int i = 0; i < priceValues.size(); i++) {
+            WebElement priceCell = priceCells.get(i);
+            String priceValue = priceValues.get(i).toString();
+            priceCell.click();
             Actions actions = new Actions(driver);
-            actions.sendKeys(price);
+            actions.sendKeys(priceValue);
             actions.sendKeys(Keys.RETURN);
             actions.build().perform();
+            assertThat(priceCell.getText()).as("Entered price value in the cell correctly").isEqualTo(priceValue);
         }
     }
 
