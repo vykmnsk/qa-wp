@@ -1,4 +1,4 @@
-@ui @redbook
+@redbook @ui @create-event
 Feature: Create Sunbets Events in WagerPlayer UI
 
   Background:

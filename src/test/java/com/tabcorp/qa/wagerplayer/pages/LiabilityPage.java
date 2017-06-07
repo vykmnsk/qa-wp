@@ -1,6 +1,8 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 
+import com.tabcorp.qa.common.Helpers;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -47,16 +49,30 @@ public class LiabilityPage extends AppPage {
 
     private void enterPrices(List<WebElement> priceCells, List<BigDecimal> priceValues) {
         assertThat(priceCells.size()).as("Price values should have equivalent UI inputs").isGreaterThanOrEqualTo(priceValues.size());
-        for(int i = 0; i < priceValues.size(); i++) {
+        for (int i = 0; i < priceValues.size(); i++) {
             WebElement priceCell = priceCells.get(i);
-            String priceValue = priceValues.get(i).toString();
-            priceCell.click();
-            Actions actions = new Actions(driver);
-            actions.sendKeys(priceValue);
-            actions.sendKeys(Keys.RETURN);
-            actions.build().perform();
-            assertThat(priceCell.getText()).as("Entered price value in the cell correctly").isEqualTo(priceValue);
+            BigDecimal priceValue = priceValues.get(i);
+            String origPriceText = priceCell.getText().trim();
+            assertThat(NumberUtils.isNumber(origPriceText)).as("Existing Price value is a Number").isTrue();
+            BigDecimal origPriceValue = new BigDecimal(origPriceText);
+            if (Helpers.roundOff(origPriceValue, 3).equals(
+                    Helpers.roundOff(priceValue, 3))) {
+                continue;
+            }
+            String updatedPriceText = updateElementText(priceCell, priceValue.toString());
+            assertThat(NumberUtils.isNumber(updatedPriceText)).as("Price value entered is a Number").isTrue();
+            BigDecimal updatedPriceValue = new BigDecimal(updatedPriceText);
+            assertThat(Helpers.roundOff(updatedPriceValue, 3)).as("Price value entered in table cell").isEqualTo(Helpers.roundOff(priceValue, 3));
         }
+    }
+
+    private String updateElementText(WebElement elem, String text) {
+        elem.click();
+        Actions actions = new Actions(driver);
+        actions.sendKeys(text);
+        actions.sendKeys(Keys.RETURN);
+        actions.build().perform();
+        return elem.getText().trim();
     }
 
 }

@@ -113,7 +113,10 @@ public class Helpers {
     }
 
     public static BigDecimal roundOff(BigDecimal value) {
-        int decimalPlaces = 2;
+        return roundOff(value, 2);
+    }
+
+    public static BigDecimal roundOff(BigDecimal value, int decimalPlaces) {
         return value.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP);
     }
 
