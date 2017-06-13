@@ -1,4 +1,4 @@
-@ui @luxbet
+@ui @luxbet @create-events
 Feature: Create Luxbet Events in WagerPlayer UI
 
   Background:

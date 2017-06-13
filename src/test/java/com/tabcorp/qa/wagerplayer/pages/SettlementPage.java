@@ -58,6 +58,9 @@ public class SettlementPage extends AppPage {
     @FindBy(css = ("td[align=left] table#no_padding_table_inner"))
     WebElement resultPricesTable;
 
+    @FindBy(css = ("input[id=settle]"))
+    WebElement disabledSettleButton;
+
     private By priceSelector = By.cssSelector("input[id^='price']");
 
     public void load() {
@@ -86,6 +89,7 @@ public class SettlementPage extends AppPage {
             count++;
         }
         result.click();
+        wait.until(ExpectedConditions.visibilityOf(disabledSettleButton));
     }
 
     public void accept() {

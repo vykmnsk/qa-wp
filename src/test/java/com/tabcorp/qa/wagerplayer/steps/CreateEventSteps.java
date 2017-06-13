@@ -271,7 +271,9 @@ public class CreateEventSteps implements En {
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
         header.pickEvent(cat, subcat, event);
         settlementPage = header.navigateToF6();
-        settlementPage.resultRace(winners);
+        Helpers.retryOnAssertionFailure(() -> {
+            settlementPage.resultRace(winners);
+        }, 2, 2);
     }
 
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {
