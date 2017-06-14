@@ -120,6 +120,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields).read(RESP_ROOT + ".login[0].session_id");
     }
 
+    @SuppressWarnings("unchecked")
     public String createNewCustomer(Map custData) {
         Map<String, Object> fields = wapiAuthFields();
         fields.put("action", "account_insert_customer");

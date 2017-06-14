@@ -151,71 +151,69 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return accessToken;
     }
 
+    @SuppressWarnings("unchecked")
     public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
-        JSONObject price = new JSONObject();
-        price.put("win_price", winPrice);
-        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Win.id, price);
+        JSONObject prices = new JSONObject();
+        prices.put("win_price", winPrice);
+        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Win.id, prices);
         return checkoutBet(betPayload);
     }
 
+    @SuppressWarnings("unchecked")
     public ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
-        JSONObject price = new JSONObject();
-        price.put("place_price", placePrice);
-        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Place.id, price);
+        JSONObject prices = new JSONObject();
+        prices.put("place_price", placePrice);
+        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Place.id, prices);
         return checkoutBet(betPayload);
     }
 
+    @SuppressWarnings("unchecked")
     public ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
-        JSONObject price = new JSONObject();
-        price.put("place_price", placePrice);
-        price.put("win_price", winPrice);
-        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Eachway.id, price);
+        JSONObject prices = new JSONObject();
+        prices.put("place_price", placePrice);
+        prices.put("win_price", winPrice);
+        String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Eachway.id, prices);
         return checkoutBet(betPayload);
     }
 
+    @SuppressWarnings("unchecked")
     public ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi) {
-        JSONObject obj = new JSONObject();
-        JSONObject selectionsData = new JSONObject();
-        JSONArray selections = new JSONArray();
         JSONObject slots = new JSONObject();
-        JSONObject options = new JSONObject();
-        JSONArray selection;
-        JSONObject slotData;
-
-        options.put("flexi", "0");
-
         for (int index = 0; index < selectionIds.size(); index++) {
-            selection = new JSONArray();
-            slotData = new JSONObject();
-            selection.add(0, selectionIds.get(index));
-            slotData.put("market", marketId);
-            slotData.put("selection", selection);
-            slots.put(index + 1, slotData);
+            JSONArray sel = new JSONArray();
+            JSONObject slot = new JSONObject();
+            sel.add(0, selectionIds.get(index));
+            slot.put("market", marketId);
+            slot.put("selection", sel);
+            slots.put(index + 1, slot);
         }
 
-        obj.put("access_token", accessToken);
-        selectionsData.put("type", "exotic");
-        selectionsData.put("stake", stake);
-        selectionsData.put("options", options);
-        selectionsData.put("product_id", productId);
-        selectionsData.put("slots", slots);
-        selections.add(selectionsData);
+        JSONObject selection = new JSONObject();
+        selection.put("slots", slots);
+        selection.put("type", "exotic");
+        selection.put("stake", stake);
+        JSONObject options = new JSONObject();
+        options.put("flexi", "0");
+        selection.put("options", options);
+        selection.put("product_id", productId);
 
-        obj.put("selections", selections);
+        JSONArray selections = new JSONArray();
+        selections.add(selection);
 
-        return checkoutBet(obj.toJSONString());
+        JSONObject payload = new JSONObject();
+        payload.put("access_token", accessToken);
+        payload.put("selections", selections);
+        return checkoutBet(payload.toJSONString());
     }
 
     @SuppressWarnings("unchecked")
     public ReadContext placeMultiBet(String accessToken, List<Map<WAPI.KEY, String>> selectionInfos, MultiType multiType, BetType betType, BigDecimal stake) {
-        JSONObject payload = new JSONObject();
-
         JSONArray selections = new JSONArray();
         for (Map<WAPI.KEY, String> selInfo : selectionInfos) {
             JSONObject selSingle = new JSONObject();
@@ -249,48 +247,47 @@ public class MOBI_V2 implements WagerPlayerAPI {
         JSONObject options = new JSONObject();
         options.put("bet_type", betType.id);
         selMulti.put("options", options);
-
         selections.add(selMulti);
 
+        JSONObject payload = new JSONObject();
         payload.put("access_token", accessToken);
         payload.put("selections", selections);
         return checkoutMultiBet(payload.toJSONString(), selectionInfos.size());
     }
 
-    private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject) {
-        JSONObject obj = new JSONObject();
-        JSONArray selections = new JSONArray();
-        JSONObject betType = new JSONObject(); //options
+    @SuppressWarnings("unchecked")
+    private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject prices) {
         JSONObject bet = new JSONObject();
-
-        obj.put("access_token", accessToken);
-
-        betType.put("bet_type", betId);
-
         bet.put("type", "single");
         bet.put("stake", stake.toString());
         bet.put("mpid", mpid);
-        bet.put("options", betType);
-        bet.put("prices", priceObject);
+        bet.put("prices", prices);
+        JSONObject options = new JSONObject();
+        options.put("bet_type", betId);
+        bet.put("options", options);
+
+        JSONArray selections = new JSONArray();
         selections.add(bet);
 
-        obj.put("selections", selections);
-
-        return obj.toJSONString();
+        JSONObject payload = new JSONObject();
+        payload.put("access_token", accessToken);
+        payload.put("selections", selections);
+        return payload.toJSONString();
     }
 
     public BigDecimal readNewBalance(ReadContext resp) {
-        JSONArray val = resp.read("$..new_balance");
-        BigDecimal newBalance = new BigDecimal((val.get(val.size() - 1)).toString());
-        return newBalance;
+        JSONArray allBalances = resp.read("$..new_balance");
+        assertThat(allBalances).as("new_balance in response").isNotEmpty();
+        String lastBalance = allBalances.get(allBalances.size() - 1).toString();
+        return new BigDecimal(lastBalance);
     }
 
+    @SuppressWarnings("unchecked")
     public String createNewCustomer(Map custData) {
         ReadContext response = post("/customer", custData);
         Integer custId = response.read("$.success.customer_id");
         log.info("Customer ID=" + custId);
-        String msg = response.read("$.success.message");
-        return msg;
+        return response.read("$.success.message");
     }
 
     public String readAmlStatus(String accessToken) {
@@ -303,7 +300,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     public String getPaymentRefence(String accessToken) {
-        Map fields = new HashMap<String, Object>();
+        Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
         ReadContext response = get("/payment/reference", fields);
         String paymentRef = response.read("$.results.reference");

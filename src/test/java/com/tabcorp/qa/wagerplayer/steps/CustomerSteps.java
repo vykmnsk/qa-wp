@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
@@ -258,7 +259,7 @@ public class CustomerSteps implements En {
     }
 
     private Map<String, String> adjustCustomerData(Map<String, String> custInput) {
-        Map custFiltered = custInput.entrySet().stream()
+        Map<String, String> custFiltered = custInput.entrySet().stream()
                 .filter(entry -> !"N/A".equals(entry.getValue()))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         StrictHashMap<String, String> cust = new StrictHashMap<>();
