@@ -1,5 +1,9 @@
 package com.tabcorp.qa.common;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum BetType {
     Win(1),
     Place(2),
@@ -18,7 +22,11 @@ public enum BetType {
                 return b;
             }
         }
-        throw new RuntimeException("Could not find BetType with name=" + name);
+        throw new RuntimeException(String.format("Could not find BetType with name='%s'. Available BetTypes: %s", name, allNames()));
+    }
+
+    public static List<String> allNames() {
+        return Arrays.stream(BetType.values()).map(BetType::name).collect(Collectors.toList());
     }
 
 }

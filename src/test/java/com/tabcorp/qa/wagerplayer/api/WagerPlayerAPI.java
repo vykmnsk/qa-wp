@@ -39,7 +39,7 @@ public interface WagerPlayerAPI {
 
     BigDecimal readNewBalance(ReadContext resp);
 
-    List readBetIds(ReadContext resp);
+    List<Integer> readBetIds(ReadContext resp);
 
     default ReadContext parseVerifyJSON(Object json, String rootPath){
         ReadContext ctx = null;

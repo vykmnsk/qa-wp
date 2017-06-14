@@ -23,11 +23,48 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WAPI implements WagerPlayerAPI {
-
-    private static Logger log = LoggerFactory.getLogger(WAPI.class);
-
     private static final String URL = Config.wapiURL();
     private static final String RESP_ROOT = "$.RSP";
+
+    public enum MultiType {
+        Double("Double"),
+        Treble("Treble"),
+        Doubles("Doubles"),
+        Trixie("Trixie"),
+        Patent("Patent"),
+        FourFold("4-Fold"),
+        Trebles("Trebles"),
+        Yankee("Yankee"),
+        Lucky15("Lucky 15"),
+        FiveFold("5-Fold"),
+        FourFolds("4-Folds"),
+        Canadian("Canadian"),
+        Lucky31("Lucky 31");
+
+        public final String exactName;
+
+        MultiType(String name) {
+            exactName = name;
+        }
+
+        public static MultiType fromName(String name) {
+            MultiType found = Arrays.stream(MultiType.values())
+                    .filter(mt -> mt.exactName.equalsIgnoreCase(name))
+                    .findFirst().orElse(null);
+            assertThat(found)
+                    .withFailMessage(String.format(
+                            "Could not find WAPI MultiType with name='%s'. Available MultiTypes: %s",
+                            name, MultiType.allNames()))
+                    .isNotNull();
+            return found;
+        }
+
+        public static List<String> allNames() {
+            return Arrays.stream(MultiType.values()).map(mt -> mt.exactName).collect(Collectors.toList());
+        }
+    }
+
+    private static Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();
@@ -132,7 +169,7 @@ public class WAPI implements WagerPlayerAPI {
         return bet;
     }
 
-    private Map<String, Object> bonusBetFields(String sessionId, Integer bbFlag, String mpid, BetType betType){
+    private Map<String, Object> bonusBetFields(String sessionId, Integer bbFlag, String mpid, BetType betType) {
         Map<String, Object> fields = new HashMap<>();
         if (bbFlag.equals(1)) {
             fields.put("free_bet_code", getBonusBetCode(sessionId, mpid, betType.id));
@@ -240,10 +277,10 @@ public class WAPI implements WagerPlayerAPI {
     public String prepareSelectionsForDoubleMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
         List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size(), betTypes.size());
         assertThat(sizes).as("Number of Selections, Products and BetTypes").allMatch(size -> size.equals(2));
-        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, "Double", betTypes);
+        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, MultiType.Double, betTypes);
     }
 
-    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, String multiType) {
+    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType) {
         List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size());
         Integer count = sizes.get(0);
         assertThat(count).as("Multi Selections count").isGreaterThan(1);
@@ -252,7 +289,7 @@ public class WAPI implements WagerPlayerAPI {
         return prepareSelectionsForMultiBet(sessionId, selections, prodIds, multiType, dummyBetTypes);
     }
 
-    private String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, String multiType, List<BetType> betTypes) {
+    private String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypes) {
         assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
         ReadContext response = null;
         for (int i = 0; i < selections.size(); i++) {
@@ -263,7 +300,7 @@ public class WAPI implements WagerPlayerAPI {
                 assertThat(msg).isEqualTo("Add more selections for multiple bet types");
             }
         }
-        JSONArray uuidsFound = response.read(RESP_ROOT + ".multiple" + jfilter("name", multiType) + ".uuid");
+        JSONArray uuidsFound = response.read(RESP_ROOT + ".multiple" + jfilter("name", multiType.exactName) + ".uuid");
         assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(1);
         return uuidsFound.get(0).toString();
     }
@@ -283,9 +320,8 @@ public class WAPI implements WagerPlayerAPI {
         return newBalance;
     }
 
-    public List readBetIds(ReadContext resp) {
-        JSONArray betIds = resp.read(RESP_ROOT + ".bet[*].bet_id");
-        return betIds;
+    public List<Integer> readBetIds(ReadContext resp) {
+        return resp.read(RESP_ROOT + ".bet[*].bet_id");
     }
 
     public ReadContext getEventMarkets(String sessionId, String evtId) {

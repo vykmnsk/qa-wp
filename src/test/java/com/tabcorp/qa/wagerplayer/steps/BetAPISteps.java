@@ -83,56 +83,40 @@ public class BetAPISteps implements En {
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
-        When("^I place a multi bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
-                (String multiType, String runnersCSV, BigDecimal stake, String flexi) -> {
-                    assertThat(multiType.toUpperCase()).as("Multi TypeName input")
-                            .isIn("DOUBLE,WIN-WIN", "DOUBLE,WIN-PLACE", "DOUBLE,PLACE-WIN", "DOUBLE,PLACE-PLACE",
-                                    "TREBLE", "DOUBLES", "DOUBLES", "TRIXIE", "PATENT", "4-FOLD", "TREBLES",
-                                    "YANKEE", "LUCKY 15", "5-FOLD", "4-FOLDS", "CANADIAN", "LUCKY 31");
-                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+        When("^I place a Luxbet Multi Bet Double \"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String betTypeName1, String betTypeName2, String runnersCSV, BigDecimal stake, String flexi) -> {
+                    assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+                    BetType betType1 = BetType.fromName(betTypeName1);
+                    BetType betType2 = BetType.fromName(betTypeName2);
                     List<String> runners = Helpers.extractCSV(runnersCSV);
-                    String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-                    List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
-                    assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+                    ReadContext response = placeMultiBet(WAPI.MultiType.Double, Arrays.asList(betType1, betType2), runners, stake, isFlexi);
+                    balanceAfterBet = api.readNewBalance(response);
+        });
 
-                    List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
-
-                    String uuid;
-                    if (multiType.contains(",")) {
-                        List<String> doubleMultiTypeInfo = Helpers.extractCSV(multiType);
-                        assertThat(doubleMultiTypeInfo).hasSize(2);
-                        assertThat(doubleMultiTypeInfo.get(0)).isEqualToIgnoringCase("DOUBLE");
-                        List<String> doubleBetTypesStr = Helpers.extractCSV(doubleMultiTypeInfo.get(1), '-');
-                        assertThat(doubleBetTypesStr).hasSize(2);
-                        List<BetType> doubleBetTypes = doubleBetTypesStr.stream().map(str -> BetType.fromName(str)).collect(Collectors.toList());
-                        uuid = wapi.prepareSelectionsForDoubleMultiBet(accessToken, selections, prodIds, doubleBetTypes);
-                    } else {
-                        uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType);
-                    }
-
-                    ReadContext response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
-                    List betIds = api.readBetIds(response);
-                    log.info("Bet IDs=" + betIds.toString());
+        When("^I place a Luxbet Multi Bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String multiTypeName, String runnersCSV, BigDecimal stake, String flexi) -> {
+                    assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+                    WAPI.MultiType multiType = WAPI.MultiType.fromName(multiTypeName);
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+                    ReadContext response = placeMultiBet(multiType, new ArrayList<>(), runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
-        When("^I place multi bet \"Double (Win|Eachway)+\" on the runners \"([^\"]+)\" for \\$(\\d+.\\d\\d)$",
-                (String betTypeName, String runnersCVS, BigDecimal stake) -> {
-                    assertThat(Config.isRedbook()).as("step runs only REDBOOK").isTrue();
-                    final String multiType = "Double";
-                    final BetType betType = BetType.fromName(betTypeName);
-
+        When("^I place a Redbook Multi Bet \"([^\"]+)\" \"([A-Za-z]+)\" on the runners \"([^\"]+)\" for \\$(\\d+.\\d\\d)$",
+                (String multiTypeName, String betTypeName, String runnersCVS, BigDecimal stake) -> {
+                    assertThat(Config.isRedbook()).as("REDBOOK only step").isTrue();
+                    MOBI_V2.MultiType multiType = MOBI_V2.MultiType.fromName(multiTypeName);
+                    BetType betType = BetType.fromName(betTypeName);
                     List<String> runners = Helpers.extractCSV(runnersCVS);
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
                     List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
                     List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
                     assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
-
                     List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
-
-                    ReadContext response = ((MOBI_V2) api).placeMultiBet(accessToken, selections, multiType, betType, stake);
-                    balanceAfterBet = api.readNewBalance(response);
+                    ReadContext resp = ((MOBI_V2) api).placeMultiBet(accessToken, selections, multiType, betType, stake);
+                    balanceAfterBet = api.readNewBalance(resp);
                 });
 
         Then("^customer balance after bet is decreased by \\$(\\d+\\.\\d\\d)$", (BigDecimal diff) -> {
@@ -149,7 +133,7 @@ public class BetAPISteps implements En {
             final BigDecimal[] balNow = new BigDecimal[1];
             Helpers.retryOnAssertionFailure(() -> {
                 balNow[0] = Helpers.roundOff(api.getBalance(accessToken));
-                if (! difference.equals(new BigDecimal("0.00"))) {
+                if (!difference.equals(new BigDecimal("0.00"))) {
                     assertThat(balNow[0]).as("Customer balance hasn't changed").isNotEqualTo(balBefore);
                 }
             }, 10, 4);
@@ -173,6 +157,24 @@ public class BetAPISteps implements En {
             }
         });
 
+    }
+
+    private ReadContext placeMultiBet(WAPI.MultiType multiType, List<BetType> betTypes, List<String> runners, BigDecimal stake, boolean isFlexi) {
+        String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+        List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+        List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+        assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
+        List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
+        String uuid;
+        if (WAPI.MultiType.Double.equals(multiType)) {
+            uuid = wapi.prepareSelectionsForDoubleMultiBet(accessToken, selections, prodIds, betTypes);
+        } else {
+            uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType);
+        }
+        ReadContext response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
+        List<Integer> betIds = api.readBetIds(response);
+        log.info("Bet IDs=" + betIds);
+        return response;
     }
 
     private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {
@@ -217,7 +219,7 @@ public class BetAPISteps implements En {
         Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
         String eventId = (String) Storage.getLast(EVENT_IDS);
         ReadContext response = placeExoticBetOneEvent(accessToken, eventId, prodId, runners, stake, isFlexi);
-        List betIds = api.readBetIds(response);
+        List<Integer> betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds.toString());
         return api.readNewBalance(response);
     }

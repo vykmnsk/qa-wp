@@ -23,7 +23,5 @@ Feature: Placing and Settling Exotic Bets for a Single Event
 
     Examples:
       | ProductName    | BetType | BetOn                        | Stake | BalanceDeductedBy | Payout | ExoticPrices |
-#      | Forecast Fixed | Exotic  | Runner01, Runner02           | 3.00  | 3.00              | 12.60  | 4.20         |
-#      | Tricast Fixed  | Exotic  | Runner01, Runner02, Runner03 | 5.00  | 5.00              | 11.00  | 2.20         |
       | Forecast SP    | Exotic  | Runner01, Runner02           | 2.00  | 2.00              | 10.40  | 5.20         |
       | Tricast SP     | Exotic  | Runner01, Runner02, Runner03 | 9.00  | 9.00              | 32.40  | 3.60         |

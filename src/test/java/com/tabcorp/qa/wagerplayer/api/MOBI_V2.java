@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.api;
 
-import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
@@ -13,9 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +24,51 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
     private static String URL_ROOT = Config.moby_V2_URL();
     private static final String RESP_ROOT = "$";
+
+    public enum MultiType {
+        Double("Double"),
+        Doubles("Doubles"),
+        WPDoubles("W/P Doubles"),
+        Patent("Patent"),
+        Trixie("Trixie"),
+        Treble("Treble"),
+        Trebles("Trebles"),
+        WPTrebles("W/P Trebles"),
+        Lucky15("Lucky 15"),
+        Yankee("Yankee"),
+        Lucky31("Lucky 31"),
+        Canadian("Canadian"),
+        Lucky63("Lucky 63"),
+        Heinz("Heinz"),
+        Lucky127("Lucky 127"),
+        SuperHeinz("Super Heinz"),
+        Lucky255("Lucky 255"),
+        Goliath("Goliath"),
+        Lucky511("Lucky 511"),
+        MassiveLux("Massive Lux");
+
+        public final String exactName;
+
+        MultiType(String name) {
+            exactName = name;
+        }
+
+        public static MultiType fromName(String name) {
+            MultiType found = Arrays.stream(MultiType.values())
+                    .filter(mt -> mt.exactName.equalsIgnoreCase(name))
+                    .findFirst().orElse(null);
+            assertThat(found)
+                    .withFailMessage(String.format(
+                            "Could not find MOBI_V2 MultiType with name='%s'. Available MultiTypes: %s",
+                            name, MultiType.allNames()))
+                    .isNotNull();
+            return found;
+        }
+
+        public static List<String> allNames() {
+            return Arrays.stream(MultiType.values()).map(mt -> mt.exactName).collect(Collectors.toList());
+        }
+    }
 
     private static Logger log = LoggerFactory.getLogger(MOBI_V2.class);
 
@@ -108,8 +154,6 @@ public class MOBI_V2 implements WagerPlayerAPI {
     public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
-
-        //prices
         JSONObject price = new JSONObject();
         price.put("win_price", winPrice);
         String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Win.id, price);
@@ -119,11 +163,8 @@ public class MOBI_V2 implements WagerPlayerAPI {
     public ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
-
-        //prices
         JSONObject price = new JSONObject();
         price.put("place_price", placePrice);
-
         String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Place.id, price);
         return checkoutBet(betPayload);
     }
@@ -131,12 +172,9 @@ public class MOBI_V2 implements WagerPlayerAPI {
     public ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
-
-        //prices
         JSONObject price = new JSONObject();
         price.put("place_price", placePrice);
         price.put("win_price", winPrice);
-
         String betPayload = createBetPayload(accessToken, mpid, stake, BetType.Eachway.id, price);
         return checkoutBet(betPayload);
     }
@@ -161,7 +199,6 @@ public class MOBI_V2 implements WagerPlayerAPI {
             slots.put(index + 1, slotData);
         }
 
-
         obj.put("access_token", accessToken);
         selectionsData.put("type", "exotic");
         selectionsData.put("stake", stake);
@@ -175,57 +212,49 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return checkoutBet(obj.toJSONString());
     }
 
-    public ReadContext placeMultiBet(String accessToken, List<Map<WAPI.KEY, String>> selections, String multiType, BetType betType, BigDecimal stake) {
-        JSONObject betPayload = new JSONObject();
-        JSONArray selectionsObj = new JSONArray();
-        JSONArray selection = new JSONArray();
+    @SuppressWarnings("unchecked")
+    public ReadContext placeMultiBet(String accessToken, List<Map<WAPI.KEY, String>> selectionInfos, MultiType multiType, BetType betType, BigDecimal stake) {
+        JSONObject payload = new JSONObject();
 
+        JSONArray selections = new JSONArray();
+        for (Map<WAPI.KEY, String> selInfo : selectionInfos) {
+            JSONObject selSingle = new JSONObject();
 
-        JSONObject selectionsData;
-        JSONObject selPrices;
-        JSONObject options;
+            selSingle.put("type", "single");
+            selSingle.put("stake", "0.00");
+            selSingle.put("mpid", selInfo.get(KEY.MPID));
 
-        for (Map<WAPI.KEY, String> sel : selections) {
-            selectionsData = new JSONObject();
-            selPrices = new JSONObject();
-            options = new JSONObject();
-
+            JSONObject options = new JSONObject();
             options.put("bet_type", betType.id);
             options.put("include_in_multi", 1);
+            selSingle.put("options", options);
 
-            selPrices.put("win_price", sel.get(KEY.WIN_PRICE));
-            selPrices.put("place_price", sel.get(KEY.PLACE_PRICE));
+            JSONObject selPrices = new JSONObject();
+            if (BetType.Win.equals(betType) || BetType.Eachway.equals(betType)) {
+                selPrices.put("win_price", selInfo.get(KEY.WIN_PRICE));
+            }
+            if (BetType.Place.equals(betType) || BetType.Eachway.equals(betType)) {
+                selPrices.put("place_price", selInfo.get(KEY.PLACE_PRICE));
+            }
+            selSingle.put("prices", selPrices);
 
-
-            selectionsData.put("type", "single");
-            selectionsData.put("stake", "0.00");
-            selectionsData.put("mpid", sel.get(KEY.MPID));
-            selectionsData.put("options", options);
-            selectionsData.put("prices", selPrices);
-
-            selectionsObj.add(selectionsData);
-
+            selections.add(selSingle);
         }
 
-        selectionsData = new JSONObject();
-        options = new JSONObject();
+        JSONObject selMulti = new JSONObject();
+        selMulti.put("type", "multi");
+        selMulti.put("stake", stake);
+        selMulti.put("multi_type", multiType.exactName);
 
+        JSONObject options = new JSONObject();
         options.put("bet_type", betType.id);
+        selMulti.put("options", options);
 
-        selectionsData.put("type", "multi");
-        selectionsData.put("stake", stake);
-        selectionsData.put("multi_type", multiType);
-        selectionsData.put("options", options);
+        selections.add(selMulti);
 
-        selectionsObj.add(selectionsData);
-
-        selection.add(0, selectionsObj);
-
-
-        betPayload.put("access_token", accessToken);
-        betPayload.put("selections", selectionsObj);
-
-        return checkoutMultiBet(betPayload.toJSONString(), selections.size());
+        payload.put("access_token", accessToken);
+        payload.put("selections", selections);
+        return checkoutMultiBet(payload.toJSONString(), selectionInfos.size());
     }
 
     private String createBetPayload(String accessToken, String mpid, BigDecimal stake, Integer betId, JSONObject priceObject) {
@@ -282,9 +311,8 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return paymentRef;
     }
 
-    public List readBetIds(ReadContext response) {
-        JSONArray betIds = response.read("$..selections[0].bet_id");
-        return betIds;
+    public List<Integer> readBetIds(ReadContext response) {
+        return response.read("$..selections[*].bet_id");
     }
 
     public String getEncryptionKey(String accessToken) {
@@ -297,7 +325,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     public String getStoredCardReference(String accessToken) {
-        Map fields = new HashMap<String, Object>();
+        Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
         ReadContext response = get("/payment/info/stored", fields);
         String selectedCardReference = response.read("$.results.stored[0].selected_card_reference");
@@ -318,7 +346,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     public void addCardAndDeposit(String accessToken, String paymentReference, String cardEncryption, String cardType, BigDecimal deposit) {
-        Map fields = new HashMap<String, Object>();
+        Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
         fields.put("card_encrypted", cardEncryption);
         fields.put("payment_method", cardType);
