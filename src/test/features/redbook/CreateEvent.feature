@@ -85,6 +85,7 @@ Feature: Create Sunbets Events in WagerPlayer UI
     Examples:
       | Category     | Subcategory   | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
       | Horse Racing | WOLVERHAMPTON | 8            | 1          | 1/5           | 3          |
+
     Examples:
       | Category         | Subcategory   | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
       | Greyhound Racing | HARLOW        | 15           | 2          | 1/5           | 3          |

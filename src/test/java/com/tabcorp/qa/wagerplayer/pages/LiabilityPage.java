@@ -3,7 +3,10 @@ package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.assertj.core.api.Assertions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -16,39 +19,43 @@ import java.util.stream.Collectors;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 
 public class LiabilityPage extends AppPage {
-    @FindBy(css = "table[id^='navigable_market_id'] ")
+    @FindBy(css = "table[id^='navigable_market_id']")
     private WebElement liabilityTable;
-
-    @FindBy(css = "td.data_cell[type='racing_price']")
-    private List<WebElement> marketPrices;
 
     @FindBy(id = "f5_eventname_para")
     private WebElement eventName;
 
+    By marketPricesSelector = By.cssSelector("td.data_cell[type='racing_price']");
 
     public void load() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
-        wait.until(ExpectedConditions.visibilityOf(liabilityTable));
         wait.until(ExpectedConditions.visibilityOf(eventName));
+        wait.until(ExpectedConditions.visibilityOf(liabilityTable));
+        try {
+            wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(marketPricesSelector, 0));
+        } catch (TimeoutException se) {
+            Assertions.fail("Liability Page Price Table appears to be empty");
+        }
     }
 
     public void updatePrices(int productId, int betTypeId, List<BigDecimal> prices) {
-        List<WebElement> filterPriceCells = filterMarketPrices(productId, betTypeId);
-        enterPrices(filterPriceCells, prices);
-    }
-
-    private List<WebElement> filterMarketPrices(Integer prodId, Integer betTypeId) {
-        Predicate<WebElement> containsBetId = marketPrice -> marketPrice.getAttribute("bet_type").contains(betTypeId.toString());
-        Predicate<WebElement> containsProdId = marketPrice -> marketPrice.getAttribute("product_id").contains(prodId.toString());
-        return marketPrices.stream().filter(containsBetId).filter(containsProdId).collect(Collectors.toList());
+        List<WebElement> marketPriceCells = driver.findElements(marketPricesSelector);
+        List<WebElement> filteredPriceCells = marketPriceCells.stream()
+                .filter(cell -> cell.getAttribute("bet_type").contains("" + betTypeId)
+                        && cell.getAttribute("product_id").contains("" + productId))
+                .collect(Collectors.toList());
+        Helpers.retryOnFailure(() -> {
+            enterPrices(filteredPriceCells, prices);
+        }, 3, 1);
     }
 
     private void enterPrices(List<WebElement> priceCells, List<BigDecimal> priceValues) {
-        assertThat(priceCells.size()).as("Price values should have equivalent UI inputs").isGreaterThanOrEqualTo(priceValues.size());
+        assertThat(priceCells.size()).as("Enough Input Cells to enter all price values").isGreaterThanOrEqualTo(priceValues.size());
         for (int i = 0; i < priceValues.size(); i++) {
             WebElement priceCell = priceCells.get(i);
             BigDecimal priceValue = priceValues.get(i);
@@ -60,9 +67,13 @@ public class LiabilityPage extends AppPage {
                 continue;
             }
             String updatedPriceText = updateElementText(priceCell, priceValue.toString());
-            assertThat(NumberUtils.isNumber(updatedPriceText)).as("Price value entered is a Number").isTrue();
+            assertThat(NumberUtils.isNumber(updatedPriceText))
+                    .as(String.format("Price value entered '%s' is a Number", updatedPriceText))
+                    .isTrue();
             BigDecimal updatedPriceValue = new BigDecimal(updatedPriceText);
-            assertThat(Helpers.roundOff(updatedPriceValue, 3)).as("Price value entered in table cell").isEqualTo(Helpers.roundOff(priceValue, 3));
+            assertThat(Helpers.roundOff(updatedPriceValue, 3))
+                    .as("Price value entered in table cell")
+                    .isEqualTo(Helpers.roundOff(priceValue, 3));
         }
     }
 

@@ -131,7 +131,7 @@ public class BetAPISteps implements En {
 
             //array here because lambda expr has to be able to update it from inside
             final BigDecimal[] balNow = new BigDecimal[1];
-            Helpers.retryOnAssertionFailure(() -> {
+            Helpers.retryOnFailure(() -> {
                 balNow[0] = Helpers.roundOff(api.getBalance(accessToken));
                 if (!difference.equals(new BigDecimal("0.00"))) {
                     assertThat(balNow[0]).as("Customer balance hasn't changed").isNotEqualTo(balBefore);

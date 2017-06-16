@@ -158,9 +158,11 @@ public class CreateEventSteps implements En {
         And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
             Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
-            reloadLastEvent();
-            LiabilityPage lp = header.navigateToF5();
-            lp.updatePrices(prodId, BetType.Place.id, placePrices);
+            Helpers.retryOnFailure(() -> {
+                reloadLastEvent();
+                LiabilityPage lp = header.navigateToF5();
+                lp.updatePrices(prodId, BetType.Place.id, placePrices);
+            }, 3, 5);
         });
 
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
@@ -269,11 +271,11 @@ public class CreateEventSteps implements En {
         String cat = (String) Storage.removeFirst(Storage.KEY.CATEGORIES);
         String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
-        header.pickEvent(cat, subcat, event);
-        settlementPage = header.navigateToF6();
-        Helpers.retryOnAssertionFailure(() -> {
+        Helpers.retryOnFailure(() -> {
+            header.pickEvent(cat, subcat, event);
+            settlementPage = header.navigateToF6();
             settlementPage.resultRace(winners);
-        }, 2, 2);
+        }, 5, 3);
     }
 
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {

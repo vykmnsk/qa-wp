@@ -119,7 +119,7 @@ public class CustomerSteps implements En {
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             customersPage.verifyLoaded();
-            Helpers.retryOnAssertionFailure(() -> {
+            Helpers.retryOnFailure(() -> {
                 header.refreshPage();
                 String actualAmlStatus = customersPage.readAMLStatus();
                 Assertions.assertThat(actualAmlStatus).as("AML status").isEqualToIgnoringCase(expectedAmlStatus);
@@ -128,7 +128,7 @@ public class CustomerSteps implements En {
 
         Then("^the customer AML status in API is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
             String accessToken = loginStoredCustomer();
-            Helpers.retryOnAssertionFailure(() -> {
+            Helpers.retryOnFailure(() -> {
                 String actualAmlStatus = api.readAmlStatus(accessToken);
                 assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
             }, 10, 2);

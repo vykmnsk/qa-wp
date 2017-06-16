@@ -71,7 +71,7 @@ public class HeaderPage extends AppPage {
     }
 
     public void pickEvent(String catVal, String subcatVal, String eventVal) {
-        Helpers.retryOnAssertionFailure(()-> {
+        Helpers.retryOnFailure(()-> {
             pickCategories(catVal, subcatVal);
             wait.until(ExpectedConditions.visibilityOf(event));
             wait.until(ExpectedConditions.textToBePresentInElement(event, eventVal));

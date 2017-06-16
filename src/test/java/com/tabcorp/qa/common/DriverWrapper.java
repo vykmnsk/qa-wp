@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DriverWrapper {
-    private static final int DEFAULT_TIMEOUT_SECONDS = 15;
+    private static final int DEFAULT_TIMEOUT_SECONDS = 10;
     private static DriverWrapper instance;
     private WebDriver driver;
     private WebDriverWait wait;

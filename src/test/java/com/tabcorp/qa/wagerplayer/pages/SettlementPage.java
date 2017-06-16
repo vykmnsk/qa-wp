@@ -82,10 +82,8 @@ public class SettlementPage extends AppPage {
             String visibleRunnerVal = Helpers.toTitleCase(winner.getKey());
             WebElement runnerEl = resultRunners.get(count);
             wait.until(ExpectedConditions.textToBePresentInElement(runnerEl, visibleRunnerVal));
-            Helpers.retryOnAssertionFailure(() -> {
-                selectByPartialVisibleText(runnerEl, visibleRunnerVal);
-                Assertions.assertThat(runnerEl.getText()).as("Runner Name").contains(visibleRunnerVal);
-            }, 5, 1);
+            selectByPartialVisibleText(runnerEl, visibleRunnerVal);
+            Assertions.assertThat(runnerEl.getText()).as("Runner Name").contains(visibleRunnerVal);
             count++;
         }
         result.click();

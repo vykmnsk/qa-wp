@@ -3,6 +3,7 @@ package com.tabcorp.qa.common;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +121,7 @@ public class Helpers {
         return value.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP);
     }
 
-    public static void retryOnAssertionFailure(Runnable block, int maxTries, int sleepSeconds) {
+    public static void retryOnFailure(Runnable block, int maxTries, int sleepSeconds) {
         for (int i = 1; i <= maxTries; i++) {
             try {
                 Thread.sleep(sleepSeconds * 1000);
@@ -128,6 +129,8 @@ public class Helpers {
                 return;
             } catch (AssertionError ae) {
                 log.info(String.format("Re-trying %d. Exception: %s", i, ae.getMessage()));
+            } catch (TimeoutException se) {
+                log.info(String.format("Re-trying %d. Exception: %s", i, se.getMessage()));
             } catch (InterruptedException e) {
                 //ignore
             }
