@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -94,7 +96,9 @@ public class Helpers {
     }
 
     public static String createUniqueName(String baseName) {
-        return String.format("%s %d", baseName, randomBetweenInclusive(1000, 9999));
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy:MM:dd:HH:mm:ss"));
+        int uniqPart = randomBetweenInclusive(000, 999);
+        return String.format("%s%s~%d", baseName, timestamp, uniqPart);
     }
 
     public static List<String> extractCSV(String csv) {

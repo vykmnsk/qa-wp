@@ -93,7 +93,7 @@ public class Config {
     }
 
     public static String testEventBaseName() {
-        return "TEST RACE";
+        return "QA-WP-";
     }
 
 
