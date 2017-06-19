@@ -31,7 +31,7 @@ public interface WagerPlayerAPI {
 
     ReadContext placeSingleEachwayBet(String accessToken, Integer productId, String mpid, String winPrice, String placePrice, BigDecimal stake, Integer bonusBetFlag);
 
-    ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi);
+    ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi, boolean isBoxed);
 
     String createNewCustomer(Map custData);
 

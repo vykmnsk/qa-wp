@@ -183,23 +183,33 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     @SuppressWarnings("unchecked")
-    public ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi) {
+    public ReadContext placeExoticBet(String accessToken, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean isFlexi, boolean isBoxed) {
         JSONObject slots = new JSONObject();
-        for (int index = 0; index < selectionIds.size(); index++) {
-            JSONArray sel = new JSONArray();
+        JSONObject options = new JSONObject();
+        options.put("flexi", isFlexi ? "1" : "0");
+        if (isBoxed) {
+            options.put("boxed", "1");
             JSONObject slot = new JSONObject();
-            sel.add(0, selectionIds.get(index));
+            JSONArray selection = new JSONArray();
+            selection.addAll(selectionIds);
+            slot.put("selection", selection);
             slot.put("market", marketId);
-            slot.put("selection", sel);
-            slots.put(index + 1, slot);
+            slots.put(1, slot);
+        } else {
+            options.put("boxed", "0");
+            for (int index = 0; index < selectionIds.size(); index++) {
+                JSONObject slot = new JSONObject();
+                JSONArray selection = new JSONArray();
+                selection.add(selectionIds.get(index));
+                slot.put("selection", selection);
+                slot.put("market", marketId);
+                slots.put(index + 1, slot);
+            }
         }
-
         JSONObject selection = new JSONObject();
         selection.put("slots", slots);
         selection.put("type", "exotic");
         selection.put("stake", stake);
-        JSONObject options = new JSONObject();
-        options.put("flexi", "0");
         selection.put("options", options);
         selection.put("product_id", productId);
 

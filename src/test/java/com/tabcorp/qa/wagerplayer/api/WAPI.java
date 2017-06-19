@@ -233,7 +233,7 @@ public class WAPI implements WagerPlayerAPI {
         return resp.read(RESP_ROOT + ".bonus_bets[0].bonus_bet[0].free_bet_code");
     }
 
-    public ReadContext placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi) {
+    public ReadContext placeExoticBet(String sessionId, Integer productId, List<String> selectionIds, String marketId, BigDecimal stake, boolean flexi, boolean unused) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);

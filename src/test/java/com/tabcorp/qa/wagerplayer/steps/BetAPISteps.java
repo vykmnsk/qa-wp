@@ -61,13 +61,19 @@ public class BetAPISteps implements En {
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runnersCSV, BigDecimal stake) -> {
-                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, false);
+                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, false, false);
+                });
+
+        When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with boxed as \"([Y|N])\"$",
+                (String betTypeName, String runnersCSV, BigDecimal stake, String boxed) -> {
+                    boolean isBoxed = "Y".equalsIgnoreCase(boxed);
+                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, false, isBoxed);
                 });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([Y|N])\"$",
                 (String betTypeName, String runnersCSV, BigDecimal stake, String flexi) -> {
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
-                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, isFlexi);
+                    balanceAfterBet = oneEventExoticBetStep(betTypeName, runnersCSV, stake, isFlexi, false);
                 });
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" across multiple events for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
@@ -211,24 +217,24 @@ public class BetAPISteps implements En {
         return api.readNewBalance(response);
     }
 
-    private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi) {
+    private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi, boolean isBoxed) {
         assertThat(betTypeName.toUpperCase()).as("Exotic BetTypeName input")
                 .isIn("FIRST FOUR", "TRIFECTA", "EXACTA", "QUINELLA", "EXOTIC");
         List<String> runners = Helpers.extractCSV(runnersCSV);
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
         Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
         String eventId = (String) Storage.getLast(EVENT_IDS);
-        ReadContext response = placeExoticBetOneEvent(accessToken, eventId, prodId, runners, stake, isFlexi);
+        ReadContext response = placeExoticBetOneEvent(accessToken, eventId, prodId, runners, stake, isFlexi, isBoxed);
         List<Integer> betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds.toString());
         return api.readNewBalance(response);
     }
 
-    private ReadContext placeExoticBetOneEvent(String accessToken, String eventId, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
+    private ReadContext placeExoticBetOneEvent(String accessToken, String eventId, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi, boolean isBoxed) {
         ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
         String marketId = wapi.readMarketId(resp, "Racing Live");
         List<String> selectionIds = wapi.readSelectionIds(resp, marketId, runners);
-        return api.placeExoticBet(accessToken, prodId, selectionIds, marketId, stake, isFlexi);
+        return api.placeExoticBet(accessToken, prodId, selectionIds, marketId, stake, isFlexi, isBoxed);
     }
 
     private ReadContext placeExoticBetMultEvents(String accessToken, List<String> eventIds, Integer prodId, List<String> runners, BigDecimal stake, boolean isFlexi) {
