@@ -80,8 +80,8 @@ public class HelpersTest {
     @Test
     public void canNormalize() {
         final String input = "Active - KYC verified";
-        final String expectedOutput = "ACTIVE_KYC_VERIFIED";
-        String output = Helpers.norm(input);
+        final String expectedOutput = "Active_KYC_verified";
+        String output = Helpers.normalize(input);
         assertThat(output).isEqualTo(expectedOutput);
     }
 

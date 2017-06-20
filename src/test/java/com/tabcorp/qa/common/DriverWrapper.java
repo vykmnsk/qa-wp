@@ -9,6 +9,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,42 +27,41 @@ public class DriverWrapper {
         return instance;
     }
 
+    public boolean hasDriver() {
+        return null != driver;
+    }
+
     public WebDriver getDriver() {
-        if (driver == null) {
-            if (Config.isDockerRun()) {
-                driver = getRemoteDriver();
-            } else {
-                System.setProperty("webdriver.chrome.driver", Helpers.getChromeDriverPath());
-
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("disable-infobars");
-
-                Map<String, Object> prefs = new HashMap<>();
-                prefs.put("credentials_enable_service", false);
-                prefs.put("profile.password_manager_enabled", false);
-                options.setExperimentalOption("prefs", prefs);
-
-                driver = new ChromeDriver(options);
-            }
+        if (null == driver) {
+            driver = Config.isDockerRun() ? getRemoteDriver() : getLocalDriver();
         }
         return driver;
     }
 
-    private WebDriver getRemoteDriver() {
-        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-        capabilities.setJavascriptEnabled(true);
-        RemoteWebDriver driver = null;
-        try {
-             driver = new RemoteWebDriver(new URL("http://seleniumhub:4444/wd/hub"),capabilities);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return driver ;
+    private WebDriver getLocalDriver() {
+        System.setProperty("webdriver.chrome.driver", Helpers.getChromeDriverPath());
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("disable-infobars");
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+        options.setExperimentalOption("prefs", prefs);
+        return new ChromeDriver(options);
     }
 
+    private WebDriver getRemoteDriver() {
+        final String seleniumHub = "http://seleniumhub:4444/wd/hub";
+        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+        capabilities.setJavascriptEnabled(true);
+        try {
+            return new RemoteWebDriver(new URL(seleniumHub), capabilities);
+        } catch (MalformedURLException mue) {
+            throw new RuntimeException(mue);
+        }
+    }
 
     public WebDriverWait getDriverWait() {
-        if (wait == null) {
+        if (null == wait) {
             wait = new WebDriverWait(getDriver(), DEFAULT_TIMEOUT_SECONDS);
         }
         return wait;

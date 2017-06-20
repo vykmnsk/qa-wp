@@ -3,7 +3,6 @@ package com.tabcorp.qa.wagerplayer.pages;
 import com.tabcorp.qa.wagerplayer.Config;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.CacheLookup;

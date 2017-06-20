@@ -1,15 +1,21 @@
 package com.tabcorp.qa.common;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,9 +62,8 @@ public class Helpers {
         return (name.substring(0, 1).toUpperCase()) + (name.substring(1));
     }
 
-    public static String norm(String input) {
-        String output = input.replaceAll("(\\s|-)+", "_");
-        return output.toUpperCase();
+    public static String normalize(String input) {
+        return input.replaceAll("(\\s|-)+", "_");
     }
 
     public static String getChromeDriverPath() {
@@ -95,10 +100,13 @@ public class Helpers {
         assertThat(lastValidDate).as("CC month=%d year=%d is expired", expMonth, expYear).isAfterOrEqualTo(today);
     }
 
+    public static String timestamp(String pattern) {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern));
+    }
+
     public static String createUniqueName(String baseName) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy:MM:dd:HH:mm:ss"));
         int uniqPart = randomBetweenInclusive(000, 999);
-        return String.format("%s%s~%d", baseName, timestamp, uniqPart);
+        return String.format("%s%s~%d", baseName, timestamp("yy:MM:dd:HH:mm:ss"), uniqPart);
     }
 
     public static List<String> extractCSV(String csv) {
@@ -170,5 +178,22 @@ public class Helpers {
     public static Map<String, String> loadYamlResource(String filename) {
         InputStream input = Helpers.class.getClassLoader().getResourceAsStream(filename);
         return (Map<String, String>) (new Yaml()).load(input);
+    }
+
+    public static String getTargetDirPath() {
+        return System.getProperty("user.dir") + File.separator + "target" + File.separator;
+    }
+
+    public static void saveScreenshot(WebDriver driver, String baseName) {
+        String shotFilename = String.format("screen%s--%s.png",
+                timestamp("HHmmssS"),
+                normalize(StringUtils.left(baseName, 50)));
+        String savePath = Helpers.getTargetDirPath() + shotFilename;
+        File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(srcFile, new File(savePath));
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 }
