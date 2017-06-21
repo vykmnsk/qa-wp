@@ -36,11 +36,11 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
     And I place a single "Eachway" bet on the runner "Runner08" for $4.00
     And I place a single "Eachway" bet on the runner "Runner09" for $4.00
     And I place a single "Win" bet on the runner "Runner10" for $4.00
-    Then customer balance is equal to $44.00
+    Then customer balance is equal to $56.00
 
     When I scratch the runners at position(s) "1"
     Then I can see the following deduction details on settlement page
-      | 1 Runner01 | 15 | 85 |
+      | 1 Runner01 | 85 | 85 |
     When I result race with the runners and positions
       | Runner02 | 1 |
       | Runner06 | 2 |
@@ -57,10 +57,11 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
       | Runner08        | Punter Win  | 6.10 |
       | Runner09        | Punter Loss | 0.00 |
       | Runner10        | Punter Loss | 0.00 |
-    And customer balance is equal to $78.09
+    And customer balance is equal to $66.09
 
   Examples:
-  | Category         | Subcategory
+
+  | Category         | Subcategory    |
   | Horse Racing     | WOLVERHAMPTION |
   | Greyhound Racing | HARLOW         |
 
