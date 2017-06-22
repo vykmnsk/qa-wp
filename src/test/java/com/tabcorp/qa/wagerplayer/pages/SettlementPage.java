@@ -6,6 +6,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -81,7 +82,11 @@ public class SettlementPage extends AppPage {
             //example: "Runner01"
             String visibleRunnerVal = Helpers.toTitleCase(winner.getKey());
             WebElement runnerEl = resultRunners.get(count);
-            wait.until(ExpectedConditions.textToBePresentInElement(runnerEl, visibleRunnerVal));
+            try {
+                wait.until(ExpectedConditions.textToBePresentInElement(runnerEl, visibleRunnerVal));
+            } catch (TimeoutException te){
+                Assertions.fail("No winner name '%s' found in result dropdown: %s", visibleRunnerVal, runnerEl.getText());
+            }
             selectByPartialVisibleText(runnerEl, visibleRunnerVal);
             Assertions.assertThat(runnerEl.getText()).as("Runner Name").contains(visibleRunnerVal);
             count++;
