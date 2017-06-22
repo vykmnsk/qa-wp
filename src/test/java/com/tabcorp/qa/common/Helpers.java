@@ -63,7 +63,7 @@ public class Helpers {
     }
 
     public static String normalize(String input) {
-        return input.replaceAll("(\\s|-)+", "_");
+        return input.trim().replaceAll("\\W+", "_");
     }
 
     public static String getChromeDriverPath() {
