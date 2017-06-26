@@ -50,7 +50,10 @@ public class DriverWrapper {
     }
 
     private WebDriver getRemoteDriver() {
-        final String seleniumHub = "http://seleniumhub:4444/wd/hub";
+        final String hostname = "seleniumhub";
+        // Enable this instead for local Docker runs
+//        final String hostname = "localhost";
+        final String seleniumHub = String.format("http://%s:4444/wd/hub", hostname);
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         capabilities.setJavascriptEnabled(true);
         try {

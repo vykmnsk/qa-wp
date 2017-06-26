@@ -1,6 +1,6 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
-import com.tabcorp.qa.adyen.pages.AdyenPage;
+import com.tabcorp.qa.adyen.Card;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
@@ -28,10 +28,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
@@ -230,18 +230,24 @@ public class CustomerSteps implements En {
 
         final MOBI_V2 mobi = new MOBI_V2();
         String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
-        String encryptionKey = mobi.getEncryptionKey(accessToken);
 
-        AdyenPage adyenPage = new AdyenPage();
-        adyenPage.load();
-        String cardEncryption = adyenPage.getCardEncryption(
-                encryptionKey,
-                cardNumber,
-                cvc,
-                expMonth,
-                expYear,
-                cardHolderName
-        );
+        String publicKey = Helpers.readResourceFile("adyen-encryption-key.txt");
+        // if becomes obsolete try:
+        // String encryptionKey = mobi.getEncryptionKey(accessToken);
+        Card card = new Card();
+        card.setNumber(cardNumber);
+        card.setCvc(cvc);
+        card.setExpiryMonth(expMonth);
+        card.setExpiryYear(expYear);
+        card.setCardHolderName(cardHolderName);
+        card.setGenerationTime(new Date());
+        String cardEncryption;
+        try {
+            cardEncryption = card.serialize(publicKey);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
         String paymentReference = mobi.getPaymentRefence(accessToken);
         mobi.addCardAndDeposit(accessToken, paymentReference, cardEncryption, cardType, deposit);
     }

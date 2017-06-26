@@ -89,7 +89,7 @@ public class BetAPISteps implements En {
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
-        When("^I place a Luxbet Multi Bet Double \"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+        When("^I place a Luxbet Double Bet \"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String betTypeName1, String betTypeName2, String runnersCSV, BigDecimal stake, String flexi) -> {
                     assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
                     BetType betType1 = BetType.fromName(betTypeName1);
@@ -98,7 +98,19 @@ public class BetAPISteps implements En {
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
                     ReadContext response = placeMultiBet(WAPI.MultiType.Double, Arrays.asList(betType1, betType2), runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
-        });
+                });
+
+        When("^I place a Luxbet Treble Bet \"([A-Za-z]+)\"-\"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
+                (String betTypeName1, String betTypeName2, String betTypeName3, String runnersCSV, BigDecimal stake, String flexi) -> {
+                    assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+                    BetType betType1 = BetType.fromName(betTypeName1);
+                    BetType betType2 = BetType.fromName(betTypeName2);
+                    BetType betType3 = BetType.fromName(betTypeName3);
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+                    ReadContext response = placeMultiBet(WAPI.MultiType.Treble, Arrays.asList(betType1, betType2, betType3), runners, stake, isFlexi);
+                    balanceAfterBet = api.readNewBalance(response);
+                });
 
         When("^I place a Luxbet Multi Bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\"$",
                 (String multiTypeName, String runnersCSV, BigDecimal stake, String flexi) -> {
@@ -108,6 +120,38 @@ public class BetAPISteps implements En {
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
                     ReadContext response = placeMultiBet(multiType, new ArrayList<>(), runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
+                });
+
+        And("^I place a Luxbet Multi-Treble \"([^\"]*)\" bet on types \"([A-Za-z]+)\"-\"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$\"([^\"]*)\" with flexi as \"([^\"]*)\"$",
+                (String multiTypeName, String betTypeName1, String betTypeName2, String betTypeName3, String runnersCSV, String stake, String flexi) -> {
+                    assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+                    List<String> multiTypes = Helpers.extractCSV(multiTypeName);
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    List<String> splitStake = Helpers.extractCSV(stake);
+                    List<BigDecimal> stakes = splitStake.stream().map(BigDecimal::new).collect(Collectors.toList());
+                    List<String> splitFlexi = Helpers.extractCSV(flexi);
+                    List<Boolean> flexis = splitFlexi.stream().map("Y"::equalsIgnoreCase).collect(Collectors.toList());
+
+                    BetType betType1 = BetType.fromName(betTypeName1);
+                    BetType betType2 = BetType.fromName(betTypeName2);
+                    BetType betType3 = BetType.fromName(betTypeName3);
+
+                    ReadContext response = placeMultiTrebleBet(multiTypes, Arrays.asList(betType1, betType2, betType3), runners, stakes, flexis);
+                    balanceAfterBet = wapi.readNewBalance(response);
+                });
+
+        And("^I place a Luxbet Multi-Multi bet on \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$\"([^\"]*)\" with flexi as \"([^\"]*)\"$",
+                (String multiTypeName, String runnersCSV, String stake, String flexi) -> {
+                    assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+                    List<String> multiTypes = Helpers.extractCSV(multiTypeName);
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    List<String> splitStake = Helpers.extractCSV(stake);
+                    List<BigDecimal> stakes = splitStake.stream().map(BigDecimal::new).collect(Collectors.toList());
+                    List<String> splitFlexi = Helpers.extractCSV(flexi);
+                    List<Boolean> flexis = splitFlexi.stream().map("Y"::equalsIgnoreCase).collect(Collectors.toList());
+                    List<BetType> dummyBetTypes = runners.stream().map(r -> (BetType) null).collect(Collectors.toList());
+                    ReadContext response = placeMultiMultiBet(multiTypes, dummyBetTypes, runners, stakes, flexis);
+                    balanceAfterBet = wapi.readNewBalance(response);
                 });
 
         When("^I place a Redbook Multi Bet \"([^\"]+)\" \"([A-Za-z]+)\" on the runners \"([^\"]+)\" for \\$(\\d+.\\d\\d)$",
@@ -173,25 +217,52 @@ public class BetAPISteps implements En {
         List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
         String uuid;
         if (WAPI.MultiType.Double.equals(multiType)) {
-            uuid = wapi.prepareSelectionsForDoubleMultiBet(accessToken, selections, prodIds, betTypes);
+            uuid = wapi.prepareSelectionsForDoubleBet(accessToken, selections, prodIds, betTypes);
+        } else if (WAPI.MultiType.Treble.equals(multiType)) {
+            uuid = wapi.prepareSelectionsForTrebleBet(accessToken, selections, prodIds, betTypes);
         } else {
             uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType);
         }
         ReadContext response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
         List<Integer> betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds);
+
+        for (int betId : betIds){
+            verifyBetTypes(accessToken, betId, betTypes);
+        }
         return response;
+    }
+
+    private void verifyBetTypes(String accessToken, int betId, List<BetType> betTypes){
+        List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
+        assertThat(placedBetTypes).as("Expected Bet Types").isEqualTo(betTypes);
+    }
+
+    private ReadContext placeMultiMultiBet(List<String> multiTypes, List<BetType> betTypes, List<String> runners, List<BigDecimal> stakes, List<Boolean> flexis) {
+        String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+        List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+        List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+        assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
+        List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
+        
+        List<String> uuids = wapi.prepareSelectionsForMultiMultiBet(accessToken, selections, prodIds, multiTypes, betTypes);
+        
+        ReadContext response = wapi.placeMultiMultiBet(accessToken, uuids, stakes, flexis);
+        List<Integer> betIds = api.readBetIds(response);
+        log.info("Bet IDs=" + betIds);
+        List<Integer> betSlipIds = wapi.readBetSlipIds(response);
+        log.info("Bet Slip IDs=" + betSlipIds);
+        return response;
+    }
+
+    private ReadContext placeMultiTrebleBet(List<String> multiTypes, List<BetType> betTypes, List<String> runners, List<BigDecimal> stakes, List<Boolean> flexis) {
+        assertThat(betTypes.size()).as("Treble should have 3 bet types").isEqualTo(3);
+        return placeMultiMultiBet(multiTypes, betTypes, runners, stakes, flexis);
     }
 
     private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-        String wapiSessionId;
-        if (Config.isRedbook()) {
-            wapiSessionId = wapi.login();
-        } else {
-            wapiSessionId = accessToken;
-        }
-        ReadContext resp = wapi.getEventMarkets(wapiSessionId, eventId);
+        ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
         Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, useDefaultPrices);
 
         ReadContext response;
@@ -212,8 +283,13 @@ public class BetAPISteps implements En {
                 throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
         }
         List<Integer> betIds = api.readBetIds(response);
-        betIds.forEach(betId -> Storage.add(BET_IDS, betId));
-        log.info("Bet IDs=" + betIds.toString());
+        assertThat(betIds.size()).as("Single Bet IDs").isEqualTo(1);
+        int betId = betIds.get(0);
+        Storage.add(BET_IDS, betId);
+        log.info("Bet ID=" + betId);
+
+        BetType expectedBetType = BetType.fromName(betTypeName);
+        verifyBetTypes(accessToken, betId, Arrays.asList(expectedBetType));
         return api.readNewBalance(response);
     }
 
