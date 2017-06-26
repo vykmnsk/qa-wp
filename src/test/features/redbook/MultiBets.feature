@@ -45,10 +45,14 @@ Feature: Placing and Settling multi Bets
     When I result/settle created event race with winners "Runner11, Runner12, Runner13"
     Then customer balance since last bet is increased by $<Payout>
 
+  @smoke
     Examples:
-      | Category          | Subcategory     | BetType | NumOfPlaces | BetOn              | Stake | Deduction | Payout |
-      | Horse Racing      | WOLVERHAMPTON   | Win     | 3           | Runner01, Runner11 | 3.00  | 3.00      | 7.59   |
-      | Greyhound Racing  | HARLOW          | Eachway | 3           | Runner01, Runner11 | 3.00  | 6.00      | 10.67  |
+      | Category     | Subcategory   | BetType | NumOfPlaces | BetOn              | Stake | Deduction | Payout |
+      | Horse Racing | WOLVERHAMPTON | Win     | 3           | Runner01, Runner11 | 3.00  | 3.00      | 7.59   |
+
+    Examples:
+      | Category         | Subcategory | BetType | NumOfPlaces | BetOn              | Stake | Deduction | Payout |
+      | Greyhound Racing | HARLOW      | Eachway | 3           | Runner01, Runner11 | 3.00  | 6.00      | 10.67  |
 
 
   Scenario Outline: Multi bet with 3 events <Category>  <Multitype>
@@ -118,15 +122,18 @@ Feature: Placing and Settling multi Bets
     When I result/settle created event race with winners "Runner21, Runner22, Runner23"
     Then customer balance since last bet is increased by $<Payout>
 
-
     Examples:
-      | Category            | Subcategory     | MultiType | BetType | NumOfPlaces | BetOn                        | Stake | Deduction | Payout |
-      | Horse Racing        | WOLVERHAMPTON   | Treble    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 8.00      | 105.25 |
-      | Horse Racing        | WOLVERHAMPTON   | Trixie    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 32.00     | 266.93 |
-      | Horse Racing        | WOLVERHAMPTON   | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
-      | Greyhound Racing    | HARLOW          | Treble    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 8.00      | 105.25 |
-      | Greyhound Racing    | HARLOW          | Trixie    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 32.00     | 266.93 |
-      | Greyhound Racing    | HARLOW          | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
+      | Category         | Subcategory   | MultiType | BetType | NumOfPlaces | BetOn                        | Stake | Deduction | Payout |
+      | Horse Racing     | WOLVERHAMPTON | Treble    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 8.00      | 105.25 |
+      | Horse Racing     | WOLVERHAMPTON | Trixie    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 32.00     | 266.93 |
+      | Horse Racing     | WOLVERHAMPTON | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
+      | Greyhound Racing | HARLOW        | Treble    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 8.00      | 105.25 |
+      | Greyhound Racing | HARLOW        | Trixie    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 32.00     | 266.93 |
+
+  @smoke
+    Examples:
+      | Category         | Subcategory | MultiType | BetType | NumOfPlaces | BetOn                        | Stake | Deduction | Payout |
+      | Greyhound Racing | HARLOW      | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
 
 
   Scenario Outline: Multi bet with 4 events <Category>  <Multitype>
@@ -217,13 +224,13 @@ Feature: Placing and Settling multi Bets
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category            | Subcategory    | MultiType | BetType | BetOn                                  | Stake | Deduction | Payout | NumOfPlaces |
-      | Horse Racing        | WOLVERHAMPTON  | 4-Fold    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 2.00      | 57.89  | 3           |
-      | Horse Racing        | WOLVERHAMPTON  | Yankee    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 22.00     | 251.38 | 3           |
-      | Horse Racing        | WOLVERHAMPTON  | Lucky 15  | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 30.00     | 272.98 | 3           |
-      | Greyhound Racing    | HARLOW         | 4-Fold    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 2.00      | 57.89  | 3           |
-      | Greyhound Racing    | HARLOW         | Yankee    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 22.00     | 251.38 | 3           |
-      | Greyhound Racing    | HARLOW         | Lucky 15  | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 30.00     | 272.98 | 3           |
+      | Category         | Subcategory   | MultiType | BetType | BetOn                                  | Stake | Deduction | Payout | NumOfPlaces |
+      | Horse Racing     | WOLVERHAMPTON | 4-Fold    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 2.00      | 57.89  | 3           |
+      | Horse Racing     | WOLVERHAMPTON | Yankee    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 22.00     | 251.38 | 3           |
+      | Horse Racing     | WOLVERHAMPTON | Lucky 15  | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 30.00     | 272.98 | 3           |
+      | Greyhound Racing | HARLOW        | 4-Fold    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 2.00      | 57.89  | 3           |
+      | Greyhound Racing | HARLOW        | Yankee    | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 22.00     | 251.38 | 3           |
+      | Greyhound Racing | HARLOW        | Lucky 15  | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 30.00     | 272.98 | 3           |
 
 
   Scenario Outline: Multi bet with 5 events <Category>  <Multitype>
@@ -288,7 +295,7 @@ Feature: Placing and Settling multi Bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
-      | prices  | 2.20, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                                 |
+      | prices  | 2.20, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | EW    |
@@ -307,7 +314,7 @@ Feature: Placing and Settling multi Bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | Runner41, Runner42, Runner43, Runner44, Runner45, Runner46, Runner47, Runner48 |
-      | prices  | 2.00, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                                 |
+      | prices  | 2.00, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | EW    |
@@ -334,6 +341,6 @@ Feature: Placing and Settling multi Bets
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category            | Subcategory    | MultiType | BetType | BetOn                                             | Stake | Deduction | Payout   | NumOfPlaces |
-      | Horse Racing        | WOLVERHAMPTON  | Canadian  |Win      | Runner01, Runner11, Runner21, Runner31, Runner41  | 2.00  | 52.00     | 797.34   | 3           |
-      | Greyhound Racing    | HARLOW         | Canadian  |Win      | Runner01, Runner11, Runner21, Runner31, Runner41  | 2.00  | 52.00     | 797.34   | 3           |
+      | Category         | Subcategory   | MultiType | BetType | BetOn                                            | Stake | Deduction | Payout | NumOfPlaces |
+      | Horse Racing     | WOLVERHAMPTON | Canadian  | Win     | Runner01, Runner11, Runner21, Runner31, Runner41 | 2.00  | 52.00     | 797.34 | 3           |
+      | Greyhound Racing | HARLOW        | Canadian  | Win     | Runner01, Runner11, Runner21, Runner31, Runner41 | 2.00  | 52.00     | 797.34 | 3           |

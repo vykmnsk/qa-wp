@@ -21,9 +21,13 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     And I settle race with Exotic prices "<ExoticPrices>"
     Then customer balance since last bet is increased by $<Payout>
 
+  @smoke
+    Examples:
+      | ProductName | BetType | BetOn              | Stake | Deduction | Payout | ExoticPrices |
+      | Forecast SP | Exotic  | Runner01, Runner02 | 2.00  | 2.00      | 10.40  | 5.20         |
+
     Examples:
       | ProductName | BetType | BetOn                        | Stake | Deduction | Payout | ExoticPrices |
-      | Forecast SP | Exotic  | Runner01, Runner02           | 2.00  | 2.00      | 10.40  | 5.20         |
       | Tricast SP  | Exotic  | Runner01, Runner02, Runner03 | 9.00  | 9.00      | 32.40  | 3.60         |
 
 
@@ -64,4 +68,8 @@ Feature: Placing and Settling Exotic Bets for a Single Event
       | Greyhound Racing | BELLE VUE     | Forecast SP | Exotic  | Runner01,Runner02,Runner04          | 2.00  | 12.00     | 10.40  | 5.20         | Y     |
       | Greyhound Racing | BELLE VUE     | Tricast SP  | Exotic  | Runner01,Runner02,Runner03          | 2.00  | 2.00      | 7.20   | 3.60         | N     |
       | Greyhound Racing | BELLE VUE     | Tricast SP  | Exotic  | Runner01,Runner02,Runner03          | 2.00  | 12.00     | 7.20   | 3.60         | Y     |
-      | Greyhound Racing | BELLE VUE     | Tricast SP  | Exotic  | Runner01,Runner02,Runner03,Runner04 | 2.00  | 48.00     | 7.20   | 3.60         | Y     |
+
+  @smoke
+    Examples:
+      | Category         | Subcategory | ProductName | BetType | BetOn                               | Stake | Deduction | Payout | ExoticPrices | Boxed |
+      | Greyhound Racing | BELLE VUE   | Tricast SP  | Exotic  | Runner01,Runner02,Runner03,Runner04 | 2.00  | 48.00     | 7.20   | 3.60         | Y     |

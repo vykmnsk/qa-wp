@@ -185,13 +185,7 @@ public class BetAPISteps implements En {
 
     private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-        String wapiSessionId;
-        if (Config.isRedbook()) {
-            wapiSessionId = wapi.login();
-        } else {
-            wapiSessionId = accessToken;
-        }
-        ReadContext resp = wapi.getEventMarkets(wapiSessionId, eventId);
+        ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
         Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, useDefaultPrices);
 
         ReadContext response;
