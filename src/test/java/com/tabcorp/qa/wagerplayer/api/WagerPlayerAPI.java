@@ -4,6 +4,7 @@ package com.tabcorp.qa.wagerplayer.api;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
+import com.tabcorp.qa.common.BetType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,6 +41,8 @@ public interface WagerPlayerAPI {
     BigDecimal readNewBalance(ReadContext resp);
 
     List<Integer> readBetIds(ReadContext resp);
+
+    List<BetType> getBetTypes(String accessToken, int betId);
 
     default ReadContext parseVerifyJSON(Object json, String rootPath){
         ReadContext ctx = null;

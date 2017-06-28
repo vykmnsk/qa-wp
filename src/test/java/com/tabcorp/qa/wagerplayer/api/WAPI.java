@@ -353,7 +353,7 @@ public class WAPI implements WagerPlayerAPI {
         return resp.read(RESP_ROOT + ".bet[*].bet_id");
     }
 
-    public List<BetType> getBetTypes(String sessionId, Integer betId) {
+    public List<BetType> getBetTypes(String sessionId, int betId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_bet");
         fields.put("bet_id", betId);
