@@ -27,7 +27,7 @@ pipeline {
         stage('checkout & install dependencies') {
             steps {
                 sh 'docker ps -a'
-                sh 'docker-compose  rm -f 4eb9525e7328'
+                // sh 'docker-compose  rm -f 4eb9525e7328'
                 sh 'docker-compose down --remove-orphans'
                 checkout scm
                 sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
