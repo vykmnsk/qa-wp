@@ -285,16 +285,10 @@ public class WAPI implements WagerPlayerAPI {
         return prepareSelectionsForMultiBet(sessionId, selections, prodIds, MultiType.Treble, betTypes);
     }
 
-    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType) {
-        List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size());
-        Integer count = sizes.get(0);
-        assertThat(count).as("Multi Selections count").isGreaterThan(1);
-        assertThat(sizes).as("Number of Selections and Products").allMatch(count::equals);
-        List<BetType> dummyBetTypes = Collections.nCopies(count, null);
-        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, multiType, dummyBetTypes);
-    }
-
-    private String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypes) {
+    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypes) {
+        if (null == betTypes) {
+            betTypes = Collections.nCopies(selections.size(), null);
+        }
         assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
         ReadContext response = null;
         for (int i = 0; i < selections.size(); i++) {

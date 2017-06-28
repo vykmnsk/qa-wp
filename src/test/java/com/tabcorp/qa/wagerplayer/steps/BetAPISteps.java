@@ -118,7 +118,7 @@ public class BetAPISteps implements En {
                     WAPI.MultiType multiType = WAPI.MultiType.fromName(multiTypeName);
                     List<String> runners = Helpers.extractCSV(runnersCSV);
                     boolean isFlexi = "Y".equalsIgnoreCase(flexi);
-                    ReadContext response = placeMultiBet(multiType, new ArrayList<>(), runners, stake, isFlexi);
+                    ReadContext response = placeMultiBet(multiType, null, runners, stake, isFlexi);
                     balanceAfterBet = api.readNewBalance(response);
                 });
 
@@ -221,21 +221,21 @@ public class BetAPISteps implements En {
         } else if (WAPI.MultiType.Treble.equals(multiType)) {
             uuid = wapi.prepareSelectionsForTrebleBet(accessToken, selections, prodIds, betTypes);
         } else {
-            uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType);
+            uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType, betTypes);
         }
         ReadContext response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
+
         List<Integer> betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds);
-
-        for (int betId : betIds){
-            verifyBetTypes(accessToken, betId, betTypes);
+        if (null != betTypes) {
+            for (int betId : betIds){
+                List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
+                assertThat(placedBetTypes)
+                        .as(String.format("Expected Bet Types for %s bet, betId=%d", multiType.exactName, betId))
+                        .isEqualTo(betTypes);
+            }
         }
         return response;
-    }
-
-    private void verifyBetTypes(String accessToken, int betId, List<BetType> betTypes){
-        List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
-        assertThat(placedBetTypes).as("Expected Bet Types").isEqualTo(betTypes);
     }
 
     private ReadContext placeMultiMultiBet(List<String> multiTypes, List<BetType> betTypes, List<String> runners, List<BigDecimal> stakes, List<Boolean> flexis) {
@@ -288,8 +288,11 @@ public class BetAPISteps implements En {
         Storage.add(BET_IDS, betId);
         log.info("Bet ID=" + betId);
 
-        BetType expectedBetType = BetType.fromName(betTypeName);
-        verifyBetTypes(accessToken, betId, Arrays.asList(expectedBetType));
+        List<BetType> expectedBetTypes = Arrays.asList(BetType.fromName(betTypeName));
+        List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
+        assertThat(placedBetTypes)
+                .as(String.format("Expected Bet Types for Single bet, betId=%d", betId))
+                .isEqualTo(expectedBetTypes);
         return api.readNewBalance(response);
     }
 
