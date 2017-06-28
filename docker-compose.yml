@@ -2,7 +2,6 @@ version: '2.1'
 services:
   seleniumhub:
       image: selenium/standalone-chrome:3.4.0
-      container_name: seleniumhub
       hostname: seleniumhub
       environment:
           # Required to avoid container startup hanging sometimes in
