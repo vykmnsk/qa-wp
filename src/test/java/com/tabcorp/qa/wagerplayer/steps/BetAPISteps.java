@@ -289,7 +289,7 @@ public class BetAPISteps implements En {
         log.info("Bet ID=" + betId);
 
         List<BetType> expectedBetTypes = Arrays.asList(BetType.fromName(betTypeName));
-        List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
+        List<BetType> placedBetTypes = api.getBetTypes(accessToken, betId);
         assertThat(placedBetTypes)
                 .as(String.format("Expected Bet Types for Single bet, betId=%d", betId))
                 .isEqualTo(expectedBetTypes);
