@@ -112,6 +112,19 @@ public class MOBI_V2 implements WagerPlayerAPI {
         assertThat(errors).as("Errors in response when sending " + req).isEmpty();
     }
 
+    public String login(String username, String password, String unused) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("username", username);
+        fields.put("password", password);
+        ReadContext response = post("/login", fields);
+
+        JSONArray accessTokens = response.read("$..login_data..access_token");
+        Assertions.assertThat(accessTokens).as("Got one token").hasSize(1);
+        String accessToken = accessTokens.get(0).toString();
+        Assertions.assertThat(accessToken).as("Access Token ").isNotEmpty();
+        return accessToken;
+    }
+
     private ReadContext checkoutBet(String reqJSON) {
         ReadContext response = put("/betslip/checkout", reqJSON);
         verifyNoErrors(response, reqJSON, "$..selections..error_message");
@@ -139,18 +152,15 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return new BigDecimal(balance);
     }
 
-    public String login(String username, String password, String unused) {
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("username", username);
-        fields.put("password", password);
-        ReadContext response = post("/login", fields);
-
-        JSONArray accessTokens = response.read("$..login_data..access_token");
-        Assertions.assertThat(accessTokens).as("Got one token").hasSize(1);
-        String accessToken = accessTokens.get(0).toString();
-        Assertions.assertThat(accessToken).as("Access Token ").isNotEmpty();
-        return accessToken;
+    public List<BetType> getBetTypes(String accessToken, int betId) {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("access_token", accessToken);
+        queryParams.put("bet_id", String.valueOf(betId));
+        ReadContext response = get("/customer/bet", queryParams);
+        JSONArray betTypeIds = response.read("$..selections.betdetail[*].bet_type");
+        return betTypeIds.stream().map(id -> BetType.fromId(Integer.valueOf(""+id))).collect(Collectors.toList());
     }
+
 
     @SuppressWarnings("unchecked")
     public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
