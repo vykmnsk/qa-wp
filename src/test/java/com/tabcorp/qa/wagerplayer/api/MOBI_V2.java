@@ -34,6 +34,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         Treble("Treble"),
         Trebles("Trebles"),
         WPTrebles("W/P Trebles"),
+        FourFold("4-Fold"),
         Lucky15("Lucky 15"),
         Yankee("Yankee"),
         Lucky31("Lucky 31"),

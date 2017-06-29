@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +64,7 @@ public class Helpers {
     }
 
     public static String normalize(String input) {
-        return input.replaceAll("(\\s|-)+", "_");
+        return input.trim().replaceAll("\\W+", "_");
     }
 
     public static String getChromeDriverPath() {
@@ -76,12 +77,6 @@ public class Helpers {
 
         return String.join(File.separator, strings);
 
-    }
-
-    public static String getUriOfResource(String fileName) {
-        ClassLoader classLoader = Helpers.class.getClassLoader();
-        String path = classLoader.getResource(fileName).getPath();
-        return new File(path).toURI().toString();
     }
 
     public static Object nonNullGet(Map map, Object key) {
@@ -195,5 +190,16 @@ public class Helpers {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    public static String readResourceFile(String filename) {
+        String content;
+        try {
+            File file = new File(Helpers.class.getClassLoader().getResource(filename).getFile());
+            content = new String(Files.readAllBytes(file.toPath()));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Could not read java resource file='%s'", filename));
+        }
+        return content;
     }
 }

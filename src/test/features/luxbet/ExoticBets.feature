@@ -26,7 +26,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     And I update fixed place prices "3.20, 21.85, 1.55, 4.75, 5.60, 1.65, 1.80, 1.85" for the first product
 
     When I place an exotic "<BetType>" bet on the runners "<BetOn>" for $<Stake> with flexi as "<Flexi>"
-    Then customer balance after bet is decreased by $<BalanceDeductedBy>
+    Then customer balance after bet is decreased by $<Cost>
 
     When I result race with the runners and positions
       | Runner01 | 1 |
@@ -43,15 +43,15 @@ Feature: Placing and Settling Exotic Bets for a Single Event
 
   @smoke
     Examples:
-      | Category     | Subcategory | ProductName   | BetType  | BetOn             | Stake | Flexi | BalanceDeductedBy | Payout |
-      | Horse Racing | BALLINA     | STAB Quinella | Quinella | Runner01,Runner02 | 3.00  | N     | 3.00              | 19.50  |
+      | Category     | Subcategory | ProductName   | BetType  | BetOn             | Stake | Flexi | Cost | Payout |
+      | Horse Racing | BALLINA     | STAB Quinella | Quinella | Runner01,Runner02 | 3.00  | N     | 3.00 | 19.50  |
 
     Examples:
-      | Category       | Subcategory | ProductName     | BetType    | BetOn                               | Stake | Flexi | BalanceDeductedBy | Payout |
-      | Horse Racing   | BALLINA     | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 38.25  |
-      | Horse Racing   | BALLINA     | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 76.35  |
-      | Horse Racing   | BALLINA     | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 105.00 |
-      | Harness Racing | ALBANY      | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00              | 19.50  |
-      | Harness Racing | ALBANY      | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00              | 38.25  |
-      | Harness Racing | ALBANY      | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00             | 76.35  |
-      | Harness Racing | ALBANY      | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00             | 105.00 |
+      | Category       | Subcategory | ProductName     | BetType    | BetOn                               | Stake | Flexi | Cost  | Payout |
+      | Horse Racing   | BALLINA     | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00  | 38.25  |
+      | Horse Racing   | BALLINA     | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00 | 76.35  |
+      | Horse Racing   | BALLINA     | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00 | 105.00 |
+      | Harness Racing | ALBANY      | STAB Quinella   | Quinella   | Runner01,Runner02                   | 3.00  | N     | 3.00  | 19.50  |
+      | Harness Racing | ALBANY      | STAB Exacta     | Exacta     | Runner01,Runner02                   | 3.00  | N     | 6.00  | 38.25  |
+      | Harness Racing | ALBANY      | STAB Trifecta   | Trifecta   | Runner01,Runner02,Runner03          | 3.00  | N     | 18.00 | 76.35  |
+      | Harness Racing | ALBANY      | STAB First Four | First Four | Runner01,Runner02,Runner03,Runner04 | 3.00  | Y     | 72.00 | 105.00 |

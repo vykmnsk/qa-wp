@@ -7,6 +7,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.assertj.core.api.BooleanArrayAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class WAPI implements WagerPlayerAPI {
     private static final String URL = Config.wapiURL();
@@ -260,11 +262,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public ReadContext addSelectionToMulti(String sessionId, Integer prodId, String mpid) {
-        return addSelectionToMulti(sessionId, prodId, mpid, null);
-    }
-
-    public ReadContext addSelectionToMulti(String sessionId, Integer prodId, String mpid, BetType bt) {
+    private ReadContext addSelectionToMulti(String sessionId, Integer prodId, String mpid, BetType bt) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_add_sel_to_multi");
         fields.put("mpid", mpid);
@@ -275,22 +273,22 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields, false);
     }
 
-    public String prepareSelectionsForDoubleMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
+    public String prepareSelectionsForDoubleBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
         List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size(), betTypes.size());
         assertThat(sizes).as("Number of Selections, Products and BetTypes").allMatch(size -> size.equals(2));
         return prepareSelectionsForMultiBet(sessionId, selections, prodIds, MultiType.Double, betTypes);
     }
 
-    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType) {
-        List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size());
-        Integer count = sizes.get(0);
-        assertThat(count).as("Multi Selections count").isGreaterThan(1);
-        assertThat(sizes).as("Number of Selections and Products").allMatch(count::equals);
-        List<BetType> dummyBetTypes = Collections.nCopies(count, null);
-        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, multiType, dummyBetTypes);
+    public String prepareSelectionsForTrebleBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
+        List<Integer> sizes = Arrays.asList(selections.size(), prodIds.size(), betTypes.size());
+        assertThat(sizes).as("Number of Selections, Products and BetTypes").allMatch(size -> size.equals(3));
+        return prepareSelectionsForMultiBet(sessionId, selections, prodIds, MultiType.Treble, betTypes);
     }
 
-    private String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypes) {
+    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypes) {
+        if (null == betTypes) {
+            betTypes = Collections.nCopies(selections.size(), null);
+        }
         assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
         ReadContext response = null;
         for (int i = 0; i < selections.size(); i++) {
@@ -306,23 +304,66 @@ public class WAPI implements WagerPlayerAPI {
         return uuidsFound.get(0).toString();
     }
 
+    public List<String> prepareSelectionsForMultiMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<String> multiType, List<BetType> betTypes) {
+        assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
+        ReadContext response = null;
+        for (int i = 0; i < selections.size(); i++) {
+            String selectionId = selections.get(i).get(KEY.MPID);
+            response = addSelectionToMulti(sessionId, prodIds.get(i), selectionId, betTypes.get(i));
+            if (i == 0) {  // error shows only for 1 selection
+                String msg = response.read(RESP_ROOT + ".error[0].error_text");
+                assertThat(msg).isEqualTo("Add more selections for multiple bet types");
+            }
+        }
+        List<String> uuidsFound = new ArrayList<>();
+        for (String newMType : multiType) {
+            WAPI.MultiType finalMType = WAPI.MultiType.fromName(newMType);
+            JSONArray uuid = response.read(RESP_ROOT + ".multiple" + jfilter("name", finalMType.exactName) + ".uuid");
+            uuidsFound.add(uuid.get(0).toString());
+        }
+        assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(multiType.size());
+        return uuidsFound;
+    }
+
     public ReadContext placeMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {
+        return placeMultiMultiBet(sessionId, Arrays.asList(uuid), Arrays.asList(stake), Arrays.asList(flexi));
+    }
+
+    public ReadContext placeMultiMultiBet(String sessionId, List<String> uuid, List<BigDecimal> stakes, List<Boolean> flexis) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("placing_multiple", 1);
-        fields.put("multi[uuid][" + uuid + "][stake]", stake);
-        if (flexi) fields.put("flexi", "y");
+        for (int i = 0; i < uuid.size(); i++) {
+            fields.put("multi[uuid][" + uuid.get(i) + "][stake]", stakes.get(i));
+            if (flexis.get(i)) {
+                fields.put("multi[uuid][" + uuid.get(i) + "][flexi]", "y");
+            }
+        }
         return post(fields);
     }
 
     public BigDecimal readNewBalance(ReadContext resp) {
-        Object val = resp.read(RESP_ROOT + ".bet[0].new_balance");
-        BigDecimal newBalance = new BigDecimal(val.toString());
-        return newBalance;
+        JSONArray allBalances = resp.read(RESP_ROOT + ".bet[*].new_balance");
+        assertThat(allBalances).as("new_balance array in response").isNotEmpty();
+        String lastBalance = allBalances.get(allBalances.size() - 1).toString();
+        return new BigDecimal(lastBalance);
     }
 
     public List<Integer> readBetIds(ReadContext resp) {
         return resp.read(RESP_ROOT + ".bet[*].bet_id");
+    }
+
+    public List<BetType> getBetTypes(String sessionId, Integer betId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_get_bet");
+        fields.put("bet_id", betId);
+        ReadContext resp = post(fields);
+        List<String> betTypeNames = resp.read(RESP_ROOT + ".bet.selections.betdetail[*].bet_type_name");
+        return betTypeNames.stream().map(BetType::fromName).collect(Collectors.toList());
+    }
+
+    public List<Integer> readBetSlipIds(ReadContext resp) {
+        return resp.read(RESP_ROOT + ".bet[*].betslip_id");
     }
 
     public ReadContext getEventMarkets(String sessionId, String evtId) {

@@ -18,7 +18,8 @@ pipeline {
 
     triggers {
         // Times needs to be specified in UTC
-        cron('0 22 * * *')
+        // TODO enable cron for master branch only
+        // cron('0 22 * * *')
         pollSCM('*/2 * * * *')
     }
 
@@ -56,22 +57,9 @@ pipeline {
             }
         }
 
-        stage('redbook smoke test : create event') {
+        stage('redbook smoke tests') {
             steps {
-                sh 'TEST_TAGS="-t @smoke -t @ui -t @redbook -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
-                sh 'exit $(docker wait testservice)'
-            }
-
-            post {
-                always {
-                    sh 'docker-compose logs testservice'
-                }
-            }
-        }
-
-        stage('common: create customer ui tests') {
-            steps {
-                sh 'TEST_TAGS="-t @redbook -t @ui -t @create-customer -t @cash-deposit" docker-compose up -d  --force-recreate --build'
+                sh 'TEST_TAGS="-t @smoke -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 

@@ -6,8 +6,12 @@ import com.tabcorp.qa.common.Storage;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Hooks {
+    private static Logger log = LoggerFactory.getLogger(Hooks.class);
+
     @Before
     public void beforeScenario(){
         Storage.init();
@@ -17,7 +21,11 @@ public class Hooks {
     public void afterScenario(Scenario scenario){
         DriverWrapper dw = DriverWrapper.getInstance();
         if (scenario.isFailed() && dw.hasDriver()) {
-            Helpers.saveScreenshot(dw.getDriver(), scenario.getName());
+            try {
+                Helpers.saveScreenshot(dw.getDriver(), scenario.getName());
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
         }
         dw.closeBrowser();
     }
