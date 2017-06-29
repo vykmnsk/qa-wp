@@ -9,7 +9,7 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
-      | prices  | 1.12, 1.40, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                             |
+      | prices  | 1.12, 1.40, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                 |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Multi  | Win   |
       | Betting | Enable Multi  | EW    |
@@ -47,21 +47,20 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
       | Runner08 | 3 |
     And I settle race
     Then I verify status and payout of bets placed on runners
-      | Runner01        | Refunded    | 4.00 |
-      | Runner02        | Punter Win  | 4.24 |
-      | Runner03        | Punter Win  | 0.00 |
-      | Runner04        | Punter Loss | 0.00 |
-      | Runner05        | Punter Win  | 0.00 |
-      | Runner06        | Punter Loss | 7.75 |
-      | Runner07        | Punter Loss | 0.00 |
-      | Runner08        | Punter Win  | 6.10 |
-      | Runner09        | Punter Loss | 0.00 |
-      | Runner10        | Punter Loss | 0.00 |
+      | Runner01 | Refunded    | 4.00 |
+      | Runner02 | Punter Win  | 4.24 |
+      | Runner03 | Punter Win  | 0.00 |
+      | Runner04 | Punter Loss | 0.00 |
+      | Runner05 | Punter Win  | 0.00 |
+      | Runner06 | Punter Loss | 7.75 |
+      | Runner07 | Punter Loss | 0.00 |
+      | Runner08 | Punter Win  | 6.10 |
+      | Runner09 | Punter Loss | 0.00 |
+      | Runner10 | Punter Loss | 0.00 |
     And customer balance is equal to $66.09
 
-  Examples:
-
-  | Category         | Subcategory    |
-  | Horse Racing     | WOLVERHAMPTION |
-  | Greyhound Racing | HARLOW         |
+    Examples:
+      | Category         | Subcategory   |
+      | Horse Racing     | WOLVERHAMPTON |
+      | Greyhound Racing | HARLOW        |
 
