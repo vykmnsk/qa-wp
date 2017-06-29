@@ -32,8 +32,24 @@ public enum BetType {
         return found;
     }
 
+    public static BetType fromId(int id) {
+        BetType found = Arrays.stream(BetType.values())
+                .filter(bt -> bt.id == id)
+                .findFirst().orElse(null);
+        assertThat(found).withFailMessage(String.format(
+                "Could not find BetType with id='%d'. Available BetType IDs: %s",
+                id, allIds()))
+                .isNotNull();
+        return found;
+    }
+
     public static List<String> allNames() {
         return Arrays.stream(BetType.values()).map(BetType::name).collect(Collectors.toList());
     }
+
+    public static List<Integer> allIds() {
+        return Arrays.stream(BetType.values()).map(bt -> bt.id).collect(Collectors.toList());
+    }
+
 
 }
