@@ -198,7 +198,7 @@ public class BetAPISteps implements En {
             for (int i = 0; i < expectedBetData.size(); i++) {
                 List<String> expectedBet = expectedBetData.get(i);
                 assertThat(expectedBet.size()).as("expecting for example: [ROCKING HORSE, Refunded, 0.00]").isEqualTo(3);
-                Map<WagerPlayerAPI.KEY, String> actualBetData = wapi.getBetDetails(placedBetIds.get(i), accessToken);
+                Map<WagerPlayerAPI.KEY, String> actualBetData = api.getBetDetails(accessToken, placedBetIds.get(i));
                 List<String> actualBet = Arrays.asList(
                         actualBetData.get(RUNNER_NAME),
                         actualBetData.get(BET_STATUS),
