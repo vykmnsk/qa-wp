@@ -126,11 +126,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     private ReadContext checkoutBet(String reqJSON) {
-        ReadContext response = put("/betslip/checkout", reqJSON);
-        verifyNoErrors(response, reqJSON, "$..selections..error_message");
-        JSONArray betId = response.read("$..selections[0].bet_id");
-        Assertions.assertThat(betId).as("Bet ID in response").isNotEmpty();
-        return response;
+        ReadContext resp = put("/betslip/checkout", reqJSON);
+        verifyNoErrors(resp, reqJSON, "$..selections..error_message");
+        JSONArray betId = resp.read("$..selections[0].bet_id");
+        Assertions.assertThat(betId).as("Bet ID in response is empty: " + resp.json()).isNotEmpty();
+        return resp;
     }
 
     private ReadContext checkoutMultiBet(String reqJSON, int selectionCount) {
@@ -150,6 +150,18 @@ public class MOBI_V2 implements WagerPlayerAPI {
         ReadContext response = get("/customer/balance", queryParams);
         Double balance = Double.parseDouble(response.read("$.balance"));
         return new BigDecimal(balance);
+    }
+
+    public Map<KEY, String> getBetDetails(String accessToken, int betId) {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("access_token", accessToken);
+        queryParams.put("bet_id", String.valueOf(betId));
+        ReadContext resp = get("/customer/bet", queryParams);
+        HashMap<KEY, String> bet = new HashMap<>();
+        bet.put(KEY.RUNNER_NAME, resp.read("$.selections.betdetail[0].side"));
+        bet.put(KEY.BET_STATUS, resp.read("$.status"));
+        bet.put(KEY.BET_PAYOUT, resp.read("$.bet_win"));
+        return bet;
     }
 
     public List<BetType> getBetTypes(String accessToken, int betId) {

@@ -33,15 +33,13 @@
  
 
 #Run Tests
-- mvn test -Dcucumber.options="--name Login"
-- mvn test -Dcucumber.options="-t @create-customer"
+mvn clean test -Dcucumber.options="-t @login"
 
 #Debug in ItelliJ
-mvn test -DforkMode=never
+mvn clean test -DforkMode=never ...
 
 # Info
-
-- The base name for races is :  TEST RACE
+- The base name for test events is set in Config.java but can be overwritten in Cucumber steps
 - The "Enabled" setting for "Betting" is enabled by 
   default. Hence not part of the feature file.
 
@@ -57,6 +55,7 @@ mvn test -DforkMode=never
 
 # Docker Run
 
+#Docker Run
 - docker-compose -f "path to the docker-compose.yml"   &
 - set the RUN_MODE env variable to 'DOCKER' to run in conatiners. anything else or not setting it, will make the test run use Chrome Driver.
 - vnc into localhost:5900 to see the test execution and the passsword is 'secret' . Use safari if there , becasuse it has inbuilt vnc support. vnc://localhost:5900

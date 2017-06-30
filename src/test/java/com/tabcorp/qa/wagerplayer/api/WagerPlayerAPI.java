@@ -44,6 +44,8 @@ public interface WagerPlayerAPI {
 
     List<BetType> getBetTypes(String accessToken, int betId);
 
+    Map<KEY, String> getBetDetails(String accessToken, int betId);
+
     default ReadContext parseVerifyJSON(Object json, String rootPath){
         ReadContext ctx = null;
         try {

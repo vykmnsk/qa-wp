@@ -160,7 +160,8 @@ public class WAPI implements WagerPlayerAPI {
         return new BigDecimal(balance);
     }
 
-    public Map<KEY, String> getBetDetails(Integer betId, String sessionId) {
+
+    public Map<KEY, String> getBetDetails(String sessionId, int betId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_get_bet");
         fields.put("bet_id", betId);
@@ -171,6 +172,16 @@ public class WAPI implements WagerPlayerAPI {
         bet.put(KEY.BET_PAYOUT, resp.read(RESP_ROOT + ".bet.bet_win"));
         return bet;
     }
+
+    public List<BetType> getBetTypes(String sessionId, int betId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_get_bet");
+        fields.put("bet_id", betId);
+        ReadContext resp = post(fields);
+        List<String> betTypeNames = resp.read(RESP_ROOT + ".bet.selections.betdetail[*].bet_type_name");
+        return betTypeNames.stream().map(BetType::fromName).collect(Collectors.toList());
+    }
+
 
     private Map<String, Object> bonusBetFields(String sessionId, Integer bbFlag, String mpid, BetType betType) {
         Map<String, Object> fields = new HashMap<>();
@@ -351,15 +362,6 @@ public class WAPI implements WagerPlayerAPI {
 
     public List<Integer> readBetIds(ReadContext resp) {
         return resp.read(RESP_ROOT + ".bet[*].bet_id");
-    }
-
-    public List<BetType> getBetTypes(String sessionId, int betId) {
-        Map<String, Object> fields = wapiAuthFields(sessionId);
-        fields.put("action", "bet_get_bet");
-        fields.put("bet_id", betId);
-        ReadContext resp = post(fields);
-        List<String> betTypeNames = resp.read(RESP_ROOT + ".bet.selections.betdetail[*].bet_type_name");
-        return betTypeNames.stream().map(BetType::fromName).collect(Collectors.toList());
     }
 
     public List<Integer> readBetSlipIds(ReadContext resp) {
