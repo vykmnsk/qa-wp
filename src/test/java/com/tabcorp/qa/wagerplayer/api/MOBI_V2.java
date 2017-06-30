@@ -126,11 +126,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     private ReadContext checkoutBet(String reqJSON) {
-        ReadContext response = put("/betslip/checkout", reqJSON);
-        verifyNoErrors(response, reqJSON, "$..selections..error_message");
-        JSONArray betId = response.read("$..selections[0].bet_id");
-        Assertions.assertThat(betId).as("Bet ID in response").isNotEmpty();
-        return response;
+        ReadContext resp = put("/betslip/checkout", reqJSON);
+        verifyNoErrors(resp, reqJSON, "$..selections..error_message");
+        JSONArray betId = resp.read("$..selections[0].bet_id");
+        Assertions.assertThat(betId).as("Bet ID in response is empty: " + resp.json()).isNotEmpty();
+        return resp;
     }
 
     private ReadContext checkoutMultiBet(String reqJSON, int selectionCount) {
