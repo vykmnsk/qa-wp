@@ -149,7 +149,7 @@ Feature: Placing and Settling multi-multi Bets
   @smoke
     Examples:
       | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType     | BetOn                      | Stake     | Flexi | Cost | Payout  |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Trixie | Runner01,Runner11,Runner21 | 3.00,3.00 | Y,Y   | 6.00 | 2439.00 |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Trixie | Runner01,Runner11,Runner21 | 3.00,3.00 | Y,Y   | 6.00 | 2442.00 |
 
     Examples:
       | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetOn                      | Stake               | Flexi   | Cost  | Payout  |
