@@ -28,6 +28,7 @@ public class CreateEventSteps implements En {
     private NewEventPage newEvtPage;
     private MarketsPage marketsPage;
     private SettlementPage settlementPage;
+    private CategorySettingsPage catSetPage;
     private int raceNumber = 1;
 
     public CreateEventSteps() {
@@ -40,6 +41,16 @@ public class CreateEventSteps implements En {
             header.navigateToF3(category, subcategory);
         });
 
+        When("^I edit the category options settings$", (DataTable table) -> {
+            StrictHashMap<String, String> settings = new StrictHashMap<>();
+            settings.putAll(table.asMap(String.class, String.class));
+            catSetPage = new CategorySettingsPage();
+            catSetPage.load();
+            catSetPage.enterSettings(
+                    settings.getBoolean("Number of Places on Bet"),
+                    settings.getBoolean("Recalculate Place Price")
+            );
+        });
 
         When("^I enter event details with (\\d+) runners, current 'show time' and 'event date/time' in (\\d+) minutes with data$",
                 (Integer numberOfRunners, Integer inMinutes, DataTable table) -> {
@@ -80,20 +91,28 @@ public class CreateEventSteps implements En {
             marketsPage.enableCrossRaceProduct(crossRaceProduct);
         });
 
+        When("^I (enter|update) market details$", (String action, DataTable table) -> {
+            boolean isUpdate = action.equals("update");
+            StrictHashMap<String, String> mkt = new StrictHashMap<>();
+            mkt.putAll(table.asMap(String.class, String.class));
 
-        When("^I enter market details$", (DataTable table) -> {
-            Map<String, String> mkt = table.asMap(String.class, String.class);
-            marketsPage.hideMarketManagement();
-            marketsPage.showMarketDetails();
-            boolean isLive = Helpers.nonNullGet(mkt, "Market Status").equals("Live");
-            boolean isEW = mkt.get("E/W").equalsIgnoreCase("yes");
-            marketsPage.enterMarketDetail(
-                    isLive,
-                    (String) Helpers.nonNullGet(mkt, "Bets Allowed"),
-                    (String) Helpers.nonNullGet(mkt, "Bets Allowed Place"),
-                    (String) Helpers.nonNullGet(mkt, "Place Fraction"),
-                    (String) Helpers.nonNullGet(mkt, "No of Places"),
-                    isEW);
+            if (isUpdate) {
+                Helpers.retryOnFailure(() -> { header.navigateToF4(); }, 3, 5);
+                marketsPage.showMarketDetails();
+                marketsPage.updateMarketDetail(mkt.get("Place Fraction"), mkt.get("No of Places"));
+            } else {
+                boolean isLive = mkt.get("Market Status").equals("Live");
+                boolean isEW = mkt.get("E/W").equalsIgnoreCase("yes");
+                marketsPage.hideMarketManagement();
+                marketsPage.showMarketDetails();
+                marketsPage.enterMarketDetail(
+                        isLive,
+                        mkt.get("Bets Allowed"),
+                        mkt.get( "Bets Allowed Place"),
+                        mkt.get( "Place Fraction"),
+                        mkt.get( "No of Places"),
+                        isEW);
+            }
         });
 
         Then("^I can see success status with message \"([^\"]*)\"$", (String msg) -> {

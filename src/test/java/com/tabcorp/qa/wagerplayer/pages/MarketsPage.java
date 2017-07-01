@@ -332,6 +332,13 @@ public class MarketsPage extends AppPage {
         updateBtn.click();
     }
 
+    public void updateMarketDetail(String newPlaceFraction, String newNumOfPlaces) {
+        new Select(placeFractionSel).selectByVisibleText(newPlaceFraction);
+        wait.until(ExpectedConditions.elementToBeClickable(numOfPlacesSel));
+        new Select(numOfPlacesSel).selectByVisibleText(newNumOfPlaces);
+        updateBtn.click();
+    }
+
     public void verifySuccessStatus(String msg) {
         wait.until(ExpectedConditions.visibilityOf(status));
         String statusMsg = status.getText();
