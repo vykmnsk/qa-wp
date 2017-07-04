@@ -9,7 +9,7 @@ Feature: Dead Heats with several single bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
     And I create a default event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
-      | prices  | 4.2, 10.20, 8.20, 6.00, 12.00, 6.10, 7.20, 8.10, 4.78, 8.20                                        |
+      | prices  | 4.2, 3.20, 4.40, 5.20, 3.60, 6.10, 7.20, 8.10, 4.78, 8.20                                        |
 
     And I enable "Luxbook DVP Fixed" product settings
       | Betting   | Enable Single | Win   |
@@ -42,12 +42,14 @@ Feature: Dead Heats with several single bets
   @smoke
     Examples:
       | Type  | Category     | Subcategory   | PlacePrices                  | NumOfPlaces | WinnerWithPositions                            | Payout |
-      | THIRD | Horse Racing | WOLVERHAMPTON | 1.80, 3.30, 2.80, 2.25, 3.75 | 3           | 1:Runner01, 2:Runner02, 3:Runner03, 3:Runner04 | 74.85  |
+      | THIRD | Horse Racing | WOLVERHAMPTON | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 2:Runner02, 3:Runner03, 3:Runner04 | 63.19  |
 
     Examples:
       | Type   | Category         | Subcategory   | PlacePrices                  | NumOfPlaces | WinnerWithPositions                                        | Payout |
-      | FIRST  | Horse Racing     | WOLVERHAMPTON | 1.80, 3.30, 2.80, 2.25, 3.75 | 3           | 1:Runner01, 1:Runner02, 3:Runner03                         | 102.41 |
-      | SECOND | Horse Racing     | WOLVERHAMPTON | 1.80, 3.30, 2.80, 2.25, 3.75 | 3           | 1:Runner01, 2:Runner02, 2:Runner03                         | 76.07  |
-      | SECOND | Greyhound Racing | HARLOW        | 1.80, 3.30, 2.80, 2.25, 3.75 | 3           | 1:Runner01, 2:Runner02, 2:Runner03                         | 76.07  |
-      | FOURTH | Horse Racing     | WOLVERHAMPTON | 1.80, 3.30, 2.80, 2.25, 3.75 | 4           | 1:Runner01, 2:Runner02, 3:Runner03, 4:Runner04, 4:Runner05 | 98.95  |
-      | FOURTH | Greyhound Racing | HARLOW        | 1.80, 3.30, 2.80, 2.25, 3.75 | 4           | 1:Runner01, 2:Runner02, 3:Runner03, 4:Runner04, 4:Runner05 | 98.95  |
+      | FIRST  | Horse Racing     | WOLVERHAMPTON | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 1:Runner02, 3:Runner03                         | 58.62  |
+      | SECOND | Horse Racing     | WOLVERHAMPTON | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 2:Runner02, 2:Runner03                         | 62.03  |
+      | FOURTH | Horse Racing     | WOLVERHAMPTON | 1.80, 1.55, 1.85, 2.05, 1.65 | 4           | 1:Runner01, 2:Runner02, 3:Runner03, 4:Runner04, 4:Runner05 | 75.81  |
+      | FIRST  | Greyhound Racing | HARLOW        | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 1:Runner02, 3:Runner03                         | 58.62  |
+      | SECOND | Greyhound Racing | HARLOW        | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 2:Runner02, 2:Runner03                         | 62.03  |
+      | THIRD  | Greyhound Racing | HARLOW        | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 2:Runner02, 3:Runner03, 3:Runner04             | 63.19  |
+      | FOURTH | Greyhound Racing | HARLOW        | 1.80, 1.55, 1.85, 2.05, 1.65 | 4           | 1:Runner01, 2:Runner02, 3:Runner03, 4:Runner04, 4:Runner05 | 75.81  |
