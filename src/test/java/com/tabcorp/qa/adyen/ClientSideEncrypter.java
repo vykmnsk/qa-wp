@@ -1,6 +1,9 @@
 package com.tabcorp.qa.adyen;
 
+import com.tabcorp.qa.wagerplayer.Config;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -23,6 +26,9 @@ public class ClientSideEncrypter {
     private Cipher rsaCipher;
     private SecureRandom srandom;
 
+    private static final Logger log = LoggerFactory.getLogger(ClientSideEncrypter.class);
+
+
     public ClientSideEncrypter (String publicKeyString) throws Exception {
         srandom = new SecureRandom();
         String[] keyComponents = publicKeyString.split("\\|");
@@ -32,7 +38,7 @@ public class ClientSideEncrypter {
         try {
             keyFactory = KeyFactory.getInstance("RSA");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error(e.toString());
             return;
         }
 
@@ -54,7 +60,7 @@ public class ClientSideEncrypter {
         } catch (NoSuchPaddingException e) {
             throw new Exception("Problem instantiation AES Cipher Padding", e);
         } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
 
         try {

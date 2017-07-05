@@ -92,17 +92,17 @@ public class CreateEventSteps implements En {
         });
 
         When("^I (enter|update) market details$", (String action, DataTable table) -> {
-            boolean isUpdate = action.equals("update");
+            boolean isUpdate = "update".equals(action);
             StrictHashMap<String, String> mkt = new StrictHashMap<>();
             mkt.putAll(table.asMap(String.class, String.class));
 
             if (isUpdate) {
-                Helpers.retryOnFailure(() -> { header.navigateToF4(); }, 3, 5);
+                Helpers.retryOnFailure(() -> header.navigateToF4(), 3, 5);
                 marketsPage.showMarketDetails();
                 marketsPage.updateMarketDetail(mkt.get("Place Fraction"), mkt.get("No of Places"));
             } else {
-                boolean isLive = mkt.get("Market Status").equals("Live");
-                boolean isEW = mkt.get("E/W").equalsIgnoreCase("yes");
+                boolean isLive = "Live".equalsIgnoreCase(mkt.get("Market Status"));
+                boolean isEW = "yes".equalsIgnoreCase(mkt.get("E/W"));
                 marketsPage.hideMarketManagement();
                 marketsPage.showMarketDetails();
                 marketsPage.enterMarketDetail(

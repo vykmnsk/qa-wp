@@ -7,7 +7,6 @@ import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.assertj.core.api.BooleanArrayAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 public class WAPI implements WagerPlayerAPI {
     private static final String URL = Config.wapiURL();
@@ -296,36 +294,16 @@ public class WAPI implements WagerPlayerAPI {
         return prepareSelectionsForMultiBet(sessionId, selections, prodIds, MultiType.Treble, betTypes);
     }
 
-    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypes) {
-        if (null == betTypes) {
-            betTypes = Collections.nCopies(selections.size(), null);
-        }
-        assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
-        ReadContext response = null;
-        for (int i = 0; i < selections.size(); i++) {
-            String selectionId = selections.get(i).get(KEY.MPID);
-            response = addSelectionToMulti(sessionId, prodIds.get(i), selectionId, betTypes.get(i));
-            if (i == 0) {  // error shows only for 1 selection
-                String msg = response.read(RESP_ROOT + ".error[0].error_text");
-                assertThat(msg).isEqualTo("Add more selections for multiple bet types");
-            }
-        }
+    public String prepareSelectionsForMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, MultiType multiType, List<BetType> betTypesInput) {
+        List<BetType> betTypes = (null != betTypesInput) ? betTypesInput : Collections.nCopies(selections.size(), null);
+        ReadContext response = addAllSelectionsToMulti(sessionId, selections, prodIds, betTypes);
         JSONArray uuidsFound = response.read(RESP_ROOT + ".multiple" + jfilter("name", multiType.exactName) + ".uuid");
         assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(1);
         return uuidsFound.get(0).toString();
     }
 
     public List<String> prepareSelectionsForMultiMultiBet(String sessionId, List<Map<WAPI.KEY, String>> selections, List<Integer> prodIds, List<String> multiType, List<BetType> betTypes) {
-        assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
-        ReadContext response = null;
-        for (int i = 0; i < selections.size(); i++) {
-            String selectionId = selections.get(i).get(KEY.MPID);
-            response = addSelectionToMulti(sessionId, prodIds.get(i), selectionId, betTypes.get(i));
-            if (i == 0) {  // error shows only for 1 selection
-                String msg = response.read(RESP_ROOT + ".error[0].error_text");
-                assertThat(msg).isEqualTo("Add more selections for multiple bet types");
-            }
-        }
+        ReadContext response = addAllSelectionsToMulti(sessionId, selections, prodIds, betTypes);
         List<String> uuidsFound = new ArrayList<>();
         for (String newMType : multiType) {
             WAPI.MultiType finalMType = WAPI.MultiType.fromName(newMType);
@@ -334,6 +312,22 @@ public class WAPI implements WagerPlayerAPI {
         }
         assertThat(uuidsFound).as("Multi UUIDs after adding selections").hasSize(multiType.size());
         return uuidsFound;
+    }
+
+    private ReadContext addAllSelectionsToMulti(String sessionId, List<Map<KEY, String>> selections, List<Integer> prodIds, List<BetType> betTypes) {
+        assertThat(selections.size()).as("Number of selections for Multi bet").isGreaterThan(1);
+        assertThat(selections.size()).isEqualTo(prodIds.size()).isEqualTo(betTypes.size());
+        ReadContext response = null;
+        for (int i = 0; i < selections.size(); i++) {
+            String selectionId = selections.get(i).get(KEY.MPID);
+            response = addSelectionToMulti(sessionId, prodIds.get(i), selectionId, betTypes.get(i));
+            if (i == 0) {  // error shows only for 1 selection
+                String msg = response.read(RESP_ROOT + ".error[0].error_text");
+                assertThat(msg).isEqualTo("Add more selections for multiple bet types");
+            }
+        }
+        assertThat(response).isNotNull();
+        return response;
     }
 
     public ReadContext placeMultiBet(String sessionId, String uuid, BigDecimal stake, boolean flexi) {

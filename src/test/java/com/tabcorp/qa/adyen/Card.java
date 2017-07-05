@@ -100,10 +100,8 @@ public class Card {
     * Helper method that calls the ClientSideEncrypter encrypt method
     * */
     private String encryptData(String data, String publicKey) throws Exception {
-        String encryptedData = null;
         ClientSideEncrypter encrypter = new ClientSideEncrypter(publicKey);
-        encryptedData = encrypter.encrypt(data);
-        return encryptedData;
+        return encrypter.encrypt(data);
     }
 
     @Override

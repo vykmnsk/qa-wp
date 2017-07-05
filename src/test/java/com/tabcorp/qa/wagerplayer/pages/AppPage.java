@@ -10,13 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AppPage extends AnyPage {
-
-    public String appName;
-    private String baseUrl;
-
     AppPage() {
-        appName = Config.appName();
-        baseUrl = Config.baseUrl();
         PageFactory.initElements(driver, this);
     }
 
@@ -24,7 +18,7 @@ public class AppPage extends AnyPage {
         if (!Config.isDockerRun()) {
             setScreenSizeToMax();
         }
-        driver.get(baseUrl);
+        driver.get(Config.baseUrl());
     }
 
     WebElement findEither(By loc1, By loc2) {

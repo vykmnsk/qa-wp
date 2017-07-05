@@ -3,7 +3,6 @@ package com.tabcorp.qa.wagerplayer;
 import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
-import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ public class Config {
     private static final String ENV_CUSTOMER_PASSWORD = "WAGERPLAYER_CUSTOMER_PASSWORD";
     private static final String ENV_CLIENT_IP = "WAGERPLAYER_CLIENT_IP";
     private static final String ENV_MOBI_V2_URL = "WAGERPLAYER_MOBIV2_URL";
-    public static Logger log = LoggerFactory.getLogger(Config.class);
+    private static final Logger log = LoggerFactory.getLogger(Config.class);
 
 
     public static String appName() {

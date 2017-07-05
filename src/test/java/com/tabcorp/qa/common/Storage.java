@@ -3,7 +3,7 @@ package com.tabcorp.qa.common;
 import org.assertj.core.api.Assertions;
 
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -19,12 +19,11 @@ public class Storage {
         API_ACCESS_TOKEN,
         CUSTOMER,
         BALANCE_BEFORE,
-        BALANCE_AFTER_BET,
         BET_IDS
     }
 
     public static void init() {
-        map = new HashMap<>();
+        map = new EnumMap<>(KEY.class);
     }
 
     public static void put(KEY key, Object value) {
