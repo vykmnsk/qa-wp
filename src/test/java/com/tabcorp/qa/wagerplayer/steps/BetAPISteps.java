@@ -276,7 +276,7 @@ public class BetAPISteps implements En {
                         selection.get(MPID), selection.get(WIN_PRICE), selection.get(PLACE_PRICE), stake, bonusBetflag);
                 break;
             default:
-                throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                throw new FrameworkError("Unknown BetTypeName=" + betTypeName);
         }
         List<Integer> betIds = api.readBetIds(response);
         assertThat(betIds.size()).as("Single Bet IDs").isEqualTo(1);
