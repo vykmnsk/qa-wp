@@ -2,6 +2,7 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
+import com.tabcorp.qa.common.FrameworkError;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
