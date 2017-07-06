@@ -11,6 +11,7 @@ services:
           - "4444:4444"
 
   testservice:
+      container_name: testservice
       build:
         context: .
       links:

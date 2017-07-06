@@ -16,7 +16,7 @@
     <junit.version>4.12</junit.version>
     <assertj.version>3.6.1</assertj.version>
     <cucumber.version>1.2.5</cucumber.version>
-    <selenium.version>2.53.0</selenium.version>
+    <selenium.version>3.4.0</selenium.version>
     <maven.compiler.version>3.1</maven.compiler.version>
   </properties>
 

@@ -27,8 +27,6 @@ pipeline {
         stage('checkout & install dependencies') {
             steps {
                 sh 'docker ps -a'
-                // sh 'docker-compose  rm -f 4eb9525e7328'
-                sh 'docker-compose down --remove-orphans'
                 checkout scm
                 sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
@@ -99,6 +97,8 @@ pipeline {
 
         always {
             sh 'docker-compose down'
+            sh 'echo "To ensure conatiners have been brought down."' 
+            sh 'docker ps -a'
         }
 
         success {
