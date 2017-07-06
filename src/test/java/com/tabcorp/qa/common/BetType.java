@@ -1,7 +1,5 @@
 package com.tabcorp.qa.common;
 
-import com.tabcorp.qa.wagerplayer.api.WAPI;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

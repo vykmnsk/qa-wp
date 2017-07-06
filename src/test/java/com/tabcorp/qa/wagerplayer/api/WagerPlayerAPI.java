@@ -52,7 +52,7 @@ public interface WagerPlayerAPI {
             ctx = JsonPath.parse(json);
             ctx.read(rootPath);
         } catch (PathNotFoundException e) {
-            fail(String.format("Response JSON seems invalid: %s, %s", json.toString(), e.getMessage()));
+            fail(String.format("Response JSON seems invalid: %s, %s", json.toString(), e));
         }
         return ctx;
     }

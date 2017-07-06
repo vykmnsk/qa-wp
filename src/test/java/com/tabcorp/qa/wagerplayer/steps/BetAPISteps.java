@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -136,7 +137,7 @@ public class BetAPISteps implements En {
                     BetType betType2 = BetType.fromName(betTypeName2);
                     BetType betType3 = BetType.fromName(betTypeName3);
 
-                    ReadContext response = placeMultiTrebleBet(multiTypes, Arrays.asList(betType1, betType2, betType3), runners, stakes, flexis);
+                    ReadContext response = placeMultiMultiBet(multiTypes, Arrays.asList(betType1, betType2, betType3), runners, stakes, flexis);
                     balanceAfterBet = wapi.readNewBalance(response);
                 });
 
@@ -149,7 +150,7 @@ public class BetAPISteps implements En {
                     List<BigDecimal> stakes = splitStake.stream().map(BigDecimal::new).collect(Collectors.toList());
                     List<String> splitFlexi = Helpers.extractCSV(flexi);
                     List<Boolean> flexis = splitFlexi.stream().map("Y"::equalsIgnoreCase).collect(Collectors.toList());
-                    List<BetType> dummyBetTypes = runners.stream().map(r -> (BetType) null).collect(Collectors.toList());
+                    List<BetType> dummyBetTypes = Collections.nCopies(runners.size(), null);
                     ReadContext response = placeMultiMultiBet(multiTypes, dummyBetTypes, runners, stakes, flexis);
                     balanceAfterBet = wapi.readNewBalance(response);
                 });
@@ -253,11 +254,6 @@ public class BetAPISteps implements En {
         List<Integer> betSlipIds = wapi.readBetSlipIds(response);
         log.info("Bet Slip IDs=" + betSlipIds);
         return response;
-    }
-
-    private ReadContext placeMultiTrebleBet(List<String> multiTypes, List<BetType> betTypes, List<String> runners, List<BigDecimal> stakes, List<Boolean> flexis) {
-        assertThat(betTypes.size()).as("Treble should have 3 bet types").isEqualTo(3);
-        return placeMultiMultiBet(multiTypes, betTypes, runners, stakes, flexis);
     }
 
     private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {

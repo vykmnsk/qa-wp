@@ -164,7 +164,7 @@ public class NewCustomerPage extends AppPage {
     }
 
     private void verifyNoFormErrors() {
-        if (formErrors.size() > 0) {
+        if (!formErrors.isEmpty()) {
             Assertions.fail("Input validation errors: " + formErrors.get(0).getText());
         }
     }

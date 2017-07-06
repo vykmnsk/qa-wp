@@ -1,11 +1,8 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CategorySettingsPage extends AppPage {
 
@@ -24,7 +21,6 @@ public class CategorySettingsPage extends AppPage {
     @FindBy(css = "form#categories_form input[value='Save']")
     private WebElement saveCat;
 
-    private static Logger log = LoggerFactory.getLogger(CategorySettingsPage.class);
 
     public void load() {
         driver.switchTo().defaultContent();

@@ -1,11 +1,25 @@
 package com.tabcorp.qa.adyen;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.crypto.*;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
@@ -23,6 +37,9 @@ public class ClientSideEncrypter {
     private Cipher rsaCipher;
     private SecureRandom srandom;
 
+    private static final Logger log = LoggerFactory.getLogger(ClientSideEncrypter.class);
+
+
     public ClientSideEncrypter (String publicKeyString) throws Exception {
         srandom = new SecureRandom();
         String[] keyComponents = publicKeyString.split("\\|");
@@ -32,7 +49,7 @@ public class ClientSideEncrypter {
         try {
             keyFactory = KeyFactory.getInstance("RSA");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error(e.toString());
             return;
         }
 
@@ -54,7 +71,7 @@ public class ClientSideEncrypter {
         } catch (NoSuchPaddingException e) {
             throw new Exception("Problem instantiation AES Cipher Padding", e);
         } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
 
         try {
@@ -109,7 +126,7 @@ public class ClientSideEncrypter {
     }
 
     private SecretKey generateAESKey(int keySize) throws Exception {
-        KeyGenerator kgen = null;
+        KeyGenerator kgen;
         try {
             kgen = KeyGenerator.getInstance("AES");
         } catch (NoSuchAlgorithmException e) {

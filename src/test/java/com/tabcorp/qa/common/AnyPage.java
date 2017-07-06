@@ -1,12 +1,9 @@
 package com.tabcorp.qa.common;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -18,17 +15,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AnyPage {
-    public WebDriver driver;
-    public WebDriverWait wait;
-    public static Logger log = LoggerFactory.getLogger(AnyPage.class);
+    public final WebDriver driver;
+    public final WebDriverWait wait;
+    package static final Logger log = LoggerFactory.getLogger(AnyPage.class);
 
     public AnyPage() {
         driver = DriverWrapper.getInstance().getDriver();

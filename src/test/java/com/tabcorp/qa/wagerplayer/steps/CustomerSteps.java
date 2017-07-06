@@ -245,7 +245,7 @@ public class CustomerSteps implements En {
         try {
             cardEncryption = card.serialize(publicKey);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         String paymentReference = mobi.getPaymentRefence(accessToken);

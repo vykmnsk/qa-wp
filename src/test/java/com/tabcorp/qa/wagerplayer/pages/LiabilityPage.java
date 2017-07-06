@@ -46,8 +46,8 @@ public class LiabilityPage extends AppPage {
     public void updatePrices(int productId, int betTypeId, List<BigDecimal> prices) {
         List<WebElement> marketPriceCells = driver.findElements(marketPricesSelector);
         List<WebElement> filteredPriceCells = marketPriceCells.stream()
-                .filter(cell -> cell.getAttribute("bet_type").contains("" + betTypeId)
-                        && cell.getAttribute("product_id").contains("" + productId))
+                .filter(cell -> cell.getAttribute("bet_type").contains(Integer.toString(betTypeId))
+                        && cell.getAttribute("product_id").contains(Integer.toString(productId)))
                 .collect(Collectors.toList());
         Helpers.retryOnFailure(() -> {
             enterPrices(filteredPriceCells, prices);

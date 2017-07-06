@@ -54,9 +54,7 @@ public class Helpers {
     }
 
     public static List<String> generateRunners(String initial, int count) {
-        List<String> runners = new ArrayList(count);
-        for (int i = 0; i < count; i++, runners.add(initial + i)) ;
-        return runners;
+        return IntStream.range(1, count + 1).mapToObj(i -> initial + i).collect(Collectors.toList());
     }
 
     public static String toTitleCase(String name) {
@@ -131,7 +129,7 @@ public class Helpers {
     public static void retryOnFailure(Runnable block, int maxTries, int sleepSeconds) {
         for (int i = 1; i <= maxTries; i++) {
             try {
-                Thread.sleep(sleepSeconds * 1000);
+                Thread.sleep((long) sleepSeconds * 1000);
                 block.run();
                 return;
             } catch (AssertionError ae) {
@@ -139,7 +137,7 @@ public class Helpers {
             } catch (TimeoutException se) {
                 log.info(String.format("Re-trying %d. Exception: %s", i, se.getMessage()));
             } catch (InterruptedException e) {
-                //ignore
+                Thread.currentThread().interrupt();
             }
         }
         throw new RuntimeException(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
@@ -187,8 +185,8 @@ public class Helpers {
         File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
         try {
             FileUtils.copyFile(srcFile, new File(savePath));
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        } catch (IOException ioe) {
+            log.error(ioe.toString());
         }
     }
 
@@ -198,7 +196,7 @@ public class Helpers {
             File file = new File(Helpers.class.getClassLoader().getResource(filename).getFile());
             content = new String(Files.readAllBytes(file.toPath()));
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Could not read java resource file='%s'", filename));
+            throw new RuntimeException(String.format("Could not read java resource file='%s' exception=%s", filename, e));
         }
         return content;
     }
