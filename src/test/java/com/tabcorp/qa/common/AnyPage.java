@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AnyPage {
     public final WebDriver driver;
     public final WebDriverWait wait;
-    private static final Logger log = LoggerFactory.getLogger(AnyPage.class);
+    package static final Logger log = LoggerFactory.getLogger(AnyPage.class);
 
     public AnyPage() {
         driver = DriverWrapper.getInstance().getDriver();

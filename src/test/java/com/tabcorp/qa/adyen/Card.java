@@ -19,6 +19,7 @@ public class Card {
     private String cardHolderName;
     private String cvc;
     private Date generationTime;
+    private static final Logger log = LoggerFactory.getLogger(Card.class);
 
     public String getNumber() {
         return number;
@@ -68,18 +69,14 @@ public class Card {
         this.generationTime = generationTime;
     }
 
-    private static Logger log = LoggerFactory.getLogger(Card.class);
-
     /*
     * Method that serializes the card data using our CSE class.
     * */
     public String serialize(String publicKey) throws Exception {
         JSONObject cardJson = new JSONObject();
         String encryptedData;
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
         try {
             cardJson.put("generationtime", simpleDateFormat.format(generationTime));
             cardJson.put("number", number);
@@ -88,20 +85,13 @@ public class Card {
             cardJson.put("expiryMonth", expiryMonth);
             cardJson.put("expiryYear", expiryYear);
 
-            encryptedData = encryptData(cardJson.toString(), publicKey);
+            ClientSideEncrypter encrypter = new ClientSideEncrypter(publicKey);
+            encryptedData = encrypter.encrypt(cardJson.toString());
         } catch (JSONException e) {
             log.error(tag + " " + e.getMessage());
             throw e;
         }
         return encryptedData;
-    }
-
-    /*
-    * Helper method that calls the ClientSideEncrypter encrypt method
-    * */
-    private String encryptData(String data, String publicKey) throws Exception {
-        ClientSideEncrypter encrypter = new ClientSideEncrypter(publicKey);
-        return encrypter.encrypt(data);
     }
 
     @Override
