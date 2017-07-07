@@ -98,7 +98,7 @@ public class Helpers {
     }
 
     public static String createUniqueName(String baseName) {
-        int uniqPart = randomBetweenInclusive(000, 999);
+        int uniqPart = randomBetweenInclusive(0, 999);
         return String.format("%s%s~%d", baseName, timestamp("yy:MM:dd:HH:mm:ss"), uniqPart);
     }
 
