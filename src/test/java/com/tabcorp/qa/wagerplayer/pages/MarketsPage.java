@@ -267,7 +267,9 @@ public class MarketsPage extends AppPage {
         WebElement chk = prodRow.findElement(crossRaceExoticsCheckbox);
         assertThat(chk.getAttribute("disabled")).as("Cross Race Product checkbox is disabled").isNull();
         String checked = chk.getAttribute("checked");
-        if (null == checked) chk.click();
+        if (null == checked){
+            chk.click();
+        }
         assertThat(checked).as("Checked Cross Race Product " + prodName).isEqualTo("checked");
         updateBtn.click();
     }

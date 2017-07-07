@@ -79,7 +79,9 @@ public class CreateEventSteps implements En {
         When("^I update race number to \"(\\d+)\"$", (Integer num) -> {
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(num);
-            if (Config.isLuxbet()) marketsPage.setHardSoftInterimLimits();
+            if (Config.isLuxbet()) {
+                marketsPage.setHardSoftInterimLimits();
+            }
         });
 
         When("^I enable \"([^\"]*)\" product settings$", (String name, DataTable table) -> {
@@ -134,7 +136,9 @@ public class CreateEventSteps implements En {
             String createMarket = "Racing Live";
 
             String evtBaseName = evt.get("base name");
-            if (null == evtBaseName) evtBaseName = Config.testEventBaseName();
+            if (null == evtBaseName) {
+                evtBaseName = Config.testEventBaseName();
+            }
             String eventName = Helpers.createUniqueName(evtBaseName);
 
             String runnersText = (String) Helpers.nonNullGet(evt, "runners");
@@ -152,7 +156,9 @@ public class CreateEventSteps implements En {
             marketsPage.verifySuccessStatus("Market Created");
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(raceNumber);
-            if (Config.isLuxbet()) marketsPage.setHardSoftInterimLimits();
+            if (Config.isLuxbet()) {
+                marketsPage.setHardSoftInterimLimits();
+            }
         });
 
         And("^I update Exotic Prices$", (DataTable table) -> {
