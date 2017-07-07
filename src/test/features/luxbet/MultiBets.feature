@@ -220,16 +220,16 @@ Feature: Placing and Settling multi Bets
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category1        | Subcategory1 | Category2        | Subcategory2 | MultiType | BetOn                      | Stake | Flexi | Cost | Payout  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Doubles   | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 687.00  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 2499.00 |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 2571.00 |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Doubles   | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 687.00  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 2499.00 |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 2571.00 |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Doubles   | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 687.00  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 2499.00 |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 2571.00 |
+      | Category1        | Subcategory1 | Category2        | Subcategory2 | MultiType | BetOn                      | Stake | Flexi | Cost  | Payout  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Doubles   | Runner01,Runner11,Runner21 | 3.00  | N     | 9.00  | 693.00  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 12.00 | 2508.00 |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 21.00 | 2589.00 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Doubles   | Runner01,Runner11,Runner21 | 3.00  | N     | 9.00  | 693.00  |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 12.00 | 2508.00 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 21.00 | 2589.00 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Doubles   | Runner01,Runner11,Runner21 | 3.00  | N     | 9.00  | 693.00  |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Trixie    | Runner01,Runner11,Runner21 | 3.00  | N     | 12.00 | 2508.00 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Patent    | Runner01,Runner11,Runner21 | 3.00  | N     | 21.00 | 2589.00 |
 
   Scenario Outline: Racing 4-Event <MultiType> bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
@@ -319,22 +319,22 @@ Feature: Placing and Settling multi Bets
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category1        | Subcategory1 | Category2        | Subcategory2 | MultiType | BetOn                               | Stake | Flexi | Cost | Payout |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 18.46  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 30.23  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 38.34  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 81.03  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 88.11  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 18.46  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 30.23  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 38.34  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 81.03  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 88.11  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 18.46  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 30.23  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 38.34  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 81.03  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00 | 88.11  |
+      | Category1        | Subcategory1 | Category2        | Subcategory2 | MultiType | BetOn                               | Stake | Flexi | Cost  | Payout |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00  | 18.46  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 18.00 | 45.23  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 12.00 | 47.34  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 33.00 | 111.03 |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 45.00 | 130.11 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00  | 18.46  |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 18.00 | 45.23  |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 12.00 | 47.34  |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 33.00 | 111.03 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 45.00 | 130.11 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | 4-Fold    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 3.00  | 18.46  |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Doubles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 18.00 | 45.23  |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Trebles   | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 12.00 | 47.34  |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Yankee    | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 33.00 | 111.03 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Lucky 15  | Runner01,Runner11,Runner21,Runner31 | 3.00  | N     | 45.00 | 130.11 |
 
   Scenario Outline: Racing 5-Event <MultiType> bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
@@ -444,22 +444,22 @@ Feature: Placing and Settling multi Bets
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category1        | Subcategory1 | Category2        | Subcategory2 | MultiType | BetOn                                        | Stake | Flexi | Cost | Payout |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | 5-Fold    | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 36.91  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Doubles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 56.39  |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Trebles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 110.79 |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | 4-Folds   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 101.16 |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Canadian  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 296.25 |
-      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Lucky 31  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 306.33 |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | 5-Fold    | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 36.91  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Doubles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 56.39  |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Trebles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 110.79 |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | 4-Folds   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 101.16 |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Canadian  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 296.25 |
-      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Lucky 31  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 306.33 |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | 5-Fold    | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 36.91  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Doubles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 56.39  |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Trebles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 110.79 |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | 4-Folds   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 101.16 |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Canadian  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 296.25 |
-      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Lucky 31  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00 | 306.33 |
+      | Category1        | Subcategory1 | Category2        | Subcategory2 | MultiType | BetOn                                        | Stake | Flexi | Cost  | Payout |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | 5-Fold    | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00  | 36.91  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Doubles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 30.00 | 83.39  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Trebles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 30.00 | 137.79 |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | 4-Folds   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 15.00 | 113.16 |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Canadian  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 78.00 | 371.25 |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Lucky 31  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 93.00 | 396.33 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | 5-Fold    | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00  | 36.91  |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Doubles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 30.00 | 83.39  |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Trebles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 30.00 | 137.79 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | 4-Folds   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 15.00 | 113.16 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Canadian  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 78.00 | 371.25 |
+      | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Lucky 31  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 93.00 | 396.33 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | 5-Fold    | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 3.00  | 36.91  |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Doubles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 30.00 | 83.39  |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Trebles   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 30.00 | 137.79 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | 4-Folds   | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 15.00 | 113.16 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Canadian  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 78.00 | 371.25 |
+      | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Lucky 31  | Runner01,Runner11,Runner21,Runner31,Runner41 | 3.00  | N     | 93.00 | 396.33 |

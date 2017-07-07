@@ -49,8 +49,8 @@ Feature: Create Luxbet Events in WagerPlayer UI
 
   @smoke
     Examples:
-      | Category     | Subcategory   | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
-      | Horse Racing | WOLVERHAMPTON | 8            | 1          | 1/5           | 3          |
+      | Category     | Subcategory             | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
+      | Horse Racing | Automation Horse Racing | 8            | 1          | 1/5           | 3          |
 
     Examples:
       | Category         | Subcategory | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |

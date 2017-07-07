@@ -7,7 +7,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
 
   @smoke
   Scenario: Deductions for 3 place 1 scratched runner
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 1.12, 1.40, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                             |
@@ -64,7 +64,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $68.22
 
   Scenario: Deductions for 2 place 1 scratched runner
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 1.12, 1.40, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                             |
@@ -116,7 +116,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $58.96
 
   Scenario: Deductions for 3 place 2 scratched runners
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 2.28, 2.35, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                             |
@@ -174,7 +174,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $86.03
 
   Scenario: Deductions for 2 place 2 scratched runners
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 2.28, 2.35, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                             |
@@ -232,7 +232,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $78.07
 
   Scenario: Deductions for 3 place 3 scratched runners
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 2.28, 2.35, 4.12, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                              |
@@ -292,7 +292,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $84.30
 
   Scenario: Deductions for 2 place 3 scratched runners
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 2.28, 2.35, 4.12, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                              |
@@ -351,7 +351,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $77.35
 
   Scenario: Deductions for 3 place 4 scratched runners
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 2.28, 2.35, 4.12, 13.00, 10.00, 7.60, 35.00, 15.00, 61.00, 23.00                                                               |
@@ -411,7 +411,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
     And customer balance is equal to $87.24
 
   Scenario: Deductions for 2 place 4 scratched runners
-    When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
+    When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
     And I create a default event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 2.28, 2.35, 4.12, 13.00, 10.00, 7.60, 35.00, 15.00, 61.00, 23.00                                                               |
