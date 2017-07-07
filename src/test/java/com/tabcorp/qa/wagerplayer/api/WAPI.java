@@ -64,7 +64,7 @@ public class WAPI implements WagerPlayerAPI {
         }
     }
 
-    private static Logger log = LoggerFactory.getLogger(WAPI.class);
+    private static final Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();
@@ -87,7 +87,9 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("output_type", "json");
         Object resp = REST.post(URL, fields);
         ReadContext ctx = parseVerifyJSON(resp, RESP_ROOT);
-        if (checkErrors) verifyNoErrors(ctx, fields);
+        if (checkErrors) {
+            verifyNoErrors(ctx, fields);
+        }
         return ctx;
     }
 
@@ -250,7 +252,9 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("product_id", productId);
         fields.put("slot[1][market]", marketId);
         fields.put("amount", stake);
-        if (flexi) fields.put("flexi", "y");
+        if (flexi) {
+            fields.put("flexi", "y");
+        }
         return postWithQueryStrings(fields, Pair.of("slot[1][selection][]", selectionIds));
     }
 
@@ -259,15 +263,13 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("action", "bet_place_bet");
         fields.put("product_id", productId);
         AtomicInteger atomicIntSel = new AtomicInteger(1);
-        selectionIds.forEach(id -> {
-            fields.put("slot[" + atomicIntSel.getAndIncrement() + "][selection][]", id);
-        });
+        selectionIds.forEach(id -> fields.put("slot[" + atomicIntSel.getAndIncrement() + "][selection][]", id));
         AtomicInteger atomicIntMarket = new AtomicInteger(1);
-        marketIds.forEach(id -> {
-            fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id);
-        });
+        marketIds.forEach(id -> fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id));
         fields.put("amount", stake);
-        if (flexi) fields.put("flexi", "y");
+        if (flexi) {
+            fields.put("flexi", "y");
+        }
         return post(fields);
     }
 

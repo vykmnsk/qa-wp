@@ -122,7 +122,7 @@ public class MarketsPage extends AppPage {
 
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
-    private static Logger log = LoggerFactory.getLogger(MarketsPage.class);
+    private static final Logger log = LoggerFactory.getLogger(MarketsPage.class);
 
     static Map<List<String>, String> productSettingIDs() {
         return Collections.unmodifiableMap(Stream.of(
@@ -267,7 +267,9 @@ public class MarketsPage extends AppPage {
         WebElement chk = prodRow.findElement(crossRaceExoticsCheckbox);
         assertThat(chk.getAttribute("disabled")).as("Cross Race Product checkbox is disabled").isNull();
         String checked = chk.getAttribute("checked");
-        if (null == checked) chk.click();
+        if (null == checked){
+            chk.click();
+        }
         assertThat(checked).as("Checked Cross Race Product " + prodName).isEqualTo("checked");
         updateBtn.click();
     }

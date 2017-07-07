@@ -54,7 +54,7 @@ public class HelpersTest {
         final String INITIAL = "Player_";
         final int COUNT = 3;
         List<String> runners = Helpers.generateRunners(INITIAL, COUNT);
-        assertThat(runners).as("generated runners names").allMatch((n -> n.startsWith(INITIAL)));
+        assertThat(runners).as("generated runners names").allMatch(n -> n.startsWith(INITIAL));
         for (int i = 1; i <= COUNT; i++) {
             assertThat(runners.get(i - 1)).as("runner name").isEqualTo(INITIAL + i);
         }

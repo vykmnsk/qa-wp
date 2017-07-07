@@ -35,10 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class Helpers {
-    private static Logger log = LoggerFactory.getLogger(Helpers.class);
+    private static final Logger log = LoggerFactory.getLogger(Helpers.class);
 
     public static int randomBetweenInclusive(int min, int max) {
-        return (new Random()).nextInt(max - min + 1) + min;
+        return new Random().nextInt(max - min + 1) + min;
     }
 
     public static List<BigDecimal> generateRandomPrices(int min, int upTo, int count) {
@@ -58,7 +58,7 @@ public class Helpers {
     }
 
     public static String toTitleCase(String name) {
-        return (name.substring(0, 1).toUpperCase()) + (name.substring(1));
+        return name.substring(0, 1).toUpperCase() + (name.substring(1));
     }
 
     public static String normalize(String input) {
@@ -98,7 +98,7 @@ public class Helpers {
     }
 
     public static String createUniqueName(String baseName) {
-        int uniqPart = randomBetweenInclusive(000, 999);
+        int uniqPart = randomBetweenInclusive(0, 999);
         return String.format("%s%s~%d", baseName, timestamp("yy:MM:dd:HH:mm:ss"), uniqPart);
     }
 

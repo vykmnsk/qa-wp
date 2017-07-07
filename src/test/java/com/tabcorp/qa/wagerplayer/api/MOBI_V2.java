@@ -71,7 +71,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         }
     }
 
-    private static Logger log = LoggerFactory.getLogger(MOBI_V2.class);
+    private static final Logger log = LoggerFactory.getLogger(MOBI_V2.class);
 
     private ReadContext get(String url, Map<String, Object> queryParams) {
         Object response = REST.get(URL_ROOT + url, queryParams);
@@ -104,7 +104,9 @@ public class MOBI_V2 implements WagerPlayerAPI {
         errPaths.add("$..errors");
         errPaths.add("$..error");
         //default
-        if (null != errPath) errPaths.add(errPath);
+        if (null != errPath) {
+            errPaths.add(errPath);
+        }
         JSONArray errors = new JSONArray();
         for (String path : errPaths) {
             errors.addAll(resp.read(path));
