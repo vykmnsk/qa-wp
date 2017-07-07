@@ -267,7 +267,9 @@ public class WAPI implements WagerPlayerAPI {
         AtomicInteger atomicIntMarket = new AtomicInteger(1);
         marketIds.forEach(id -> fields.put("slot[" + atomicIntMarket.getAndIncrement() + "][market]", id));
         fields.put("amount", stake);
-        if (flexi) fields.put("flexi", "y");
+        if (flexi) {
+            fields.put("flexi", "y");
+        }
         return post(fields);
     }
 
