@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateEventSteps implements En {
 
-    private static Logger log = LoggerFactory.getLogger(CreateEventSteps.class);
+    private static final Logger log = LoggerFactory.getLogger(CreateEventSteps.class);
 
     private HeaderPage header;
     private NewEventPage newEvtPage;

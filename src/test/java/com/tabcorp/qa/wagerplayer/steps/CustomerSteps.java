@@ -48,7 +48,7 @@ public class CustomerSteps implements En {
     private HeaderPage header;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
-    private static Logger log = LoggerFactory.getLogger(CustomerSteps.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomerSteps.class);
 
     public CustomerSteps() {
         Given("^Existing customer with at least \\$(\\d+\\.\\d\\d) balance is logged in API$", (BigDecimal minBalance) -> {

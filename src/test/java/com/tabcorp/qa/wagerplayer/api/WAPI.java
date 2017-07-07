@@ -64,7 +64,7 @@ public class WAPI implements WagerPlayerAPI {
         }
     }
 
-    private static Logger log = LoggerFactory.getLogger(WAPI.class);
+    private static final Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static Map<String, Object> wapiAuthFields() {
         Map<String, Object> fields = new HashMap<>();

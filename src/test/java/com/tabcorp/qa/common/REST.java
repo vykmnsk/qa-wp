@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class REST {
-    private static Logger log = LoggerFactory.getLogger(REST.class);
+    private static final Logger log = LoggerFactory.getLogger(REST.class);
 
     public static Object post(String url, Map<String, Object> fields) {
         HttpResponse<String> response;

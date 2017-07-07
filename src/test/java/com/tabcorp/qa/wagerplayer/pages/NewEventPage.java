@@ -68,7 +68,7 @@ public class NewEventPage extends AppPage {
     @FindBy(css = "#filter_table input[src='images/button_insert.gif']")
     private WebElement insertEvent;
 
-    private static Logger log = LoggerFactory.getLogger(NewEventPage.class);
+    private static final Logger log = LoggerFactory.getLogger(NewEventPage.class);
 
     public void load() {
         driver.switchTo().defaultContent();

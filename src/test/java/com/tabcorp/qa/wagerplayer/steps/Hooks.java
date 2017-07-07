@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Hooks {
-    private static Logger log = LoggerFactory.getLogger(Hooks.class);
+    private static final Logger log = LoggerFactory.getLogger(Hooks.class);
 
     @Before
     public void beforeScenario(){

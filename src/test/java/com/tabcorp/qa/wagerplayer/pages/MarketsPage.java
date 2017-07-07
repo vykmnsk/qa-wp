@@ -122,7 +122,7 @@ public class MarketsPage extends AppPage {
 
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
-    private static Logger log = LoggerFactory.getLogger(MarketsPage.class);
+    private static final Logger log = LoggerFactory.getLogger(MarketsPage.class);
 
     static Map<List<String>, String> productSettingIDs() {
         return Collections.unmodifiableMap(Stream.of(

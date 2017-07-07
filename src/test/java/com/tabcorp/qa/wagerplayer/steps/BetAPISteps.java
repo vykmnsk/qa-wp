@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class BetAPISteps implements En {
-    private static Logger log = LoggerFactory.getLogger(BetAPISteps.class);
+    private static final Logger log = LoggerFactory.getLogger(BetAPISteps.class);
 
     private BigDecimal balanceAfterBet;
     private WagerPlayerAPI api = Config.getAPI();

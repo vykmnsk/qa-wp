@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class Helpers {
-    private static Logger log = LoggerFactory.getLogger(Helpers.class);
+    private static final Logger log = LoggerFactory.getLogger(Helpers.class);
 
     public static int randomBetweenInclusive(int min, int max) {
         return (new Random()).nextInt(max - min + 1) + min;

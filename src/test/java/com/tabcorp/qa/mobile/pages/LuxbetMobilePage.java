@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LuxbetMobilePage extends AppPage {
-    private static Logger log = LoggerFactory.getLogger(LuxbetMobilePage.class);
+    private static final Logger log = LoggerFactory.getLogger(LuxbetMobilePage.class);
 
     @FindBy(css = ("#login .validationMessageContainer"))
     private List<WebElement> loginErrors;

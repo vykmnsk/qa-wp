@@ -71,7 +71,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         }
     }
 
-    private static Logger log = LoggerFactory.getLogger(MOBI_V2.class);
+    private static final Logger log = LoggerFactory.getLogger(MOBI_V2.class);
 
     private ReadContext get(String url, Map<String, Object> queryParams) {
         Object response = REST.get(URL_ROOT + url, queryParams);
