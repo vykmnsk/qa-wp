@@ -161,7 +161,7 @@ public class CreateEventSteps implements En {
             for (List<String> priceRow : priceData) {
                 assertThat(priceRow.size()).as("expecting for example: [STAB, Quinella, 6.50]").isEqualTo(3);
                 BigDecimal priceValue = new BigDecimal(priceRow.get(2));
-                assertThat(priceValue).isGreaterThan(new BigDecimal(0));
+                assertThat(priceValue).isGreaterThan(BigDecimal.ZERO);
             }
             settlementPage.updateExoticPrices(priceData);
         });
