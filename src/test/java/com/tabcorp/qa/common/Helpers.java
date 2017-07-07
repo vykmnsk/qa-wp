@@ -38,7 +38,7 @@ public class Helpers {
     private static final Logger log = LoggerFactory.getLogger(Helpers.class);
 
     public static int randomBetweenInclusive(int min, int max) {
-        return (new Random()).nextInt(max - min + 1) + min;
+        return new Random().nextInt(max - min + 1) + min;
     }
 
     public static List<BigDecimal> generateRandomPrices(int min, int upTo, int count) {
@@ -58,7 +58,7 @@ public class Helpers {
     }
 
     public static String toTitleCase(String name) {
-        return (name.substring(0, 1).toUpperCase()) + (name.substring(1));
+        return name.substring(0, 1).toUpperCase() + (name.substring(1));
     }
 
     public static String normalize(String input) {
