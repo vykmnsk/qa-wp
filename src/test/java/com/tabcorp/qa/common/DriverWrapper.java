@@ -59,7 +59,7 @@ public class DriverWrapper {
         try {
             return new RemoteWebDriver(new URL(seleniumHub), capabilities);
         } catch (MalformedURLException mue) {
-            throw new RuntimeException(mue);
+            throw new FrameworkError(mue);
         }
     }
 

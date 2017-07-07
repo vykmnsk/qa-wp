@@ -1,6 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.adyen.Card;
+import com.tabcorp.qa.common.FrameworkError;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.Storage.KEY;
@@ -65,7 +66,7 @@ public class CustomerSteps implements En {
             } else if (Config.isLuxbet()) {
                 filename = "customer-default-LB.yml";
             } else {
-                throw new RuntimeException("Unknown App name=" + Config.appName());
+                throw new FrameworkError("Unknown App name=" + Config.appName());
             }
             Map<String, String> custRaw = Helpers.loadYamlResource(filename);
             Map<String, String> custData = adjustCustomerData(custRaw);
@@ -93,7 +94,7 @@ public class CustomerSteps implements En {
                         custData.get("CardType"),
                         requiredBalance);
             } else {
-                throw new RuntimeException("Unknown App name=" + Config.appName());
+                throw new FrameworkError("Unknown App name=" + Config.appName());
             }
 
             Storage.put(BALANCE_BEFORE, requiredBalance);
@@ -245,7 +246,7 @@ public class CustomerSteps implements En {
         try {
             cardEncryption = card.serialize(publicKey);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new FrameworkError(e);
         }
 
         String paymentReference = mobi.getPaymentRefence(accessToken);

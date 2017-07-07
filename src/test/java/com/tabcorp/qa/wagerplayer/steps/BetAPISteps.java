@@ -2,6 +2,7 @@ package com.tabcorp.qa.wagerplayer.steps;
 
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
+import com.tabcorp.qa.common.FrameworkError;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
@@ -276,7 +277,7 @@ public class BetAPISteps implements En {
                         selection.get(MPID), selection.get(WIN_PRICE), selection.get(PLACE_PRICE), stake, bonusBetflag);
                 break;
             default:
-                throw new RuntimeException("Unknown BetTypeName=" + betTypeName);
+                throw new FrameworkError("Unknown BetTypeName=" + betTypeName);
         }
         List<Integer> betIds = api.readBetIds(response);
         assertThat(betIds.size()).as("Single Bet IDs").isEqualTo(1);

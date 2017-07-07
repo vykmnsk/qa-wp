@@ -2,6 +2,8 @@
 env_*.sh
 target/*
 **/temp/*
+sonar-project.properties
+.scannerwork/*
 
 ### IntelliJ IDEA ###
 .idea

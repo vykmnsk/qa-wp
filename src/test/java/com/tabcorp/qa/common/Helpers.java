@@ -140,7 +140,7 @@ public class Helpers {
                 Thread.currentThread().interrupt();
             }
         }
-        throw new RuntimeException(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
+        throw new FrameworkError(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
     }
 
     public static List<String> collectElementsTexts(WebElement parent, By childrenSelector) {
@@ -196,7 +196,7 @@ public class Helpers {
             File file = new File(Helpers.class.getClassLoader().getResource(filename).getFile());
             content = new String(Files.readAllBytes(file.toPath()));
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Could not read java resource file='%s' exception=%s", filename, e));
+            throw new FrameworkError(String.format("Could not read java resource file='%s' exception=%s", filename, e));
         }
         return content;
     }

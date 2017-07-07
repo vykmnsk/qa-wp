@@ -28,7 +28,7 @@ public class REST {
                     .asString();
         } catch (UnirestException e) {
             log.info("REST URL=" + url);
-            throw new RuntimeException(e);
+            throw new FrameworkError(e);
         }
         return verifyAndParseResponse(response);
     }
@@ -43,7 +43,7 @@ public class REST {
                     .asString();
         } catch (UnirestException e) {
             log.info("REST URL=" + url);
-            throw new RuntimeException(e);
+            throw new FrameworkError(e);
         }
         return verifyAndParseResponse(response);
     }
@@ -60,7 +60,7 @@ public class REST {
         } catch (UnirestException e) {
             log.info("REST URL for PUT=" + url);
             log.info("PUT Request JSON=" + reqJSON);
-            throw new RuntimeException(e);
+            throw new FrameworkError(e);
         }
         return verifyAndParseResponse(response);
     }
@@ -74,7 +74,7 @@ public class REST {
                     .asString();
         } catch (UnirestException e) {
             log.info("GET URL=" + url);
-            throw new RuntimeException(e);
+            throw new FrameworkError(e);
         }
         return verifyAndParseResponse(response);
     }
@@ -88,7 +88,7 @@ public class REST {
             new JSONParser().parse(body);
         } catch (ParseException e) {
             String errorMsg = String.format("Response body is not JSON: %s JSON Parse error: %s", body, e);
-            throw new RuntimeException(errorMsg);
+            throw new FrameworkError(errorMsg);
         }
         return Configuration.defaultConfiguration().jsonProvider().parse(body);
     }
