@@ -11,11 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -321,6 +317,16 @@ public class MOBI_V2 implements WagerPlayerAPI {
     public String createNewCustomer(Map custData) {
         ReadContext response = post("/customer", custData);
         Integer custId = response.read("$.success.customer_id");
+        log.info("Customer ID=" + custId);
+        return response.read("$.success.message");
+    }
+
+    public String updateCustomer(String accessToken, Map custData) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.putAll(custData);
+        ReadContext response = post("/customer/update", fields);
+        String custId = response.read("$.success.customer_id");
         log.info("Customer ID=" + custId);
         return response.read("$.success.message");
     }

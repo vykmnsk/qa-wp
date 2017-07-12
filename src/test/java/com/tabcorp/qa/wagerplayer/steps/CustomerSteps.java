@@ -11,12 +11,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
-import com.tabcorp.qa.wagerplayer.pages.CustomersPage;
-import com.tabcorp.qa.wagerplayer.pages.DepositPage;
-import com.tabcorp.qa.wagerplayer.pages.HeaderPage;
-import com.tabcorp.qa.wagerplayer.pages.LoginPage;
-import com.tabcorp.qa.wagerplayer.pages.NewCustomerPage;
-import com.tabcorp.qa.wagerplayer.pages.PromotionPage;
+import com.tabcorp.qa.wagerplayer.pages.*;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -35,9 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
-import static com.tabcorp.qa.common.Storage.KEY.BALANCE_BEFORE;
-import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER;
+import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomerSteps implements En {
@@ -116,6 +109,17 @@ public class CustomerSteps implements En {
             newCustPage.enterCustomerDetails(custData);
             Storage.put(CUSTOMER, custData);
             log.info("New Customer created: " + custData);
+        });
+
+        When("^I update the customer details$", (DataTable table) -> {
+            String accessToken = loginStoredCustomer();
+            Map<String, String> custDataInput = table.asMap(String.class, String.class);
+            Map<String, String> custData = updateCustomerData(custDataInput);
+            MOBI_V2 mobi = new MOBI_V2();
+            String successMsg = mobi.updateCustomer(accessToken, custData);
+            assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Updated");
+            Storage.put(CUSTOMER, custData);
+            log.info("Customer updated: " + custData);
         });
 
         Then("^the customer AML status in UI is updated to ([^\"]*)$", (String expectedAmlStatus) -> {
@@ -285,6 +289,17 @@ public class CustomerSteps implements En {
         cust.put("dob-year", String.valueOf(dob.getYear()));
         cust.put("dob-month", String.valueOf(dob.getMonthValue()));
         cust.put("dob-day", String.valueOf(dob.getDayOfMonth()));
+        return cust;
+    }
+
+    private Map<String, String> updateCustomerData(Map<String, String> custInput) {
+        Map<String, String> custFiltered = custInput.entrySet().stream()
+                .filter(entry -> !"N/A".equals(entry.getValue()))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        StrictHashMap<String, String> cust = new StrictHashMap<>();
+        cust.putAll(custFiltered);
+        Map<String, String> custgetData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
+        cust.replace("email_address", custgetData.get("email_address"));
         return cust;
     }
 
