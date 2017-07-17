@@ -140,6 +140,15 @@ public class CustomerSteps implements En {
             Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
         });
 
+        When("^I update the customer AML status to \"([^\"]*)\"$", (String newamlstatus) -> {
+            header = new HeaderPage();
+            customersPage = header.navigateToF11();
+            Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
+            customersPage.searchCustomer(custData.get("username"));
+            CustomerConfigPage customerConfigPage = customersPage.openConfigWindow();
+            customerConfigPage.updateAmlStatus(newamlstatus);
+        });
+
         Then("^the affiliate customer should be able to login to mobile site successfully$", () -> {
             String sessionId = loginStoredCustomer();
             String mobileAccessToken = wapi.generateAffiliateLoginToken(sessionId);

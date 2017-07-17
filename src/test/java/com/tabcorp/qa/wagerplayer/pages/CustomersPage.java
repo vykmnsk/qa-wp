@@ -21,6 +21,9 @@ public class CustomersPage extends AppPage{
     @FindBy(css = "input[value=promotion]")
     private WebElement promotionButton;
 
+    @FindBy(css = "img[src='images/button_config.gif']")
+    private WebElement configButton;
+
     @FindBy(css = "a[title$=options]")
     public WebElement options;
 
@@ -79,5 +82,12 @@ public class CustomersPage extends AppPage{
         PromotionPage pp = new PromotionPage();
         pp.load();
         return pp;
+    }
+
+    public CustomerConfigPage openConfigWindow() {
+        configButton.click();
+        CustomerConfigPage cp = new CustomerConfigPage();
+        cp.load();
+        return cp;
     }
 }

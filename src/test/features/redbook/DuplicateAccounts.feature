@@ -228,3 +228,35 @@ Feature: Verify Duplicate Accounts - UK and EU Customers (SUN-5310 - Duplicate A
       | Mr         | SCOTT     | JOPLIN   | 1980-08-08 | @example.com          | 0421147741 | 65       | High Street | Westbury | Westbury | PP88PP   | N/A   | GB      | Europe/London | Favourite Holiday Spot? | GBP           | N/A           | 212.58.244.18 | 1                   | LUKAS        | MOCNAY      | 1980-01-01 | OX42QX      |
 
 # Account 01, 02: (SUN-5313) Two UK Customers sign-up, update second customer with first customer details - Customers Created and Updated
+
+  @dupacctsclo
+  Scenario Outline: <country> Customer Sign-up (Customer Validation) and manually update AML status to <newamlstatus>
+    When I login with valid username and password
+    And I create a new customer via API with data
+      | salutation            | <salutation>            |
+      | firstname             | <firstname>             |
+      | lastname              | <lastname>              |
+      | dob                   | <dob>                   |
+      | _email_address_suffix | <_email_address_suffix> |
+      | telephone             | <telephone>             |
+      | building              | <building>              |
+      | street                | <street>                |
+      | city                  | <city>                  |
+      | suburb                | <suburb>                |
+      | state                 | <state>                 |
+      | postcode              | <postcode>              |
+      | country               | <country>               |
+      | currency_code         | <currency_code>         |
+      | secret_question       | <secret_question>       |
+      | deposit_limit         | <deposit_limit>         |
+      | client_ip             | <client_ip>             |
+      | manual_verification   | <manual_verification>   |
+    And I update the customer AML status to "<newamlstatus>"
+
+    Examples:
+      | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street      | city     | suburb   | postcode | state | country | secret_question         | currency_code | deposit_limit | client_ip     | manual_verification | newamlstatus          |
+      | Mr         | SCOTT     | PATON    | 1972-02-01 | @example.com          | 0421147741 | 65       | High Street | Westbury | Westbury | BA133BN  | N/A   | GB      | Favourite Holiday Spot? | GBP           | N/A           | 212.58.244.18 | 1                   | Suspended             |
+      | Mr         | SCOTT     | PATON    | 1972-02-01 | @example.com          | 0421147741 | 65       | High Street | Westbury | Westbury | BA133BN  | N/A   | GB      | Favourite Holiday Spot? | GBP           | N/A           | 212.58.244.18 | 1                   | Closed                |
+      | Mr         | SCOTT     | PATON    | 1972-02-01 | @example.com          | 0421147741 | 65       | High Street | Westbury | Westbury | BA133BN  | N/A   | GB      | Favourite Holiday Spot? | GBP           | N/A           | 212.58.244.18 | 1                   | Active - KYC verified |
+
+# Account 01: (SUN-5XXX) UK Customer sign-up with unique data - Customer Created and update the AML Status to Closed
