@@ -28,13 +28,13 @@ pipeline {
             steps {
                 sh 'docker ps -a'
                 checkout scm
-                sh 'TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
+                sh 'ENV=src/env_files/php7_env  TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 
             post {
                 always {
-                    sh 'docker-compose logs testservice'
+                    sh 'ENV=src/env_files/php7_env docker-compose logs testservice'
                 }
             }
         }
@@ -46,26 +46,26 @@ pipeline {
 
         stage('common : login tests') {
             steps {
-                sh 'TEST_TAGS="-t @login" docker-compose up -d  --force-recreate --build'
+                sh 'ENV=src/env_files/php7_env TEST_TAGS="-t @login" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 
             post {
                 always {
-                    sh 'docker-compose logs testservice'
+                    sh 'ENV=src/env_files/php7_env docker-compose logs testservice'
                 }
             }
         }
 
         stage('redbook smoke tests') {
             steps {
-                sh 'TEST_TAGS="-t @smoke -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
+                sh 'ENV=src/env_files/php7_env TEST_TAGS="-t @smoke -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 
             post {
                 always {
-                    sh 'docker-compose logs testservice'
+                    sh 'ENV=src/env_files/php7_env docker-compose logs testservice'
                 }
             }
         }
