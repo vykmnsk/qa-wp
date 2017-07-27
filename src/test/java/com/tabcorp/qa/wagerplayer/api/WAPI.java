@@ -3,6 +3,7 @@ package com.tabcorp.qa.wagerplayer.api;
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
+import static com.tabcorp.qa.common.Storage.KEY.EVENT_IDS;
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_IDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WAPI implements WagerPlayerAPI {
@@ -61,6 +65,18 @@ public class WAPI implements WagerPlayerAPI {
 
         public static List<String> allNames() {
             return Arrays.stream(MultiType.values()).map(mt -> mt.exactName).collect(Collectors.toList());
+        }
+    }
+
+    public enum InterceptOption {
+        Accept("Accept"),
+        Reject("Reject"),
+        Partial("Partial");
+
+        public final String exactName;
+
+        InterceptOption(String name) {
+            exactName = name;
         }
     }
 
@@ -446,6 +462,19 @@ public class WAPI implements WagerPlayerAPI {
         return readAttrOneOnly(resp, path, attrName);
     }
 
+    public String readInterceptRejectedCombin(ReadContext response) {
+        String path = "$.RSP.bet_intercept.rejected_bets.multiple[0].rejected_combin";
+        return response.read(path).toString();
+    }
+
+    public String readInterceptStatus(ReadContext resp) {
+        return resp.read("$.RSP.bet_intercept.status");
+    }
+
+    public String readInterceptNewStake(ReadContext resp) {
+        return resp.read("$.RSP.bet[0].new_stake");
+    }
+
     private static String readAttrOrElse(ReadContext resp, String basePath, String attrName, String orElse) {
         String attr = orElse;
         JSONArray attrs = resp.read(basePath + "." + attrName);
@@ -460,6 +489,41 @@ public class WAPI implements WagerPlayerAPI {
         String attr = readAttrOrElse(resp, basePath, attrName, null);
         assertThat(attr).as(String.format("expected to find one attribute '%s' at path='%s'", attrName, basePath));
         return attr;
+    }
+
+    public ReadContext placeSingleWinBetForIntercept(String accessToken, Integer prodId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag, WAPI.InterceptOption interceptOption, String partialAmount) {
+        ReadContext response = placeSingleWinBet(accessToken, prodId, mpid, winPrice, stake, bonusBetFlag);
+        return response;
+    }
+
+    public ReadContext placeMultiBetInIntercept(WAPI.MultiType multiType, List<BetType> betTypes, List<String> runners, BigDecimal stake, boolean isFlexi, WAPI.InterceptOption interceptOption, String partialAmount) {
+        String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+        String uuid = configureMultiBet(accessToken, multiType, betTypes, runners, stake, isFlexi);
+        ReadContext response = placeMultiBet(accessToken, uuid, stake, isFlexi);
+        return response;
+    }
+
+    public ReadContext placeMultipleBetsInIntercept(WAPI.MultiType multiType, List<BetType> betTypes, List<String> runners, BigDecimal stake, boolean isFlexi, List<String> interceptOptions, String partialAmount) {
+        String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+        String uuid = configureMultiBet(accessToken, multiType, betTypes, runners, stake, isFlexi);
+        ReadContext response = placeMultiBet(accessToken, uuid, stake, isFlexi);
+        return response;
+    }
+
+    public String configureMultiBet(String accessToken, WAPI.MultiType multiType, List<BetType> betTypes, List<String> runners, BigDecimal stake, boolean isFlexi) {
+        List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
+        List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+        assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
+        List<Map<WAPI.KEY, String>> selections = getMultiEventSelections(accessToken, eventIds, runners, prodIds);
+        String uuid;
+        if (WAPI.MultiType.Double.equals(multiType)) {
+            uuid = prepareSelectionsForDoubleBet(accessToken, selections, prodIds, betTypes);
+        } else if (WAPI.MultiType.Treble.equals(multiType)) {
+            uuid = prepareSelectionsForTrebleBet(accessToken, selections, prodIds, betTypes);
+        } else {
+            uuid = prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType, betTypes);
+        }
+        return uuid;
     }
 
     private static String jfilter(String attr, String value) {

@@ -200,4 +200,12 @@ public class Helpers {
         }
         return content;
     }
+
+    public static void delayInMillis(int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

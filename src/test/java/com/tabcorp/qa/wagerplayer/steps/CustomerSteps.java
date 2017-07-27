@@ -1,11 +1,9 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.tabcorp.qa.adyen.Card;
-import com.tabcorp.qa.common.FrameworkError;
-import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.*;
+import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.Storage.KEY;
-import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.mobile.pages.LuxbetMobilePage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
@@ -23,14 +21,13 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
+import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.MPID;
+import static com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI.KEY.WIN_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomerSteps implements En {
@@ -39,6 +36,8 @@ public class CustomerSteps implements En {
     private WAPI wapi = new WAPI();
     //for UI
     private HeaderPage header;
+    private FooterPage footer;
+    private InterceptPage intercept;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
     private static final Logger log = LoggerFactory.getLogger(CustomerSteps.class);
@@ -235,6 +234,162 @@ public class CustomerSteps implements En {
             assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
         });
 
+        And("^I modify Intercept on Bet Placement Racing to \"([^\"]*)\" on customer config for default customer$",
+                (String option) -> {
+                    header = new HeaderPage();
+                    customersPage = header.navigateToF11();
+                    Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
+                    customersPage.searchCustomer(custData.get("username"));
+                    CustomerConfigPage customerConfigPage = customersPage.openConfigWindow();
+                    customerConfigPage.verifyLoaded();
+                    customerConfigPage.selectInterceptOnRacingBetPlacement();
+                });
+
+        When("^I place a single \"([^\"]*)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d\\d) and \"([^\"]*)\" the intercept$",
+                (String betType, String runner, BigDecimal stake, WAPI.InterceptOption interceptOption) -> {
+                    String partialAmount = "";
+                    placeInterceptSingleBet(runner, stake, interceptOption, partialAmount);
+                });
+
+        When("^I place a single \"([^\"]*)\" bet on the runner \"([^\"]*)\" for \\$(\\d+\\.\\d\\d) and do Partial the intercept for \\$(\\d+\\.\\d\\d)$",
+                (String betType, String runner, BigDecimal stake, String partialAmount) -> {
+                    WAPI.InterceptOption interceptOption = WAPI.InterceptOption.Partial;
+                    placeInterceptSingleBet(runner, stake, interceptOption, partialAmount);
+                });
+
+        When("^I place a Luxbet Treble Bet \"([A-Za-z]+)\"-\"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\" and do \"([^\"]*)\" the intercept$",
+                (String betTypeName1, String betTypeName2, String betTypeName3, String runnersCSV, BigDecimal stake, String flexi, WAPI.InterceptOption interceptOption) -> {
+                    String partialAmount = "0";
+                    placeInterceptMultiBet(betTypeName1, betTypeName2, betTypeName3, runnersCSV, stake, flexi, interceptOption, partialAmount);
+                });
+
+        When("^I place a Luxbet Treble Bet \"([A-Za-z]+)\"-\"([A-Za-z]+)\"-\"([A-Za-z]+)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\" and do Partial the intercept for \\$(\\d+\\.\\d\\d)$",
+                (String betTypeName1, String betTypeName2, String betTypeName3, String runnersCSV, BigDecimal stake, String flexi, String partialAmount) -> {
+                    WAPI.InterceptOption interceptOption = WAPI.InterceptOption.Partial;
+                    placeInterceptMultiBet(betTypeName1, betTypeName2, betTypeName3, runnersCSV, stake, flexi, interceptOption, partialAmount);
+                });
+
+        When("^I place a Luxbet Multi Bet \"([^\"]*)\" on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d) with flexi as \"([^\"]*)\" and do \"([^\"]*)\" the intercepts with partial amount as \\$(\\d+\\.\\d\\d)$",
+                (String multiTypeName, String runnersCSV, BigDecimal stake, String flexi, String interceptOptionCSV, String partialAmount) -> {
+                    assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+                    WAPI.MultiType multiType = WAPI.MultiType.fromName(multiTypeName);
+                    List<String> runners = Helpers.extractCSV(runnersCSV);
+                    List<String> interceptOptions = Helpers.extractCSV(interceptOptionCSV);
+                    List<WAPI.InterceptOption> newInterceptOptions = new ArrayList<>();
+                    for (String interceptOpt : interceptOptions) {
+                        newInterceptOptions.add(WAPI.InterceptOption.valueOf(interceptOpt));
+                    }
+                    boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+                    String interceptText = "Patent  (See panel for details)";
+                    new Thread(() -> {
+                        ReadContext response = wapi.placeMultipleBetsInIntercept(multiType, null, runners, stake, isFlexi, interceptOptions, partialAmount);
+                        List<Integer> betIds = wapi.readBetIds(response);
+                        assertThat(betIds.size()).isGreaterThan(0);
+                        log.info("Bet IDs=" + betIds);
+                    }).start();
+                    Helpers.delayInMillis(5000);
+                    actionOnIntercept(interceptText, newInterceptOptions, partialAmount);
+                });
+
+    }
+
+    private void placeInterceptSingleBet(String runner, BigDecimal stake, WAPI.InterceptOption interceptOption, String partialAmount) {
+        String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+        String eventId = (String) Storage.getLast(EVENT_IDS);
+        Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+        Integer bonusBetFlag = 0;
+        String catg = (String) Storage.getLast(KEY.CATEGORIES);
+        String subCatg = (String) Storage.getLast(KEY.SUBCATEGORIES);
+        String eventName = (String) Storage.getLast(KEY.EVENT_NAMES);
+        String interceptText = catg + ": " + subCatg + ": " + eventName + " (Racing Live): 1 " + runner;
+        ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
+        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, true);
+        new Thread(() -> {
+            ReadContext response = wapi.placeSingleWinBetForIntercept(accessToken, prodId, selection.get(MPID), selection.get(WIN_PRICE), stake, bonusBetFlag, interceptOption, partialAmount);
+            List<Integer> betIds;
+            switch (interceptOption) {
+                case Accept:
+                    betIds = wapi.readBetIds(response);
+                    assertThat(betIds.size()).isGreaterThan(0);
+                    log.info("Bet IDs=" + betIds);
+                    break;
+                case Reject:
+                    String readResp = wapi.readInterceptStatus(response);
+                    assertThat(readResp).isNotEmpty();
+                    log.info("Bet IDs not generated as bet in intercept was Rejected");
+                    break;
+                case Partial:
+                    betIds = wapi.readBetIds(response);
+                    assertThat(betIds.size()).isGreaterThan(0);
+                    log.info("Bet IDs=" + betIds);
+                    String newStake = wapi.readInterceptNewStake(response);
+                    assertThat(newStake).isEqualTo(partialAmount);
+                    log.info("Bet placed using partial stake amount");
+                    break;
+                default:
+                    throw new FrameworkError("Unexpected interceptOption=" + interceptOption);
+            }
+        }).start();
+        actionOnIntercept(interceptText, Arrays.asList(interceptOption), partialAmount);
+    }
+
+    private void placeInterceptMultiBet(String betTypeName1, String betTypeName2, String betTypeName3, String runnersCSV, BigDecimal stake, String flexi, WAPI.InterceptOption interceptOption, String partialAmount) {
+        assertThat(Config.isLuxbet()).as("LUXBET only step").isTrue();
+        BetType betType1 = BetType.fromName(betTypeName1);
+        BetType betType2 = BetType.fromName(betTypeName2);
+        BetType betType3 = BetType.fromName(betTypeName3);
+        List<String> runners = Helpers.extractCSV(runnersCSV);
+        boolean isFlexi = "Y".equalsIgnoreCase(flexi);
+        String interceptText = "Treble  (See panel for details)";
+        new Thread(() -> {
+            ReadContext response = wapi.placeMultiBetInIntercept(WAPI.MultiType.Treble, Arrays.asList(betType1, betType2, betType3), runners, stake, isFlexi, interceptOption, partialAmount);
+            switch (interceptOption) {
+                case Accept:
+                    String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+                    List<Integer> betIds = wapi.readBetIds(response);
+                    log.info("Bet IDs=" + betIds);
+                    if (!Arrays.asList(betType1, betType2, betType3).isEmpty()) {
+                        for (int betId : betIds) {
+                            List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
+                            assertThat(placedBetTypes)
+                                    .as(String.format("Expected Bet Types for %s bet, betId=%d", WAPI.MultiType.Treble.exactName, betId))
+                                    .isEqualTo(Arrays.asList(betType1, betType2, betType3));
+                        }
+                    }
+                    break;
+                case Reject:
+                    String readResp = wapi.readInterceptRejectedCombin(response);
+                    assertThat(readResp).isNotEmpty();
+                    log.info("Bet IDs not generated as bet in intercept was Rejected");
+                    break;
+                case Partial:
+                    String newStake = wapi.readInterceptNewStake(response);
+                    assertThat(newStake).isEqualTo(partialAmount);
+                    break;
+                default:
+                    throw new FrameworkError("Unexpected interceptOption=" + interceptOption);
+            }
+
+            if (interceptOption.equals(WAPI.InterceptOption.Accept)) {
+            } else if (interceptOption.equals(WAPI.InterceptOption.Reject)) {
+
+            } else if (interceptOption.equals(WAPI.InterceptOption.Partial)) {
+            }
+        }).start();
+        Helpers.delayInMillis(5000);
+        actionOnIntercept(interceptText, Arrays.asList(interceptOption), partialAmount);
+    }
+
+    public void actionOnIntercept(String interceptText, List<WAPI.InterceptOption> interceptOptions, String partialAmount) {
+        footer = new FooterPage();
+        footer.toggleIntercept();
+        intercept = new InterceptPage();
+        if (interceptOptions.size() == 1) {
+            intercept.actionOnBetIntercept(interceptText, interceptOptions.get(0), partialAmount);
+        } else if (interceptOptions.size() > 1) {
+            intercept.actionOnMultipleBetsOnIntercept(interceptText, interceptOptions, partialAmount);
+        }
+        footer.toggleIntercept();
     }
 
     private void addCCMakeDeposit(String cardNumber, String cvc, String expMonth, String expYear, String cardHolderName, String cardType, BigDecimal deposit) {
@@ -284,7 +439,7 @@ public class CustomerSteps implements En {
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         StrictHashMap<String, String> cust = new StrictHashMap<>();
         cust.putAll(custFiltered);
-        cust.put("username", "AutoUser" + RandomStringUtils.randomNumeric(7));
+        cust.put("username", "AutoUser" + RandomStringUtils.randomNumeric(9));
         String password = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
         cust.put("password", password);
         cust.put("internet_password", password);

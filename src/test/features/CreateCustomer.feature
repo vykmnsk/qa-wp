@@ -36,6 +36,7 @@ Feature: Create New Customer
     Examples:
       | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city | suburb         | postcode | state | country | timezone         | secret_question         | currency_code | deposit_limit | client_ip   | manual_verification | amlStatus        | depositAmount |
       | API     | Mr         | Oswald    | Petrucco | 1939-05-31 | @example.com          | 0421147741 | N/A      | 142 Tynte Street | N/A  | North Adelaide | 5006     | SA    | AU      | Australia/Sydney | Favourite Holiday Spot? | AUD           | 4500.00       | 61.9.192.13 | N/A                 | account_verified | 10000.00      |
+      | API     | Mr         | Sean      | Somi     | 1980-05-04 | @example.com          | 0400555666 | N/A      | 22 Johns Rd      | N/A  | Kilda          | 3182     | VIC   | AU      | Australia/Sydney | Favourite Holiday Spot? | AUD           |               |             | N/A                 | account_verified | 10000.00      |
 
   @luxbet @api
     Examples:

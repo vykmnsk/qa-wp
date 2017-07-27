@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
-import cucumber.api.java.hu.De;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -26,6 +25,9 @@ public class CustomersPage extends AppPage{
 
     @FindBy(css = "a[title$=options]")
     public WebElement options;
+
+    @FindBy(css = ("img[src='images/button_config.gif']"))
+    public WebElement config;
 
     @FindBy(css = "input[name=username]")
     public WebElement customerUsername;

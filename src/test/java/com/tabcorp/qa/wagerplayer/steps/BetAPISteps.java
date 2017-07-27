@@ -33,6 +33,7 @@ public class BetAPISteps implements En {
     private BigDecimal balanceAfterBet;
     private WagerPlayerAPI api = Config.getAPI();
     private WAPI wapi = new WAPI();
+    private CustomerSteps customerSteps;
 
     public BetAPISteps() {
         When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
@@ -213,24 +214,12 @@ public class BetAPISteps implements En {
 
     private ReadContext placeMultiBet(WAPI.MultiType multiType, List<BetType> betTypes, List<String> runners, BigDecimal stake, boolean isFlexi) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-        List<String> eventIds = (List<String>) Storage.get(EVENT_IDS);
-        List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
-        assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
-        List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
-        String uuid;
-        if (WAPI.MultiType.Double.equals(multiType)) {
-            uuid = wapi.prepareSelectionsForDoubleBet(accessToken, selections, prodIds, betTypes);
-        } else if (WAPI.MultiType.Treble.equals(multiType)) {
-            uuid = wapi.prepareSelectionsForTrebleBet(accessToken, selections, prodIds, betTypes);
-        } else {
-            uuid = wapi.prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType, betTypes);
-        }
+        String uuid = wapi.configureMultiBet(accessToken, multiType, betTypes, runners, stake, isFlexi);
         ReadContext response = wapi.placeMultiBet(accessToken, uuid, stake, isFlexi);
-
         List<Integer> betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds);
         if (null != betTypes) {
-            for (int betId : betIds){
+            for (int betId : betIds) {
                 List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
                 assertThat(placedBetTypes)
                         .as(String.format("Expected Bet Types for %s bet, betId=%d", multiType.exactName, betId))
@@ -246,9 +235,9 @@ public class BetAPISteps implements En {
         List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
         assertThat(eventIds.size()).isEqualTo(runners.size()).isEqualTo(prodIds.size());
         List<Map<WAPI.KEY, String>> selections = wapi.getMultiEventSelections(accessToken, eventIds, runners, prodIds);
-        
+
         List<String> uuids = wapi.prepareSelectionsForMultiMultiBet(accessToken, selections, prodIds, multiTypes, betTypes);
-        
+
         ReadContext response = wapi.placeMultiMultiBet(accessToken, uuids, stakes, flexis);
         List<Integer> betIds = api.readBetIds(response);
         log.info("Bet IDs=" + betIds);

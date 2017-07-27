@@ -8,6 +8,14 @@ import org.openqa.selenium.support.ui.Select;
 import java.util.Arrays;
 
 public class CustomerConfigPage extends AppPage {
+    @FindBy(css = ("table#main_table th"))
+    public WebElement pageTitle;
+
+    @FindBy(css = ("input[alt*=Update]"))
+    public WebElement updateButton;
+
+    @FindBy(css = ("input#ab_r_y"))
+    public WebElement interceptOnBetRacingYes;
 
     @FindBy(css= "select#aml_status")
     private WebElement aml_status;
@@ -18,11 +26,27 @@ public class CustomerConfigPage extends AppPage {
     @FindBy (css= "input[name=Cancel]")
     private WebElement cancel;
 
-    private String configWindow;
+    private String customerConfigWindow;
 
     public void load() {
-        configWindow = driver.getWindowHandle();
-        switchToNewWindow(Arrays.asList(configWindow));
+        customerConfigWindow = driver.getWindowHandle();
+        switchToNewWindow(Arrays.asList(customerConfigWindow));
+    }
+
+    public void verifyLoaded() {
+        HeaderPage deposit = new HeaderPage();
+        deposit.verifyPageTitle("Customer Configuration");
+        wait.until(ExpectedConditions.visibilityOf(updateButton));
+    }
+
+    public void selectInterceptOnRacingBetPlacement() {
+        interceptOnBetRacingYes.click();
+        scrollTo(updateButton);
+        updateButton.click();
+
+        driver.close();
+        driver.switchTo().window(customerConfigWindow);
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
     public void updateAmlStatus(String newamlstatus) {
@@ -30,5 +54,5 @@ public class CustomerConfigPage extends AppPage {
         (new Select(aml_status)).selectByVisibleText(newamlstatus);
         update.click();
     }
-}
 
+}
