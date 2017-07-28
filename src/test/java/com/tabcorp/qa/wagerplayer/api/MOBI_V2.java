@@ -77,10 +77,16 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     private ReadContext post(String url, Map<String, Object> fields) {
+        return post(url, fields, true);
+    }
+
+    private ReadContext post(String url, Map<String, Object> fields, boolean checkErrors) {
         fields.put("output_type", "json");
         Object response = REST.post(URL_ROOT + url, fields);
         ReadContext ctx = parseVerifyJSON(response, RESP_ROOT);
-        verifyNoErrors(ctx, fields);
+        if (checkErrors) {
+            verifyNoErrors(ctx, fields);
+        }
         return ctx;
     }
 
@@ -96,6 +102,11 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     private static void verifyNoErrors(ReadContext resp, Object req, String errPath) {
+        JSONArray errors = readAllErrors(resp, errPath);
+        assertThat(errors).as("Errors in response when sending " + req).isEmpty();
+    }
+
+    private static JSONArray readAllErrors(ReadContext resp, String errPath) {
         List<String> errPaths = new ArrayList<>();
         errPaths.add("$..errors");
         errPaths.add("$..error");
@@ -107,13 +118,28 @@ public class MOBI_V2 implements WagerPlayerAPI {
         for (String path : errPaths) {
             errors.addAll(resp.read(path));
         }
-        assertThat(errors).as("Errors in response when sending " + req).isEmpty();
+        return errors;
     }
 
-    public String login(String username, String password, String unused) {
+    private static JSONArray readAllErrorMessages(ReadContext resp, String errPath) {
+        List<String> errPaths = new ArrayList<>();
+        errPaths.add("$..error_message");
+        //default
+        if (null != errPath) {
+            errPaths.add(errPath);
+        }
+        JSONArray errors = new JSONArray();
+        for (String path : errPaths) {
+            errors.addAll(resp.read(path));
+        }
+        return errors;
+    }
+
+    public String login(String username, String password, String client_ip) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("username", username);
         fields.put("password", password);
+        fields.put("client_ip", client_ip);
         ReadContext response = post("/login", fields);
 
         JSONArray accessTokens = response.read("$..login_data..access_token");
@@ -315,10 +341,18 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
     @SuppressWarnings("unchecked")
     public String createNewCustomer(Map custData) {
-        ReadContext response = post("/customer", custData);
+        ReadContext response = post("/customer", custData, true);
         Integer custId = response.read("$.success.customer_id");
         log.info("Customer ID=" + custId);
         return response.read("$.success.message");
+    }
+
+    public List<String> createNewCustomerWithErrors(Map custData) {
+        ReadContext resp = post("/customer", custData, false);
+        Map success = resp.read("$.success");
+        assertThat(success).as("Expect success").isNull();
+        JSONArray errorMsgObjs = readAllErrorMessages(resp, "$..customer_errors..description");
+        return errorMsgObjs.stream().map(e -> e.toString()).collect(Collectors.toList());
     }
 
     public String updateCustomer(String accessToken, Map custData) {

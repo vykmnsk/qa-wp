@@ -19,7 +19,8 @@ public class Storage {
         API_ACCESS_TOKEN,
         CUSTOMER,
         BALANCE_BEFORE,
-        BET_IDS
+        BET_IDS,
+        PREV_CUSTOMER,
     }
 
     public static void init() {

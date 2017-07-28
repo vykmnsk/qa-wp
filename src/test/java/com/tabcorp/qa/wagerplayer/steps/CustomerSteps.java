@@ -98,7 +98,35 @@ public class CustomerSteps implements En {
             String successMsg = api.createNewCustomer(custData);
             assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
             Storage.put(CUSTOMER, custData);
+            Storage.put(PREV_CUSTOMER, custData);
             log.info("New Customer created: " + custData);
+        });
+
+        When("^I create a new customer via API with old customer data$", (DataTable table) -> {
+            Map<String, String> custDataInput = table.asMap(String.class, String.class);
+            Map<String, String> custData = adjustCustomerData(custDataInput);
+            Map<String, String> prevCustData = (Map<String, String>) Storage.get(KEY.PREV_CUSTOMER);
+            String prevLastName = (String) prevCustData.get("lastname");
+            custData.replace("lastname", prevLastName);
+            String successMsg = api.createNewCustomer(custData);
+            assertThat(successMsg).as("Success Message from API").isEqualTo("Customer Created");
+            Storage.put(CUSTOMER, custData);
+            log.info("New Customer created: " + custData);
+        });
+
+        When("^I attempt to create a new customer via API with (invalid|existing) data$", (String action, DataTable table) -> {
+            boolean isExisting = "existing".equals(action);
+            Map<String, String> custDataInput = table.asMap(String.class, String.class);
+            Map<String, String> custData = adjustCustomerData(custDataInput);
+            MOBI_V2 mobi = new MOBI_V2();
+            if (isExisting) {
+                Map<String, String> existCustData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
+                custData.replace("lastname", existCustData.get("lastname"));
+                custData.replace("postcode", existCustData.get("postcode"));
+                custData.replace("dob", existCustData.get("dob"));
+            }
+            List<String> errors = mobi.createNewCustomerWithErrors(custData);
+            assertThat(errors).as("Errors Messages from API").contains(custData.get("api_resp_message"));
         });
 
         When("^I create a new customer via UI with data$", (DataTable table) -> {
@@ -107,6 +135,7 @@ public class CustomerSteps implements En {
             loginGoToCustomersPage();
             newCustPage.enterCustomerDetails(custData);
             Storage.put(CUSTOMER, custData);
+            Storage.put(PREV_CUSTOMER, custData);
             log.info("New Customer created: " + custData);
         });
 
@@ -427,7 +456,8 @@ public class CustomerSteps implements En {
             return storedToken;
         }
         Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-        String clientIp = Config.isLuxbet() ? custData.get("client_ip") : null;
+//        String clientIp = Config.isLuxbet() ? custData.get("client_ip") : null;
+        String clientIp = custData.containsKey("client_ip") ? custData.get("client_ip") : null;
         String newToken = api.login(custData.get("username"), custData.get("password"), clientIp);
         Storage.put(KEY.API_ACCESS_TOKEN, newToken);
         return newToken;
@@ -439,6 +469,7 @@ public class CustomerSteps implements En {
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         StrictHashMap<String, String> cust = new StrictHashMap<>();
         cust.putAll(custFiltered);
+        cust.put("lastname", "Auto" + RandomStringUtils.randomAlphabetic(30));
         cust.put("username", "AutoUser" + RandomStringUtils.randomNumeric(9));
         String password = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
         cust.put("password", password);
@@ -463,7 +494,15 @@ public class CustomerSteps implements En {
         StrictHashMap<String, String> cust = new StrictHashMap<>();
         cust.putAll(custFiltered);
         Map<String, String> custgetData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-        cust.replace("email_address", custgetData.get("email_address"));
+        cust.put("email_address", custgetData.get("email_address"));
+        cust.put("res_street_address", custgetData.get("street"));
+        cust.put("res_city", custgetData.get("city"));
+        cust.put("street", custgetData.get("street"));
+        cust.put("city", custgetData.get("city"));
+        cust.put("country", custgetData.get("country"));
+        cust.put("telephone", custgetData.get("telephone"));
+        cust.put("currency_code", custgetData.get("currency_code"));
+        cust.put("res_postcode", custgetData.get("postcode"));
         return cust;
     }
 
