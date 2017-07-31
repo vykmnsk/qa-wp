@@ -2,4 +2,4 @@
 Feature: Event Feed
 
   Scenario: Create Race Event
-    When I login and put event sample into RabbitMQ
+    When I login in RabbitMQ and enqueue event message based on "feed-sample.json"

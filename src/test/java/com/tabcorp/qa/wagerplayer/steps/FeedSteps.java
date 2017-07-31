@@ -3,13 +3,20 @@ package com.tabcorp.qa.wagerplayer.steps;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.tabcorp.qa.common.FrameworkError;
+import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
 import cucumber.api.java8.En;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class FeedSteps implements En {
     private final static String EXCHANGE_NAME = "wift_primary";
@@ -17,7 +24,37 @@ public class FeedSteps implements En {
 
 
     public FeedSteps() {
-        When("^I login and put event sample into RabbitMQ$", () -> {
+        When("^I login in RabbitMQ and enqueue event message based on \"([^\"]+)\"$", (String templateFile) -> {
+            final String baseName = "QAFEED-";
+            String eventName = Helpers.createUniqueName(baseName);
+            String id = String.format("%s_%s",
+                    RandomStringUtils.randomNumeric(5),
+                    RandomStringUtils.randomAlphanumeric(12));
+            String payload = preparePayload(templateFile, id, eventName, 30);
+
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setVirtualHost("/");
+            factory.setHost(Config.feedMQHost());
+            factory.setPort(Config.feedMQPort());
+            factory.setUsername(Config.feedMQUsername());
+            factory.setPassword(Config.feedMQPassword());
+
+            try {
+                Connection connection = factory.newConnection();
+                Channel channel = connection.createChannel();
+                channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
+                log.info("connected to rabbitMQ!");
+                channel.basicPublish(EXCHANGE_NAME, "", null, payload.getBytes());
+                log.info("Sent '" + payload + "'");
+
+                channel.close();
+                connection.close();
+            } catch (IOException e) {
+                throw new FrameworkError(e);
+            }
+        });
+
+        When("^I login in RabbitMQ and enqueue hardcoded event message", () -> {
             String payload = String.join("\n"
                     , "{"
                     , "  \"id\": \"88578_338995test02\","
@@ -210,9 +247,25 @@ public class FeedSteps implements En {
                 channel.close();
                 connection.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FrameworkError(e);
             }
         });
+    }
+
+    private String preparePayload(String templateFile, String id, String name, int inMinutes) {
+        JSONParser parser = new JSONParser();
+        JSONObject json;
+        try {
+            json = (JSONObject) parser.parse(Helpers.readResourceFile(templateFile));
+        } catch (ParseException pe) {
+            throw new FrameworkError(pe);
+        }
+        LocalDateTime startTime = LocalDateTime.now().plusMinutes(inMinutes);
+        String startTimeStamp = startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        json.put("id", id);
+        json.put("name", name);
+        json.put("start_time", startTimeStamp);
+        return json.toJSONString();
     }
 
 }
