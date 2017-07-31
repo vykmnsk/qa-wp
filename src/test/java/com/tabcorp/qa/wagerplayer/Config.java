@@ -96,6 +96,16 @@ public class Config {
     }
 
 
+    private static final String ENV_FEEDMQ_HOST = "WAGERPLAYER_FEEDMQ_HOST";
+    private static final String ENV_FEEDMQ_PORT = "WAGERPLAYER_FEEDMQ_PORT";
+    private static final String ENV_FEEDMQ_USERNAME = "WAGERPLAYER_FEEDMQ_USERNAME";
+    private static final String ENV_FEEDMQ_PASSWORD = "WAGERPLAYER_FEEDMQ_PASSWORD";
+    public static String feedMQHost() { return readVerify(ENV_FEEDMQ_HOST); }
+    public static int feedMQPort() { return Integer.parseInt(readVerify(ENV_FEEDMQ_PORT)); }
+    public static String feedMQUsername() { return readVerify(ENV_FEEDMQ_USERNAME); }
+    public static String feedMQPassword() { return readVerify(ENV_FEEDMQ_PASSWORD); }
+
+
     private static String readVerify(String envVarName) {
         String var = System.getenv(envVarName);
         assertThat(var).withFailMessage(envVarName + " env var is not provided")
