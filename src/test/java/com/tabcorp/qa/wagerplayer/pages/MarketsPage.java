@@ -117,8 +117,8 @@ public class MarketsPage extends AppPage {
     @FindBy(css = ("input[name=refund][src='images/button_scratch.gif']"))
     public WebElement scratchButton;
 
-    @FindBy(css = ("input[name=betfair_place_back_limit]"))
-    public WebElement placeBackLimit;
+    @FindBy(css = ("input[name=MARKET_TYPE_DEFAULT_TYPE]"))
+    public WebElement position;
 
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
@@ -180,19 +180,32 @@ public class MarketsPage extends AppPage {
         assertThat(header.getText()).as("Markets Page header").isEqualTo("Markets");
     }
 
-    public void enterPrices(List<BigDecimal> prices) {
-        List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
-        Integer size0 = sizes.get(0);
-        assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
-        for (int i = 0; i < positionTxts.size(); i++) {
-            WebElement pos = positionTxts.get(i);
-            WebElement priceTxt = priceTxts.get(i);
-            BigDecimal priceVal = prices.get(i);
-            pos.sendKeys(String.valueOf(i + 1));
-            priceTxt.clear();
-            priceTxt.sendKeys(priceVal.toString());
+    public void enterPrices(boolean isEventType, List<BigDecimal> prices) {
+        if (isEventType) {
+            List<Integer> sizes = Arrays.asList(positionTxts.size(), priceTxts.size(), prices.size());
+            Integer size0 = sizes.get(0);
+            assertThat(sizes).as("position elements, price elements and prices counts are the same").allMatch(size0::equals);
+            for (int i = 0; i < positionTxts.size(); i++) {
+                WebElement pos = positionTxts.get(i);
+                pos.sendKeys(String.valueOf(i + 1));
+                enterPricesInCells(i, prices);
+            }
+        } else {
+            List<Integer> sizes = Arrays.asList(priceTxts.size(), prices.size());
+            Integer size0 = sizes.get(0);
+            assertThat(sizes).as("price elements and prices counts are the same").allMatch(size0::equals);
+            for (int i = 0; i < priceTxts.size(); i++) {
+                enterPricesInCells(i, prices);
+            }
         }
         insertBtn.click();
+    }
+
+    private void enterPricesInCells(Integer i, List<BigDecimal> prices) {
+        WebElement priceTxt = priceTxts.get(i);
+        BigDecimal priceVal = prices.get(i);
+        priceTxt.clear();
+        priceTxt.sendKeys(priceVal.toString());
     }
 
     public void updateRaceNumber(int num) {
@@ -317,8 +330,8 @@ public class MarketsPage extends AppPage {
         }
         new Select(betsAllowedWinSel).selectByVisibleText(betsAllowedWin);
         new Select(betsAllowedPlaceSel).selectByVisibleText(betsAllowedPlace);
-        wait.until(ExpectedConditions.visibilityOf(placeBackLimit));
-        scrollTo(placeBackLimit);
+        wait.until(ExpectedConditions.visibilityOf(position));
+        scrollTo(position);
         if (!ewLockedChks.isEmpty()) {
             WebElement box = ewLockedChks.get(0);
             if (box.isSelected()) {

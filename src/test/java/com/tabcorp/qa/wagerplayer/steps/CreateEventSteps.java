@@ -71,9 +71,10 @@ public class CreateEventSteps implements En {
             marketsPage.verifyLoaded();
         });
 
-        When("^I enter random prices matching (\\d+)$", (Integer count) -> {
+        When("^I enter random prices for (racing|sports) event matching (\\d+) participants$", (String action, Integer count) -> {
+            boolean isEventType = "racing".equals(action);
             List<BigDecimal> prices = Helpers.generateRandomPrices(2, 100, count);
-            marketsPage.enterPrices(prices);
+            marketsPage.enterPrices(isEventType, prices);
         });
 
         When("^I update race number to \"(\\d+)\"$", (Integer num) -> {
@@ -110,9 +111,9 @@ public class CreateEventSteps implements En {
                 marketsPage.enterMarketDetail(
                         isLive,
                         mkt.get("Bets Allowed"),
-                        mkt.get( "Bets Allowed Place"),
-                        mkt.get( "Place Fraction"),
-                        mkt.get( "No of Places"),
+                        mkt.get("Bets Allowed Place"),
+                        mkt.get("Place Fraction"),
+                        mkt.get("No of Places"),
                         isEW);
             }
         });
@@ -152,7 +153,7 @@ public class CreateEventSteps implements En {
             newEvtPage.load();
             marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
             marketsPage.verifyLoaded();
-            marketsPage.enterPrices(prices);
+            marketsPage.enterPrices(false, prices);
             marketsPage.verifySuccessStatus("Market Created");
             marketsPage.showMarketManagement();
             marketsPage.updateRaceNumber(raceNumber);
