@@ -16,7 +16,6 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -56,6 +55,12 @@ public class FeedSteps implements En {
             } catch (Exception e) {
                 throw new FrameworkError(e);
             }
+        });
+
+        Then("^Event details can be retrieved via WP API$", () -> {
+            String sessionId = wapi.login();
+            ReadContext resp = wapi.getEvents(sessionId, 1);
+            log.info(resp.toString());
         });
 
     }

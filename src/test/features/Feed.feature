@@ -2,4 +2,5 @@
 Feature: Event Feed
 
   Scenario: Create Race Event
-    When I login in RabbitMQ and enqueue event message based on "pa-feed-sample.json"
+#    When I login in RabbitMQ and enqueue event message based on "pa-feed-sample.json"
+    Then Event details can be retrieved via WP API

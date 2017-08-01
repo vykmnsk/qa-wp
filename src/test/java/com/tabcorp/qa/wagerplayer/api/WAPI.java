@@ -388,6 +388,14 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
+    public ReadContext getEvents(String sessionId, int latestHours) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "site_get_events");
+        fields.put("latest", latestHours);
+        return post(fields);
+    }
+
+
     public String readAmlStatus(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_verify_aml");
