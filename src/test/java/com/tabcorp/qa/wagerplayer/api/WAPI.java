@@ -30,6 +30,7 @@ public class WAPI implements WagerPlayerAPI {
     private static final String URL = Config.wapiURL();
     private static final String RESP_ROOT = "$.RSP";
 
+
     public enum MultiType {
         Double("Double"),
         Treble("Treble"),
@@ -388,13 +389,17 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public ReadContext getEvents(String sessionId, int latestHours) {
+    public List<String> getExistingEventNames(String sessionId, int catId, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
+        fields.put("cid", catId);
         fields.put("latest", latestHours);
-        return post(fields);
+        ReadContext resp = post(fields);
+        log.info(resp.jsonString());
+        JSONArray events = resp.read(RESP_ROOT + ".events.*");
+        assertThat(events).withFailMessage("No Events found").isNotEmpty();
+        return resp.read(RESP_ROOT + ".events.event[*].name.-content");
     }
-
 
     public String readAmlStatus(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);

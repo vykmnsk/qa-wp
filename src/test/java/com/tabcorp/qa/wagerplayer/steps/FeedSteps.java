@@ -10,6 +10,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,19 +19,28 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeedSteps implements En {
-    private final static String EXCHANGE_NAME = "wift_primary";
-    private final static String EXCHANGE_TYPE = "fanout";
+    private final static String EXCHANGE_NAME = "wift_all";
+    private final static String EXCHANGE_TYPE = "direct";
+    private final static String ALTERNATE_EXCHANGE_NAME = "wift_primary";
     public static Logger log = LoggerFactory.getLogger(FeedSteps.class);
     private WAPI wapi = new WAPI();
-    private String eventId;
+    private String eventName;
+    private final int HOURSE_RACING_ID = 71;
+    private final int GREYHOUND_RACING_ID = 405;
+
 
     public FeedSteps() {
-        When("^I login in RabbitMQ and enqueue event message based on \"([^\"]+)\"$", (String templateFile) -> {
-            final String baseName = "QAFEED-";
-            String eventName = Helpers.createUniqueName(baseName);
-            eventId = String.format("%s_%s",
+        When("^I login in RabbitMQ and enqueue Racing Event message based on \"([^\"]+)\"$", (String templateFile) -> {
+            final String baseName = "QAFEED";
+            eventName = Helpers.createUniqueNameForFeed(baseName);
+            String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
             String payload = preparePayload(templateFile, eventId, eventName, 30);
@@ -45,7 +55,10 @@ public class FeedSteps implements En {
             try {
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
-                channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true);
+
+                Map<String, Object> args = new HashMap<String, Object>();
+                args.put("alternate-exchange", ALTERNATE_EXCHANGE_NAME);
+                channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true, false, args);
                 log.info("connected to rabbitMQ!");
                 channel.basicPublish(EXCHANGE_NAME, "", null, payload.getBytes());
                 log.info("Sent '" + payload + "'");
@@ -57,10 +70,11 @@ public class FeedSteps implements En {
             }
         });
 
-        Then("^Event details can be retrieved via WP API$", () -> {
+        Then("^WagerPlayer will receive the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
+            int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
             String sessionId = wapi.login();
-            ReadContext resp = wapi.getEvents(sessionId, 1);
-            log.info(resp.toString());
+            List<String> eventNames = wapi.getExistingEventNames(sessionId, catId, 24);
+            assertThat(eventNames).anySatisfy(i -> assertThat(i).endsWith(eventName));
         });
 
     }
