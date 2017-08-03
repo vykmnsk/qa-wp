@@ -320,6 +320,15 @@ public class CustomerSteps implements En {
                     actionOnIntercept(interceptText, newInterceptOptions, partialAmount);
                 });
 
+        Then("^the default loss limit has to be (\\d+.\\d+)$",(BigDecimal expectedLossLimit) -> {
+            Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
+            String clientIp = custData.getOrDefault("client_ip", null);
+            String accessToken = api.login(custData.get("username"), custData.get("password"), clientIp);
+            BigDecimal actualLossLimit = new MOBI_V2().getCustomerLossLimit(accessToken);
+
+            assertThat(Helpers.roundOff(actualLossLimit)).as("Actual Casino Loss Limit").isEqualTo(Helpers.roundOff(expectedLossLimit));
+        });
+
     }
 
     private void placeInterceptSingleBet(String runner, BigDecimal stake, WAPI.InterceptOption interceptOption, String partialAmount) {
@@ -456,8 +465,7 @@ public class CustomerSteps implements En {
             return storedToken;
         }
         Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-//        String clientIp = Config.isLuxbet() ? custData.get("client_ip") : null;
-        String clientIp = custData.containsKey("client_ip") ? custData.get("client_ip") : null;
+        String clientIp = custData.getOrDefault("client_ip", null);
         String newToken = api.login(custData.get("username"), custData.get("password"), clientIp);
         Storage.put(KEY.API_ACCESS_TOKEN, newToken);
         return newToken;

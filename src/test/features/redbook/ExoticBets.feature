@@ -7,7 +7,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
 
   Scenario Outline: Horse Race Exotic bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "<ProductName>" product settings
@@ -34,7 +34,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
   @exotic-sp-boxed
   Scenario Outline: <Category> Exotic <ProductName> Bet with boxed type field set to <Boxed>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "<ProductName>" product settings

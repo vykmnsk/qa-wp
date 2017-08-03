@@ -7,7 +7,7 @@ Feature: Deadheats testing on a Luxbet event
 
   Scenario Outline: Deadheat at <type>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | <WinPrices>                                                                                                                    |
     And I enable "Luxbook DVP Fixed" product settings

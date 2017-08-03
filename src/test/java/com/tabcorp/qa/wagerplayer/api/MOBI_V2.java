@@ -430,4 +430,14 @@ public class MOBI_V2 implements WagerPlayerAPI {
         Assertions.assertThat(resultCode).as("Found result code in response is " + resultCode).isEqualToIgnoringCase("Authorised");
     }
 
+    public BigDecimal getCustomerLossLimit(String accessToken) {
+        Map<String,Object> queryParams = new HashMap<>();
+        queryParams.put("access_token",accessToken);
+        ReadContext resp = get("/customer/get_casino_loss_limit",queryParams);
+
+        JSONArray lossLimit = resp.read("$..casino_loss_limit_data.casino_loss_limit_amount");
+        Assertions.assertThat(lossLimit).hasSize(1);
+        return new BigDecimal(Double.parseDouble(lossLimit.get(0).toString()));
+    }
+
 }

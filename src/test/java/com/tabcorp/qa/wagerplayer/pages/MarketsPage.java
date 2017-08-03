@@ -215,7 +215,7 @@ public class MarketsPage extends AppPage {
     }
 
     public void setHardSoftInterimLimits() {
-        for (int i = 0; i < positionTxts.size(); i++) {
+        for (int i = 0; i < priceTxts.size(); i++) {
             WebElement hardLimitTxt = hardLimitTxts.get(i);
             WebElement softLimitTxt = softLimitTxts.get(i);
             WebElement interimLimitTxt = interimLimitTxts.get(i);

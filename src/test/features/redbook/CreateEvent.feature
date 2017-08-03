@@ -15,7 +15,7 @@ Feature: Create Sunbets Events in WagerPlayer UI
     Then I see Create Market page
     And I can see success status with message "Event Created"
 
-    When I enter random prices matching <NumOfRunners>
+    When I enter random prices for racing event matching <NumOfRunners> participants
     Then I can see success status with message "Market Created"
 
     When I update race number to "<RaceNumber>"

@@ -7,7 +7,7 @@ Feature: Single Bets
 
   Scenario Outline: Single Win Bet: <Category> | <Product> | Punter <Outcome>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
       | prices  | 1.10, 2.20, 3.30, 4.40, 5.50                     |
     And I enable "<Product>" product settings
@@ -34,7 +34,7 @@ Feature: Single Bets
 
   Scenario Outline: Single <BetType> Bet: <Category> | <Product> | Punter <Outcome>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
       | prices  | 1.10, 2.20, 3.30, 4.40, 5.50                     |
     And I enable "<Product>" product settings

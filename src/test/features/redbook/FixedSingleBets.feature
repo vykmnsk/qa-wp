@@ -9,7 +9,7 @@ Feature: Placing and Settling several Single bets on the same event
   @smoke
   Scenario: Horse Race several Single bets
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05 |
       | prices  | 1.10, 2.20, 2.80, 3.40, 5.20                     |
     And I enable "Luxbook DVP Fixed" product settings

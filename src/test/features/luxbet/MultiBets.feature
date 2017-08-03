@@ -7,7 +7,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Racing Double bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -26,7 +26,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -73,7 +73,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Racing Treble bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -92,7 +92,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -111,7 +111,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -154,7 +154,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Racing 3-Event <MultiType> bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -173,7 +173,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -192,7 +192,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -233,7 +233,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Racing 4-Event <MultiType> bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.80, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -252,7 +252,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 1.50, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
@@ -271,7 +271,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 1.28, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -290,7 +290,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
       | prices  | 1.78, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
@@ -338,7 +338,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Racing 5-Event <MultiType> bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.80, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -357,7 +357,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 1.50, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
@@ -376,7 +376,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 1.28, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -395,7 +395,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
       | prices  | 1.78, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
@@ -414,7 +414,7 @@ Feature: Placing and Settling multi Bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner41, Runner42, Runner43, Runner44, Runner45, Runner46, Runner47, Runner48 |
       | prices  | 2.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
