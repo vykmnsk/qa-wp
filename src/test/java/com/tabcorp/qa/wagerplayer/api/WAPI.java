@@ -395,7 +395,7 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("cid", catId);
         fields.put("latest", latestHours);
         ReadContext resp = post(fields);
-        log.info(resp.jsonString());
+        log.debug(resp.jsonString());
         JSONArray events = resp.read(RESP_ROOT + ".events.*");
         assertThat(events).withFailMessage("No Events found").isNotEmpty();
         return resp.read(RESP_ROOT + ".events.event[*].name.-content");

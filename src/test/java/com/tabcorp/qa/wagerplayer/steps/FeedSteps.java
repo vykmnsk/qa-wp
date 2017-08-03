@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
-import com.jayway.jsonpath.ReadContext;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -10,7 +9,6 @@ import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -34,6 +32,7 @@ public class FeedSteps implements En {
     private String eventName;
     private final int HOURSE_RACING_ID = 71;
     private final int GREYHOUND_RACING_ID = 405;
+    private final int FEED_TRAVEL_SECONDS = 2;
 
 
     public FeedSteps() {
@@ -71,10 +70,14 @@ public class FeedSteps implements En {
         });
 
         Then("^WagerPlayer will receive the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
+            assertThat(eventName).as("Event created in previous step has name").isNotEmpty();
+            Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
             String sessionId = wapi.login();
-            List<String> eventNames = wapi.getExistingEventNames(sessionId, catId, 24);
-            assertThat(eventNames).anySatisfy(i -> assertThat(i).endsWith(eventName));
+            Helpers.retryOnFailure(() -> {
+                List<String> foundEventNames = wapi.getExistingEventNames(sessionId, catId, 24);
+                assertThat(foundEventNames).as("Looking for Event with name=" + eventName).anySatisfy(n -> assertThat(n).endsWith(eventName));
+            }, 5, 3);
         });
 
     }
