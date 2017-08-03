@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -130,36 +131,12 @@ public class CreateEventSteps implements En {
             marketsPage.verifyMarketStatus(expectedStatus);
         });
 
-        When("^I create a default event with details$", (DataTable table) -> {
-            Map<String, String> evt = table.asMap(String.class, String.class);
-            int inMinutes = 30;
-            String betInRunType = "Both Allowed";
-            String createMarket = "Racing Live";
+        When("^I create a default Racing event with details$", (DataTable table) -> {
+            prepareAndCreateEvent(table, true);
+        });
 
-            String evtBaseName = evt.get("base name");
-            if (null == evtBaseName) {
-                evtBaseName = Config.testEventBaseName();
-            }
-            String eventName = Helpers.createUniqueName(evtBaseName);
-
-            String runnersText = (String) Helpers.nonNullGet(evt, "runners");
-            List<String> runners = Helpers.extractCSV(runnersText);
-
-            String pricesText = (String) Helpers.nonNullGet(evt, "prices");
-            List<String> pricesTokens = Helpers.extractCSV(pricesText);
-            List<BigDecimal> prices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
-
-            newEvtPage = new NewEventPage();
-            newEvtPage.load();
-            marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
-            marketsPage.verifyLoaded();
-            marketsPage.enterPrices(false, prices);
-            marketsPage.verifySuccessStatus("Market Created");
-            marketsPage.showMarketManagement();
-            marketsPage.updateRaceNumber(raceNumber);
-            if (Config.isLuxbet()) {
-                marketsPage.setHardSoftInterimLimits();
-            }
+        When("^I create a default Sports event with details$", (DataTable table) -> {
+            prepareAndCreateEvent(table, false);
         });
 
         And("^I update Exotic Prices$", (DataTable table) -> {
@@ -282,6 +259,46 @@ public class CreateEventSteps implements En {
         String subcat = (String) Storage.getLast(Storage.KEY.SUBCATEGORIES);
         String evName = (String) Storage.getLast(Storage.KEY.EVENT_NAMES);
         header.pickEvent(cat, subcat, evName);
+    }
+
+    private void prepareAndCreateEvent(DataTable table, boolean isRacing) {
+        Map<String, String> evt = table.asMap(String.class, String.class);
+        String evtBaseName = evt.get("base name");
+        if (null == evtBaseName) evtBaseName = Config.testEventBaseName();
+        String eventName = Helpers.createUniqueName(evtBaseName);
+        String pricesText = (String) Helpers.nonNullGet(evt, "prices");
+        List<String> pricesTokens = Helpers.extractCSV(pricesText);
+        List<BigDecimal> prices = pricesTokens.stream().map(BigDecimal::new).collect(Collectors.toList());
+        if (isRacing) {
+            String runnersText = (String) Helpers.nonNullGet(evt, "runners");
+            List<String> runners = Helpers.extractCSV(runnersText);
+            String betInRunType = "Both Allowed";
+            String createMarket = "Racing Live";
+            createEvent(eventName, betInRunType, createMarket, runners, prices, isRacing);
+        } else {
+            String playersText = (String) Helpers.nonNullGet(evt, "players");
+            List<String> players = Helpers.extractCSV(playersText);
+            String betInRunType = "None";
+            String createMarket = (String) Helpers.nonNullGet(evt, "market");
+            createEvent(eventName, betInRunType, createMarket, players, prices, isRacing);
+        }
+    }
+
+    private void createEvent(String eventName, String betInRunType, String createMarket, List<String> runners, List<BigDecimal> prices, boolean isEventType) {
+        int inMinutes = 30;
+        newEvtPage = new NewEventPage();
+        newEvtPage.load();
+        marketsPage = newEvtPage.enterEventDetails(inMinutes, eventName, betInRunType, createMarket, runners);
+        marketsPage.verifyLoaded();
+        marketsPage.enterPrices(isEventType, prices);
+        marketsPage.verifySuccessStatus("Market Created");
+        marketsPage.showMarketManagement();
+        if (createMarket.equals("Racing Live")) {
+            marketsPage.updateRaceNumber(raceNumber);
+        }
+        if (Config.isLuxbet()) {
+            marketsPage.setHardSoftInterimLimits();
+        }
     }
 
     private Map<String, String> extractWinnersAddPositions(String winnersCSV) {

@@ -7,7 +7,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Multi bet with 2 events <Category>  <Multitype>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -26,7 +26,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -57,7 +57,7 @@ Feature: Placing and Settling multi Bets
 
   Scenario Outline: Multi bet with 3 events <Category>  <Multitype>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -76,7 +76,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -95,7 +95,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 5.20, 2.20, 8.20, 10.40, 12.00, 2.60, 4.40, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -139,7 +139,7 @@ Feature: Placing and Settling multi Bets
   Scenario Outline: Multi bet with 4 events <Category>  <Multitype>
 
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -158,7 +158,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -177,7 +177,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 5.20, 2.20, 8.20, 10.40, 12.00, 2.60, 4.40, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -196,7 +196,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
       | prices  | 2.20, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -236,7 +236,7 @@ Feature: Placing and Settling multi Bets
   Scenario Outline: Multi bet with 5 events <Category>  <Multitype>
 
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -255,7 +255,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 2.30, 4.30, 1.50, 3.46, 3.30, 2.90, 4.40, 5.85                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -274,7 +274,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 5.20, 2.20, 8.20, 10.40, 12.00, 2.60, 4.40, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -293,7 +293,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner31, Runner32, Runner33, Runner34, Runner35, Runner36, Runner37, Runner38 |
       | prices  | 2.20, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -312,7 +312,7 @@ Feature: Placing and Settling multi Bets
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner41, Runner42, Runner43, Runner44, Runner45, Runner46, Runner47, Runner48 |
       | prices  | 2.00, 4.20, 8.00, 2.40, 6.30, 10.60, 12.00, 2.80                               |
     And I enable "Luxbook DVP Fixed" product settings

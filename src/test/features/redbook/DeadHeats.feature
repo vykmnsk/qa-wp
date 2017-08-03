@@ -7,7 +7,7 @@ Feature: Dead Heats with several single bets
 
   Scenario Outline: Deadheat: <Category> | <Type>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
       | prices  | 4.2, 3.20, 4.40, 5.20, 3.60, 6.10, 7.20, 8.10, 4.78, 8.20                                        |
 

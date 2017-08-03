@@ -7,7 +7,7 @@ Feature: Placing and Settling several Single bets on the same event
 
   Scenario Outline: Racing multiple Single bets
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                           |
     And I enable "Luxbook DVP Fixed" product settings
@@ -47,3 +47,25 @@ Feature: Placing and Settling several Single bets on the same event
       | Category         | Subcategory                 |
       | Greyhound Racing | Automation Greyhound Racing |
       | Harness Racing   | Automation Harness Racing   |
+
+  Scenario Outline: Sports Single bets
+    When I enter specifics category "<Category>" and subcategory "<Subcategory>"
+    And I create a default Sports event with details
+      | players | <list>       |
+      | prices  | 1.50, 1.40   |
+      | market  | Head to Head |
+    And I enable "Fixed" product settings
+      | Betting | Enable Single | Win |
+      | Betting | Enable Multi  | Win |
+    And I enter market details
+      | Market Status      | Live     |
+      | Bets Allowed       | WIN Yes  |
+      | Bets Allowed Place | PLACE No |
+      | Place Fraction     | -        |
+      | No of Places       | -        |
+      | E/W                | no       |
+
+  @smoke
+    Examples:
+      | Category | Subcategory                | list                 |
+      | Tennis   | ATP- Binghamton Challenger | PLAYER_01, PLAYER_02 |

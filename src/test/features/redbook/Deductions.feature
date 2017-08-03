@@ -7,7 +7,7 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
 
   Scenario Outline: Deductions for Racing 1 scratched runner
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
       | prices  | 1.12, 1.40, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                 |
     And I enable "Luxbook DVP Fixed" product settings
@@ -65,7 +65,7 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
 
   Scenario Outline: <Category> Maximum deductions is 90 Pence
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08, Runner09, Runner10 |
       | prices  | 2.00, 1.40, 14.00, 1.80, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                  |
     And I enable "Luxbook DVP Fixed" product settings

@@ -32,7 +32,7 @@ Feature: Bonus Bets
     Then customer bonus bet balance is equal to $100.00
 
     When I enter specifics category "Horse Racing" and subcategory "WOLVERHAMPTON"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 1.12, 1.40, 14.00, 13.00, 10.00, 26.00, 35.00, 15.00, 61.00, 23.00                                                             |
     And I enable "Luxbook DVP Fixed" product settings

@@ -12,7 +12,7 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
     And I edit the category options settings
       | Number of Places on Bet | Y |
       | Recalculate Place Price | N |
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "<ProductName>" product settings
@@ -63,7 +63,7 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
     And I edit the category options settings
       | Number of Places on Bet | Y |
       | Recalculate Place Price | N |
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "<ProductName>" product settings
@@ -110,7 +110,7 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
     And I edit the category options settings
       | Number of Places on Bet | Y |
       | Recalculate Place Price | N |
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 1.10, 2.20, 1.20, 2.40, 1.30, 2.60, 1.40, 2.80                                 |
     And I enable "<ProductName>" product settings

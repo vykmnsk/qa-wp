@@ -8,7 +8,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
 
   Scenario Outline: <interceptAction> Single bet on Intercept
     When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                           |
     And I enable "Luxbook DVP Fixed" product settings
@@ -45,7 +45,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
 
   Scenario: ACCEPT PARTIAL Single bet on Intercept
     When I enter specifics category "Horse Racing" and subcategory "Automation Horse Racing"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | ROCKING HORSE, COLORADO MISS, CADEYRN, PROSPECT ROAD, WHITE LADY, SUPERBEE, FIGHT FOR GLORY, BONUS SPIN, TORCHBEARER, TRUST ME |
       | prices  | 15.00, 1.40, 14.00, 13.00, 10.00, 26.00, 735.00, 15.00, 61.00, 23.00                                                           |
     And I enable "Luxbook DVP Fixed" product settings
@@ -73,7 +73,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
 
   Scenario: ACCEPT Multi bet on Intercept
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -92,7 +92,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -111,7 +111,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -140,7 +140,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
 
   Scenario: REJECT Multi bet on Intercept
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -159,7 +159,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -178,7 +178,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -207,7 +207,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
 
   Scenario: ACCEPT PARTIAL Multi bet on Intercept
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -226,7 +226,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -245,7 +245,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -274,7 +274,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
 
   Scenario: ACCEPT ALL Multi PATENT bets on Intercept
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -293,7 +293,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -312,7 +312,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -342,7 +342,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
   # JIRA bug exists : WAGDOMCI-2675
   Scenario: ACCEPT REJECT PARTIAL Multi PATENT bets on Intercept
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
       | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
@@ -361,7 +361,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.35, 2.65, 4.80, 1.50, 6.70, 2.15, 9.10, 8.60"
     When I enter specifics category "Horse Racing" and subcategory "SEYMOUR"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
@@ -380,7 +380,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
     When I enter specifics category "Horse Racing" and subcategory "PAKENHAM"
-    And I create a default event with details
+    And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
       | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
     And I enable "Luxbook DVP Fixed" product settings
