@@ -1,6 +1,5 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
-import com.jayway.jsonpath.ReadContext;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -16,22 +15,31 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeedSteps implements En {
-    private final static String EXCHANGE_NAME = "wift_primary";
-    private final static String EXCHANGE_TYPE = "fanout";
+    private final static String EXCHANGE_NAME = "wift_all";
+    private final static String EXCHANGE_TYPE = "direct";
+    private final static String ALTERNATE_EXCHANGE_NAME = "wift_primary";
     public static Logger log = LoggerFactory.getLogger(FeedSteps.class);
     private WAPI wapi = new WAPI();
-    private String eventId;
+    private String eventName;
+    private final int HOURSE_RACING_ID = 71;
+    private final int GREYHOUND_RACING_ID = 405;
+    private final int FEED_TRAVEL_SECONDS = 2;
+
 
     public FeedSteps() {
-        When("^I login in RabbitMQ and enqueue event message based on \"([^\"]+)\"$", (String templateFile) -> {
-            final String baseName = "QAFEED-";
-            String eventName = Helpers.createUniqueName(baseName);
-            eventId = String.format("%s_%s",
+        When("^I login in RabbitMQ and enqueue Racing Event message based on \"([^\"]+)\"$", (String templateFile) -> {
+            final String baseName = "QAFEED";
+            eventName = Helpers.createUniqueNameForFeed(baseName);
+            String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
             String payload = preparePayload(templateFile, eventId, eventName, 30);
@@ -46,7 +54,10 @@ public class FeedSteps implements En {
             try {
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
-                channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true);
+
+                Map<String, Object> args = new HashMap<String, Object>();
+                args.put("alternate-exchange", ALTERNATE_EXCHANGE_NAME);
+                channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true, false, args);
                 log.info("connected to rabbitMQ!");
                 channel.basicPublish(EXCHANGE_NAME, "", null, payload.getBytes());
                 log.info("Sent '" + payload + "'");
@@ -56,6 +67,17 @@ public class FeedSteps implements En {
             } catch (Exception e) {
                 throw new FrameworkError(e);
             }
+        });
+
+        Then("^WagerPlayer will receive the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
+            assertThat(eventName).as("Event created in previous step has name").isNotEmpty();
+            Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
+            int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
+            String sessionId = wapi.login();
+            Helpers.retryOnFailure(() -> {
+                List<String> foundEventNames = wapi.getExistingEventNames(sessionId, catId, 24);
+                assertThat(foundEventNames).as("Looking for Event with name=" + eventName).anySatisfy(n -> assertThat(n).endsWith(eventName));
+            }, 5, 3);
         });
 
     }

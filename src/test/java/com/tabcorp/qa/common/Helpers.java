@@ -102,6 +102,12 @@ public class Helpers {
         return String.format("%s%s~%d", baseName, timestamp("yy:MM:dd:HH:mm:ss"), uniqPart);
     }
 
+    public static String createUniqueNameForFeed(String baseName) {
+        int uniqPart = randomBetweenInclusive(0, 999);
+        return String.format("%s%s%d", baseName, timestamp("yyMMddHHmmss"), uniqPart);
+    }
+
+
     public static List<String> extractCSV(String csv) {
         char separator = ',';
         return extractCSV(csv, separator);
