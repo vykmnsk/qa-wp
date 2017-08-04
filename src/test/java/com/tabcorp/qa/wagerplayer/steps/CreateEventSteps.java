@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_IDS;
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_NAMES;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateEventSteps implements En {
@@ -152,7 +154,15 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed win prices \"([^\"]*)\"$", (String winPricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
-            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Win.id, winPrices);
+        });
+
+        And("^I update SP win prices \"([^\"]*)\"$", (String winPricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
             reloadLastEvent();
             LiabilityPage lp = header.navigateToF5();
             lp.updatePrices(prodId, BetType.Win.id, winPrices);
@@ -160,7 +170,7 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
             Helpers.retryOnFailure(() -> {
                 reloadLastEvent();
                 LiabilityPage lp = header.navigateToF5();
@@ -170,7 +180,7 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getFirst(PRODUCT_IDS);
             reloadLastEvent();
             LiabilityPage lp = header.navigateToF5();
             lp.updatePrices(prodId, BetType.Place.id, placePrices);
@@ -179,7 +189,20 @@ public class CreateEventSteps implements En {
         And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Win.id, winPrices);
+            lp.updatePrices(prodId, BetType.Place.id, placePrices);
+        });
+
+        And("^I update \"([^\"]*)\" win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String productName, String winPricesCSV, String placePricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            List<String> prodNames = (List<String>) Storage.get(PRODUCT_NAMES);
+            List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+            Map<String, Integer> prodNamesIDsMap = Helpers.zipToMap(prodNames, prodIds);
+            Integer prodId = prodNamesIDsMap.get(productName);
             reloadLastEvent();
             LiabilityPage lp = header.navigateToF5();
             lp.updatePrices(prodId, BetType.Win.id, winPrices);
@@ -322,7 +345,7 @@ public class CreateEventSteps implements En {
     }
 
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {
-        Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+        Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
         List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCVS);
         Assertions.assertThat(prices).as(betType + " prices cucumber input").isNotEmpty();
         settlementPage.updateSettlePrices(prodId, betType.id, prices);

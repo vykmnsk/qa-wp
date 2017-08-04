@@ -44,6 +44,17 @@ public class BetAPISteps implements En {
                     balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
                 });
 
+        When("^I place a single \"([a-zA-Z]+)\" bet for \"([^\"]*)\" product on runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String productName, String runner, BigDecimal stake) -> {
+                    String evId = (String) Storage.getLast(EVENT_IDS);
+                    List<String> prodNames = (List<String>) Storage.get(PRODUCT_NAMES);
+                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+                    Map<String, Integer> prodNamesIDsMap = Helpers.zipToMap(prodNames, prodIds);
+                    Integer prodId = prodNamesIDsMap.get(productName);
+                    Integer bonusBetFlag = 0;
+                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
+                });
+
         When("^I place a bonus single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d) with bonus wallet as \"([Y|N])\"$",
                 (String betTypeName, String runner, BigDecimal stake, String bonusWalletOption) -> {
                     boolean useBonusWallet = "Y".equalsIgnoreCase(bonusWalletOption);
@@ -60,7 +71,6 @@ public class BetAPISteps implements En {
                     Integer bonusBetFlag = 0;
                     balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
                 });
-
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runnersCSV, BigDecimal stake) -> {
