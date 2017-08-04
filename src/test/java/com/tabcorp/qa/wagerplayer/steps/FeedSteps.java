@@ -36,7 +36,8 @@ public class FeedSteps implements En {
 
 
     public FeedSteps() {
-        When("^I login in RabbitMQ and enqueue Racing Event message based on \"([^\"]+)\"$", (String templateFile) -> {
+        When("^I login in \"(PA|WIFT)\" RabbitMQ and enqueue Racing Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
+            final boolean isPA = "PA".equals(feedType);
             final String baseName = "QAFEED";
             eventName = Helpers.createUniqueNameForFeed(baseName);
             String eventId = String.format("%s_%s",
@@ -46,10 +47,18 @@ public class FeedSteps implements En {
 
             ConnectionFactory factory = new ConnectionFactory();
             factory.setVirtualHost("/");
-            factory.setHost(Config.feedMQHost());
-            factory.setPort(Config.feedMQPort());
-            factory.setUsername(Config.feedMQUsername());
-            factory.setPassword(Config.feedMQPassword());
+
+            if (isPA) {
+                factory.setHost(Config.feedMQPAHost());
+                factory.setPort(Config.feedMQPAPort());
+                factory.setUsername(Config.feedMQPAUsername());
+                factory.setPassword(Config.feedMQPAPassword());
+            } else {
+                factory.setHost(Config.feedMQWiftHost());
+                factory.setPort(Config.feedMQWiftPort());
+                factory.setUsername(Config.feedMQWiftUsername());
+                factory.setPassword(Config.feedMQWiftPassword());
+            }
 
             try {
                 Connection connection = factory.newConnection();

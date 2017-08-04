@@ -1,0 +1,42 @@
+{
+  "id": "88578_738995test15",
+  "local_date": "20170805",
+  "start_time": "2017-08-05T16:50:00.000+0000",
+  "race_status": "NotRun",
+  "event_status": "Normal",
+  "category": "Thoroughbred",
+  "sub_category": "BENDIGO",
+  "race_num": 1,
+  "name": "Thang test race 4",
+  "distance": 1609,
+  "prize_money": "GBP 7870",
+  "handicap": true,
+  "participants": [
+    {
+      "id": "4189446",
+      "name": "Mighty Lady",
+      "number": 1,
+      "barrier": 11,
+      "rider": "Josephine Gordon",
+      "trainer": "R Brisland",
+      "status": "Normal",
+      "last_five_starts": "15232-6",
+      "emergency": false,
+      "silks_image_file_name": "20170705kmp211001.png",
+      "weight": "136 pounds"
+    },
+    {
+      "id": "4236231",
+      "name": "Capton",
+      "number": 2,
+      "barrier": 3,
+      "rider": "Non Runner",
+      "trainer": "H Candy",
+      "status": "Scratched",
+      "last_five_starts": "253-20",
+      "emergency": false,
+      "silks_image_file_name": "20170705kmp211002.png",
+      "weight": "135 pounds"
+    }
+  ]
+}
