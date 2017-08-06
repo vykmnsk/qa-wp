@@ -211,11 +211,25 @@ public class WAPI implements WagerPlayerAPI {
         return fields;
     }
 
-    public ReadContext placeSingleWinBet(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag) {
+    public ReadContext placeSingleWinBetForRacing(String sessionId, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "bet_place_bet");
         fields.put("bet_type", BetType.Win.id);
         fields.put("product_id", productId);
+        fields.put("mpid", mpid);
+        fields.put("win_price", winPrice);
+        fields.put("amount", stake);
+        if (bonusBetFlag > 0) {
+            fields.putAll(bonusBetFields(sessionId, bonusBetFlag, mpid, BetType.Win));
+        }
+        return post(fields);
+    }
+
+    public ReadContext placeSingleWinBetForSports(String sessionId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "bet_place_bet");
+        fields.put("bet_type", BetType.Win.id);
+        fields.put("price_type", 1);
         fields.put("mpid", mpid);
         fields.put("win_price", winPrice);
         fields.put("amount", stake);
@@ -417,29 +431,14 @@ public class WAPI implements WagerPlayerAPI {
         List<Map<WAPI.KEY, String>> selections = new ArrayList<>();
         for (int i = 0; i < eventIds.size(); i++) {
             ReadContext resp = getEventMarkets(sessionId, eventIds.get(i));
-            Map<WAPI.KEY, String> sel = readSelection(resp, runners.get(i), prodIds.get(i));
+            Map<WAPI.KEY, String> sel = readSelectionForRacing(resp, runners.get(i), prodIds.get(i), true);
             selections.add(sel);
         }
         return selections;
     }
 
-    public Map<KEY, String> readSelection(ReadContext resp, String selName, Integer prodId) {
-        return readSelection(resp, selName, prodId, true);
-    }
-
-    public Map<KEY, String> readSelection(ReadContext resp, String selName, Integer prodId, boolean withPrices) {
-        String mktPath = RESP_ROOT + ".markets.market[0]";
-        String selPath = mktPath + ".selections.selection" + jfilter("name", selName);
-        String pricePath = selPath + ".prices.price";
-        String prodPricePath = pricePath + jfilter("product_id", prodId.toString());
-        Map market = resp.read(mktPath);
-        JSONArray selections = resp.read(selPath);
-        JSONArray prices = resp.read(pricePath);
-        JSONArray productPrices = resp.read(prodPricePath);
-        assertThat(market).as("No markets found at path=" + mktPath).isNotEmpty();
-        assertThat(selections).as("No selections for market=" + market).isNotEmpty();
-        assertThat(prices).as("No prices in selection=" + selections).isNotEmpty();
-        assertThat(productPrices).as(String.format("No price for product=%s: other prices: %s", prodId, prices)).isNotEmpty();
+    public Map<KEY, String> readSelectionForRacing(ReadContext resp, String selName, Integer prodId, boolean withPrices) {
+        String prodPricePath = assertSelectionsForEvents(resp, selName, jfilter("product_id", prodId.toString()));
 
         HashMap<KEY, String> sel = new HashMap<>();
         sel.put(KEY.MPID, readPriceAttr(resp, prodPricePath, BetType.Win.name(), "mpid"));
@@ -451,6 +450,34 @@ public class WAPI implements WagerPlayerAPI {
             sel.put(KEY.PLACE_PRICE, "1.00");
         }
         return sel;
+    }
+
+    public Map<KEY, String> readSelectionForSports(ReadContext resp, String selName) {
+        String priceTypePath = assertSelectionsForEvents(resp, selName, jfilter("price_type", "1"));
+
+        HashMap<KEY, String> sel = new HashMap<>();
+        JSONArray mpid = resp.read("$.RSP.markets.market[0].selections.selection" + jfilter("name", selName) + "mpid");
+        sel.put(KEY.MPID, mpid.get(0).toString());
+        sel.put(KEY.WIN_PRICE, readPriceAttr(resp, priceTypePath, BetType.Win.name(), "precise_price"));
+        return sel;
+    }
+
+    private String assertSelectionsForEvents(ReadContext resp, String selName, String subPath) {
+        String mktPath = RESP_ROOT + ".markets.market[0]";
+        String selPath = mktPath + ".selections.selection" + jfilter("name", selName);
+        String pricePath = selPath + ".prices.price";
+
+        Map market = resp.read(mktPath);
+        JSONArray selections = resp.read(selPath);
+        JSONArray prices = resp.read(pricePath);
+        assertThat(market).as("No markets found at path=" + mktPath).isNotEmpty();
+        assertThat(selections).as("No selections for market=" + market).isNotEmpty();
+        assertThat(prices).as("No prices in selection=" + selections).isNotEmpty();
+
+        String thisPath = pricePath + subPath;
+        JSONArray thisPrice = resp.read(thisPath);
+        assertThat(thisPrice).as(String.format("No prices found at: %s", thisPath)).isNotEmpty();
+        return thisPath;
     }
 
     public List<String> readSelectionIds(ReadContext resp, String marketId, List<String> selectionNames) {
@@ -505,7 +532,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     public ReadContext placeSingleWinBetForIntercept(String accessToken, Integer prodId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag, WAPI.InterceptOption interceptOption, String partialAmount) {
-        ReadContext response = placeSingleWinBet(accessToken, prodId, mpid, winPrice, stake, bonusBetFlag);
+        ReadContext response = placeSingleWinBetForRacing(accessToken, prodId, mpid, winPrice, stake, bonusBetFlag);
         return response;
     }
 

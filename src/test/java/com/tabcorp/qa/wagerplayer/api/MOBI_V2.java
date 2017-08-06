@@ -199,7 +199,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
 
     @SuppressWarnings("unchecked")
-    public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
+    public ReadContext placeSingleWinBetForRacing(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
         JSONObject prices = new JSONObject();

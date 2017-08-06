@@ -15,7 +15,7 @@ Feature: Single Bets
       | Betting | Display Price | Win |
     And I update fixed win prices "<WinPrices>"
 
-    When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
+    When I place a single Racing "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction>
 
     When I result/settle created event race with winners "Runner01, Runner02"
@@ -54,7 +54,7 @@ Feature: Single Bets
       | No of Places       | 3              |
     And I update fixed win prices "<WinPrices>" and place prices "<PlacePrices>"
 
-    When I place a single "<BetType>" bet on the runner "<BetOn>" for $<Stake>
+    When I place a single Racing "<BetType>" bet on the runner "<BetOn>" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction>
 
     When I result/settle created event race with winners "Runner01, Runner02, Runner03"

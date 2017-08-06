@@ -26,16 +26,16 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
       | Place Fraction     | 1/4            |
       | No of Places       | 3              |
 
-    When I place a single "Win" bet on the runner "Runner01" for $4.00
-    And I place a single "Win" bet on the runner "Runner02" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner03" for $4.00
-    And I place a single "Win" bet on the runner "Runner04" for $4.00
-    And I place a single "Win" bet on the runner "Runner05" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner06" for $4.00
-    And I place a single "Win" bet on the runner "Runner07" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner08" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner09" for $4.00
-    And I place a single "Win" bet on the runner "Runner10" for $4.00
+    When I place a single Racing "Win" bet on the runner "Runner01" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner02" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner04" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner05" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner06" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner07" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner08" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner09" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner10" for $4.00
     Then customer balance is equal to $44.00
 
     When I scratch the runners at position(s) "1"
@@ -84,18 +84,18 @@ Feature: This is to verify deductions is applied and bets are payed out correctl
       | Place Fraction     | 1/4            |
       | No of Places       | 3              |
 
-    When I place a single "Win" bet on the runner "Runner01" for $4.00
-    And I place a single "Win" bet on the runner "Runner02" for $4.00
+    When I place a single Racing "Win" bet on the runner "Runner01" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner02" for $4.00
     When I scratch the runners at position(s) "1"
-    And I place a single "Eachway" bet on the runner "Runner03" for $4.00
-    And I place a single "Win" bet on the runner "Runner04" for $4.00
-    And I place a single "Win" bet on the runner "Runner05" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner06" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner04" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner05" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner06" for $4.00
     When I scratch the runners at position(s) "4"
-    And I place a single "Win" bet on the runner "Runner07" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner08" for $4.00
-    And I place a single "Eachway" bet on the runner "Runner09" for $4.00
-    And I place a single "Win" bet on the runner "Runner10" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner07" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner08" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "Runner09" for $4.00
+    And I place a single Racing "Win" bet on the runner "Runner10" for $4.00
     Then customer balance is equal to $52.00
 
    Then I can see the following deduction details on settlement page

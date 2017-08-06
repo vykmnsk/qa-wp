@@ -341,7 +341,7 @@ public class CustomerSteps implements En {
         String eventName = (String) Storage.getLast(KEY.EVENT_NAMES);
         String interceptText = catg + ": " + subCatg + ": " + eventName + " (Racing Live): 1 " + runner;
         ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
-        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, true);
+        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelectionForRacing(resp, runner, prodId, true);
         new Thread(() -> {
             ReadContext response = wapi.placeSingleWinBetForIntercept(accessToken, prodId, selection.get(MPID), selection.get(WIN_PRICE), stake, bonusBetFlag, interceptOption, partialAmount);
             List<Integer> betIds;

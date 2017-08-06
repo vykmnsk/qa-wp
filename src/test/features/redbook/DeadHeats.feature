@@ -25,14 +25,14 @@ Feature: Dead Heats with several single bets
       | No of Places       | <NumOfPlaces>  |
     And I update fixed place prices "<PlacePrices>"
 
-    When I place a single "Win" bet on the runner "Runner01" for $3.10
-    And I place a single "Win" bet on the runner "Runner02" for $4.00
-    When I place a single "Win" bet on the runner "Runner03" for $2.50
-    And I place a single "Eachway" bet on the runner "Runner01" for $5.00
-    And I place a single "Eachway" bet on the runner "Runner02" for $4.50
-    And I place a single "Eachway" bet on the runner "Runner03" for $6.50
-    And I place a single "Eachway" bet on the runner "Runner04" for $7.00
-    And I place a single "Eachway" bet on the runner "Runner05" for $8.00
+    When I place a single Racing "Win" bet on the runner "Runner01" for $3.10
+    And I place a single Racing "Win" bet on the runner "Runner02" for $4.00
+    When I place a single Racing "Win" bet on the runner "Runner03" for $2.50
+    And I place a single Racing "Eachway" bet on the runner "Runner01" for $5.00
+    And I place a single Racing "Eachway" bet on the runner "Runner02" for $4.50
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $6.50
+    And I place a single Racing "Eachway" bet on the runner "Runner04" for $7.00
+    And I place a single Racing "Eachway" bet on the runner "Runner05" for $8.00
     Then customer balance after bet is decreased by $71.60
 
     When I result race with the runners and positions "<WinnerWithPositions>"

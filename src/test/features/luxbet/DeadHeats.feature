@@ -23,12 +23,12 @@ Feature: Deadheats testing on a Luxbet event
       | E/W                | yes       |
     And I update fixed place prices "<PlacePrices>"
 
-    When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
-    And I place a single "Win" bet on the runner "WHITE LADY" for $3.50
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
-    And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
-    And I place a single "Eachway" bet on the runner "PROSPECT ROAD" for $2.50
+    When I place a single Racing "Win" bet on the runner "ROCKING HORSE" for $5.50
+    And I place a single Racing "Win" bet on the runner "WHITE LADY" for $3.50
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $2.50
+    And I place a single Racing "Eachway" bet on the runner "COLORADO MISS" for $5.50
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $2.50
+    And I place a single Racing "Eachway" bet on the runner "PROSPECT ROAD" for $2.50
     Then customer balance after bet is decreased by $32.50
 
     When I result race with the runners and positions "<WinnerWithPositions>"

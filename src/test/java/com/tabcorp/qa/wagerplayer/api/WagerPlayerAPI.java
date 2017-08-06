@@ -26,7 +26,7 @@ public interface WagerPlayerAPI {
 
     BigDecimal getBalance(String sessionToken);
 
-    ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag);
+    ReadContext placeSingleWinBetForRacing(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer bonusBetFlag);
 
     ReadContext placeSinglePlaceBet(String accessToken, Integer productId, String mpid, String placePrice, BigDecimal stake, Integer bonusBetFlag);
 

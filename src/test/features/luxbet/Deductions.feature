@@ -29,16 +29,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1"
@@ -81,16 +81,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1"
@@ -138,16 +138,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1,2"
@@ -196,16 +196,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1,2"
@@ -254,16 +254,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1,2,3"
@@ -314,16 +314,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1,2,3"
@@ -373,16 +373,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1,2,3,6"
@@ -433,16 +433,16 @@ Feature: Create and verify event in Luxbet WagerPlayer
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $4.00
-    And I place a single "Win" bet on the runner "COLORADO MISS" for $4.00
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $4.00
-    And I place a single "Win" bet on the runner "PROSPECT ROAD" for $4.00
-    And I place a single "Place" bet on the runner "WHITE LADY" for $4.00
-    And I place a single "Eachway" bet on the runner "SUPERBEE" for $4.00
-    And I place a single "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
-    And I place a single "Eachway" bet on the runner "BONUS SPIN" for $4.00
-    And I place a single "Place" bet on the runner "TORCHBEARER" for $4.00
-    And I place a single "Win" bet on the runner "TRUST ME" for $4.00
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $4.00
+    And I place a single Racing "Win" bet on the runner "COLORADO MISS" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $4.00
+    And I place a single Racing "Win" bet on the runner "PROSPECT ROAD" for $4.00
+    And I place a single Racing "Place" bet on the runner "WHITE LADY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "SUPERBEE" for $4.00
+    And I place a single Racing "Win" bet on the runner "FIGHT FOR GLORY" for $4.00
+    And I place a single Racing "Eachway" bet on the runner "BONUS SPIN" for $4.00
+    And I place a single Racing "Place" bet on the runner "TORCHBEARER" for $4.00
+    And I place a single Racing "Win" bet on the runner "TRUST ME" for $4.00
     Then customer balance is equal to $48.00
 
     When I scratch the runners at position(s) "1,2,3,6"
