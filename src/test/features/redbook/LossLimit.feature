@@ -2,31 +2,13 @@
 
 Feature: Casino Loss Limit
 
-  @loss-limit
-  Scenario Outline: Create Customer, Ensure Loss limit is 0 by default
-    When I create a new customer via <UIorAPI> with data
-      | salutation            | <salutation>            |
-      | firstname             | <firstname>             |
-      | lastname              | <lastname>              |
-      | dob                   | <dob>                   |
-      | _email_address_suffix | <_email_address_suffix> |
-      | telephone             | <telephone>             |
-      | building              | <building>              |
-      | street                | <street>                |
-      | city                  | <city>                  |
-      | suburb                | <suburb>                |
-      | state                 | <state>                 |
-      | postcode              | <postcode>              |
-      | country               | <country>               |
-      | timezone              | <timezone>              |
-      | currency_code         | <currency_code>         |
-      | secret_question       | <secret_question>       |
-      | deposit_limit         | <deposit_limit>         |
-      | client_ip             | <client_ip>             |
-      | manual_verification   | <manual_verification>   |
+  Background:
+    Given A new default customer with $100.00 balance is created and logged in API
 
-    Then the default loss limit has to be 0.0
+  Scenario: The Default Loss limit should be 0
+    Then the loss limit should be $0.0 and loss limit definition should be "24 hours"
 
-    Examples:
-      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city     | suburb | postcode | state | country | timezone | secret_question         | currency_code | deposit_limit | client_ip | manual_verification |
-      | API     | Mr         | Oswald    | Petrucco | 1939-05-31 | @example.com          | 0463254781 | Level5   | 142 Tynte Street | Adelaide | N/A    | 5006     | N/A   | GB      | N/A      | Favourite Holiday Spot? | GBP           | N/A           | N/A       | Y                   |
+  @set-limit
+  Scenario: Set Loss Limit and Loss Limit Definition. Ensure it is updated
+    When I update the loss limit to $1200 for 48 hours
+    Then the loss limit should be $1200 and loss limit definition should be "48 hours"
