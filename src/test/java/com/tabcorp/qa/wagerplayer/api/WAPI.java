@@ -389,6 +389,18 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
+    public JSONArray getExistingEvents(String sessionId, int catId, int latestHours) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "site_get_events");
+        fields.put("cid", catId);
+        fields.put("latest", latestHours);
+        ReadContext resp = post(fields);
+        log.debug(resp.jsonString());
+        JSONArray events = resp.read(RESP_ROOT + ".events.event.*");
+        assertThat(events).withFailMessage("No Events found").isNotEmpty();
+        return events;
+    }
+
     public List<String> getExistingEventNames(String sessionId, int catId, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
@@ -421,6 +433,13 @@ public class WAPI implements WagerPlayerAPI {
             selections.add(sel);
         }
         return selections;
+    }
+
+    public Map findOneSelectionByName(ReadContext resp, String selName) {
+        String selPath = RESP_ROOT + ".markets.market[*].selections.selection" + jfilter("name", selName);
+        JSONArray selections = resp.read(selPath);
+        assertThat(selections).as("Expected to find 1 selection at path=" + selPath).hasSize(1);
+        return (Map) selections.get(0);
     }
 
     public Map<KEY, String> readSelection(ReadContext resp, String selName, Integer prodId) {
