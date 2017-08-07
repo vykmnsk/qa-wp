@@ -250,6 +250,11 @@ public class CreateEventSteps implements En {
             resultRace(winnerPosMap);
         });
 
+        When("^I result sport with scores \"([^\"]*)\"$", (String scores) -> {
+            List<String> playerScores = Helpers.extractCSV(scores);
+            resultSport(playerScores);
+        });
+
         When("^I result race with the runners and positions \"([^\"]*)\"$", (String winnersCSV) -> {
             // Expecting list in format [Position]:[RunnerName]. e.g. 1:Runner01
             List<String> posWinnerPairs = Helpers.extractCSV(winnersCSV);
@@ -263,6 +268,10 @@ public class CreateEventSteps implements En {
 
         And("^I settle race$", () -> {
             settleRace();
+        });
+
+        And("^I settle sport$", () -> {
+            settleSport();
         });
 
         When("^I settle race with Exotic prices \"([\\d.,\\s]*)\"$", (String pricesCSV) -> {
@@ -344,6 +353,17 @@ public class CreateEventSteps implements En {
         }, 5, 3);
     }
 
+    private void resultSport(List<String> scores) {
+        String cat = (String) Storage.removeFirst(Storage.KEY.CATEGORIES);
+        String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
+        String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
+        Helpers.retryOnFailure(() -> {
+            header.pickEvent(cat, subcat, event);
+            settlementPage = header.navigateToF6();
+            settlementPage.resultSport(scores);
+        }, 5, 3);
+    }
+
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {
         Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
         List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCVS);
@@ -355,6 +375,10 @@ public class CreateEventSteps implements En {
         settlementPage.accept();
         settlementPage.settle();
         header.deSelectSettled();
+    }
+
+    private void settleSport() {
+        settlementPage.settle();
     }
 
 }

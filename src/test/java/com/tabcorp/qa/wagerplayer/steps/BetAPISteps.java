@@ -60,7 +60,7 @@ public class BetAPISteps implements En {
                     Map<String, Integer> prodNamesIDsMap = Helpers.zipToMap(prodNames, prodIds);
                     Integer prodId = prodNamesIDsMap.get(productName);
                     Integer bonusBetFlag = 0;
-                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
+                    balanceAfterBet = placeRacingSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
                 });
 
         When("^I place a bonus single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d) with bonus wallet as \"([Y|N])\"$",

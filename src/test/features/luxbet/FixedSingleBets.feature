@@ -69,7 +69,9 @@ Feature: Placing and Settling several Single bets on the same event
     When I place a single Sports win bet on the player "PLAYER_02" on the market "Head to Head" for $5.50
     Then customer balance is equal to $89.00
 
-    #TODO : Settlement of Sports event
+    When I result sport with scores "6,4"
+    And I settle sport
+    Then customer balance is equal to $97.25
 
   @smoke
     Examples:

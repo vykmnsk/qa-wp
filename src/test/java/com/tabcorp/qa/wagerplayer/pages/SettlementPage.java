@@ -27,7 +27,7 @@ public class SettlementPage extends AppPage {
     WebElement resultsTable;
 
     @FindBy(css = "input[id^='settle_market'] ")
-    WebElement winnerCheck;
+    WebElement winnerRacingCheck;
 
     @FindBy(css = "select[name^='result_position']")
     List<WebElement> resultPositions;
@@ -62,18 +62,30 @@ public class SettlementPage extends AppPage {
     @FindBy(css = ("input[id=settle]"))
     WebElement disabledSettleButton;
 
+    @FindBy(css = ("input[name^=home_score][onblur*=ft]"))
+    WebElement firstPlayerFT;
+
+    @FindBy(css = ("input[name^=away_score][onblur*=ft]"))
+    WebElement secondPlayerFT;
+
+    @FindBy(css = ("input[name^=settle_market]"))
+    WebElement winnerSportCheck;
+
+    @FindBy(css = ("font[color=green]"))
+    WebElement resultedLabel;
+
     private By priceSelector = By.cssSelector("input[id^='price']");
 
     public void load() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
-        wait.until(ExpectedConditions.visibilityOf(resultsTable));
     }
 
     public void resultRace(Map<String, String> winners) {
+        wait.until(ExpectedConditions.visibilityOf(resultsTable));
         int count = 0;
-        wait.until(ExpectedConditions.elementToBeClickable(winnerCheck));
-        winnerCheck.click();
+        wait.until(ExpectedConditions.elementToBeClickable(winnerRacingCheck));
+        winnerRacingCheck.click();
         for (Map.Entry<String, String> winner : winners.entrySet()) {
             String positionVal = winner.getValue();
             WebElement positionEl = resultPositions.get(count);
@@ -93,6 +105,16 @@ public class SettlementPage extends AppPage {
         }
         result.click();
         wait.until(ExpectedConditions.visibilityOf(disabledSettleButton));
+    }
+
+    public void resultSport(List<String> scores) {
+        wait.until(ExpectedConditions.visibilityOf(firstPlayerFT));
+        firstPlayerFT.sendKeys(scores.get(0));
+        wait.until(ExpectedConditions.visibilityOf(secondPlayerFT));
+        secondPlayerFT.sendKeys(scores.get(1));
+        winnerSportCheck.click();
+        result.click();
+        wait.until(ExpectedConditions.visibilityOf(resultedLabel));
     }
 
     public void accept() {
