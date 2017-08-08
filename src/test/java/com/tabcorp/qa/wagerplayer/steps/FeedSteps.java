@@ -33,14 +33,10 @@ public class FeedSteps implements En {
     private String apiSessionId;
     private String eventNameRequested;
     private Map eventReceived;
-    private final int HOURSE_RACING_ID = 71;
-    private final int GREYHOUND_RACING_ID = 405;
     private final int FEED_TRAVEL_SECONDS = 2;
 
-
     public FeedSteps() {
-        When("^I login in \"(PA|WIFT)\" RabbitMQ and enqueue Racing Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
-            final boolean isPA = "PA".equals(feedType);
+        When("^I login in \"(PA|WIFT)\" RabbitMQ and enqueue an Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
             final String baseName = "QAFEED";
             eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
             String eventId = String.format("%s_%s",
@@ -50,17 +46,21 @@ public class FeedSteps implements En {
 
             ConnectionFactory factory = new ConnectionFactory();
             factory.setVirtualHost("/");
-
-            if (isPA) {
-                factory.setHost(Config.feedMQPAHost());
-                factory.setPort(Config.feedMQPAPort());
-                factory.setUsername(Config.feedMQPAUsername());
-                factory.setPassword(Config.feedMQPAPassword());
-            } else {
-                factory.setHost(Config.feedMQWiftHost());
-                factory.setPort(Config.feedMQWiftPort());
-                factory.setUsername(Config.feedMQWiftUsername());
-                factory.setPassword(Config.feedMQWiftPassword());
+            switch(feedType) {
+                case "PA":
+                    factory.setHost(Config.feedMQPAHost());
+                    factory.setPort(Config.feedMQPAPort());
+                    factory.setUsername(Config.feedMQPAUsername());
+                    factory.setPassword(Config.feedMQPAPassword());
+                    break;
+                case "WIFT":
+                    factory.setHost(Config.feedMQWiftHost());
+                    factory.setPort(Config.feedMQWiftPort());
+                    factory.setUsername(Config.feedMQWiftUsername());
+                    factory.setPassword(Config.feedMQWiftPassword());
+                    break;
+                 default:
+                    throw new FrameworkError("Unknown RabbitMQ Feed: " + feedType);
             }
 
             try {
@@ -81,13 +81,14 @@ public class FeedSteps implements En {
             }
         });
 
-        Then("^WagerPlayer receives the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
+        Then("^WagerPlayer receives the Event in category \"([^\"]+)\"$", (String catName) -> {
+            WAPI.Category category = WAPI.Category.valueOf(Helpers.normalize(catName).toUpperCase());
+
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
-            int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
-                JSONArray events = wapi.getEvents(apiSessionId, catId, 24);
+                JSONArray events = wapi.getEvents(apiSessionId, category, 24);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName((e), eventNameRequested))
@@ -97,7 +98,7 @@ public class FeedSteps implements En {
             }, 5, 3);
         });
 
-        Then("^The received event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
+        Then("^The received Event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
             assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
             String eventId = (String) eventReceived.get("id");
             assertThat(eventId).as("Received Event ID").isNotEmpty();
