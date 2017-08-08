@@ -27,11 +27,11 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
       | Bets Allowed Place | PLACE Fraction |
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
-    When I place a single "Win" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner02" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner03" for $<Stake>
-    And I place a single "Win" bet on the runner "Runner08" for $<Stake>
+    When I place a single Racing "Win" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner02" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $<Stake>
+    And I place a single Racing "Win" bet on the runner "Runner08" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction>
 
     When I scratch the runners at position(s) "8"
@@ -86,10 +86,10 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
     Then I can see the following deduction details on settlement page
       | 8 Runner08 | 30 | 30 |
 
-    When I place a single "Win" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner02" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner03" for $<Stake>
+    When I place a single Racing "Win" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner02" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction>
 
     When I result race with the runners and positions
@@ -126,11 +126,11 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
       | Place Fraction     | 1/4            |
       | No of Places       | <NumOfPlaces>  |
 
-    When I place a single "Win" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner02" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner03" for $<Stake>
-    And I place a single "Win" bet on the runner "Runner08" for $<Stake>
+    When I place a single Racing "Win" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner02" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $<Stake>
+    And I place a single Racing "Win" bet on the runner "Runner08" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction1>
 
     When I scratch the runners at position(s) "8"
@@ -144,10 +144,10 @@ Feature: Placing and Settling several Single bets on an Event with Number of Pla
     Then I can see the following deduction details on settlement page
       | 8 Runner08 | 30 | 30 |
 
-    When I place a single "Win" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner01" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner02" for $<Stake>
-    And I place a single "Eachway" bet on the runner "Runner03" for $<Stake>
+    When I place a single Racing "Win" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner01" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner02" for $<Stake>
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $<Stake>
     Then customer balance after bet is decreased by $<Deduction2>
 
     When I result race with the runners and positions

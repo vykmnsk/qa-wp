@@ -49,9 +49,7 @@ public class LiabilityPage extends AppPage {
                 .filter(cell -> cell.getAttribute("bet_type").contains(Integer.toString(betTypeId))
                         && cell.getAttribute("product_id").contains(Integer.toString(productId)))
                 .collect(Collectors.toList());
-        Helpers.retryOnFailure(() -> {
-            enterPrices(filteredPriceCells, prices);
-        }, 3, 1);
+        enterPrices(filteredPriceCells, prices);
     }
 
     private void enterPrices(List<WebElement> priceCells, List<BigDecimal> priceValues) {
@@ -66,14 +64,16 @@ public class LiabilityPage extends AppPage {
                     Helpers.roundOff(priceValue, 3))) {
                 continue;
             }
+            Helpers.retryOnFailure(() -> {
             String updatedPriceText = updateElementText(priceCell, priceValue.toString());
-            assertThat(NumberUtils.isNumber(updatedPriceText))
-                    .as(String.format("Price value entered '%s' is a Number", updatedPriceText))
-                    .isTrue();
-            BigDecimal updatedPriceValue = new BigDecimal(updatedPriceText);
-            assertThat(Helpers.roundOff(updatedPriceValue, 3))
-                    .as("Price value entered in table cell")
-                    .isEqualTo(Helpers.roundOff(priceValue, 3));
+                assertThat(NumberUtils.isNumber(updatedPriceText))
+                        .as(String.format("Price value entered '%s' is a Number", updatedPriceText))
+                        .isTrue();
+                BigDecimal updatedPriceValue = new BigDecimal(updatedPriceText);
+                assertThat(Helpers.roundOff(updatedPriceValue, 3))
+                        .as("Price value entered in table cell")
+                        .isEqualTo(Helpers.roundOff(priceValue, 3));
+            }, 3, 1);
         }
     }
 

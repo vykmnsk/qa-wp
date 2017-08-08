@@ -23,12 +23,12 @@ Feature: Placing and Settling several Single bets on the same event
       | E/W                | yes       |
     And I update fixed place prices "2.85, 1.10, 2.70, 2.60, 2.25, 3.95, 1.95, 2.85, 7.05, 3.65"
 
-    When I place a single "Win" bet on the runner "ROCKING HORSE" for $5.50
-    And I place a single "Win" bet on the runner "ROCKING HORSE" for $3.50
-    And I place a single "Win" bet on the runner "WHITE LADY" for $3.50
-    When I place a single "Place" bet on the runner "ROCKING HORSE" for $2.50
-    And I place a single "Eachway" bet on the runner "COLORADO MISS" for $5.50
-    And I place a single "Eachway" bet on the runner "CADEYRN" for $2.50
+    When I place a single Racing "Win" bet on the runner "ROCKING HORSE" for $5.50
+    And I place a single Racing "Win" bet on the runner "ROCKING HORSE" for $3.50
+    And I place a single Racing "Win" bet on the runner "WHITE LADY" for $3.50
+    When I place a single Racing "Place" bet on the runner "ROCKING HORSE" for $2.50
+    And I place a single Racing "Eachway" bet on the runner "COLORADO MISS" for $5.50
+    And I place a single Racing "Eachway" bet on the runner "CADEYRN" for $2.50
     Then customer balance is equal to $69.00
 
     When I result race with the runners and positions
@@ -64,6 +64,14 @@ Feature: Placing and Settling several Single bets on the same event
       | Place Fraction     | -        |
       | No of Places       | -        |
       | E/W                | no       |
+
+    When I place a single Sports win bet on the player "PLAYER_01" on the market "Head to Head" for $5.50
+    When I place a single Sports win bet on the player "PLAYER_02" on the market "Head to Head" for $5.50
+    Then customer balance is equal to $89.00
+
+    When I result sport with scores "6,4"
+    And I settle sport
+    Then customer balance is equal to $97.25
 
   @smoke
     Examples:

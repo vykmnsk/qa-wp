@@ -4,6 +4,7 @@ import com.jayway.jsonpath.Configuration;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,11 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class REST {
     private static final Logger log = LoggerFactory.getLogger(REST.class);
 
-    public static Object post(String url, Map<String, Object> fields) {
+    public static Object post(String url, Map<String, Object> fields, Map<String, String> headers) {
         HttpResponse<String> response;
         try {
+
+            log.info("sending REST headers=" + headers);
             log.info("sending REST fields=" + fields);
             response = Unirest.post(url)
+                    .headers(headers)
                     .fields(fields)
                     .asString();
         } catch (UnirestException e) {
@@ -31,6 +35,10 @@ public class REST {
             throw new FrameworkError(e);
         }
         return verifyAndParseResponse(response);
+    }
+
+    public static Object post(String url, Map<String, Object> fields) {
+        return post(url, fields, null);
     }
 
     public static Object postWithQueryStrings(String url, Map<String, Object> fields, Pair<String, List<String>> pair) {

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_IDS;
+import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_NAMES;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateEventSteps implements En {
@@ -139,6 +141,19 @@ public class CreateEventSteps implements En {
             prepareAndCreateEvent(table, false);
         });
 
+        When("^I navigate to F4 Markets page$", () -> {
+            header.navigateToF4();
+        });
+
+        And("^I delay test for \"([^\"]*)\" milliseconds$", (String millis) -> {
+            Helpers.delayInMillis(Integer.valueOf(millis));
+        });
+
+        And("I update Hard Limit as \"([^\"]*)\" and also update Max Hard Limit as \"([^\"]*)\" for runner position \"([^\"]*)\"",
+                (String hardLimit, String maxHardLimit, String runner) -> {
+                    marketsPage.updateHardLimitsForRunner(hardLimit, maxHardLimit, runner);
+                });
+
         And("^I update Exotic Prices$", (DataTable table) -> {
             List<List<String>> priceData = table.raw();
             assertThat(priceData.size()).as("price table rows").isGreaterThan(0);
@@ -152,7 +167,15 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed win prices \"([^\"]*)\"$", (String winPricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
-            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Win.id, winPrices);
+        });
+
+        And("^I update SP win prices \"([^\"]*)\"$", (String winPricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
             reloadLastEvent();
             LiabilityPage lp = header.navigateToF5();
             lp.updatePrices(prodId, BetType.Win.id, winPrices);
@@ -160,7 +183,7 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed place prices \"([^\"]*)\"$", (String placePricesCSV) -> {
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
             Helpers.retryOnFailure(() -> {
                 reloadLastEvent();
                 LiabilityPage lp = header.navigateToF5();
@@ -170,7 +193,7 @@ public class CreateEventSteps implements En {
 
         And("^I update fixed place prices \"([^\"]*)\" for the first product$", (String placePricesCSV) -> {
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            Integer prodId = (Integer) Storage.getFirst(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getFirst(PRODUCT_IDS);
             reloadLastEvent();
             LiabilityPage lp = header.navigateToF5();
             lp.updatePrices(prodId, BetType.Place.id, placePrices);
@@ -179,7 +202,20 @@ public class CreateEventSteps implements En {
         And("^I update fixed win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String winPricesCSV, String placePricesCSV) -> {
             List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
             List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
-            Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+            Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
+            reloadLastEvent();
+            LiabilityPage lp = header.navigateToF5();
+            lp.updatePrices(prodId, BetType.Win.id, winPrices);
+            lp.updatePrices(prodId, BetType.Place.id, placePrices);
+        });
+
+        And("^I update \"([^\"]*)\" win prices \"([^\"]*)\" and place prices \"([^\"]*)\"$", (String productName, String winPricesCSV, String placePricesCSV) -> {
+            List<BigDecimal> winPrices = Helpers.extractCSVPrices(winPricesCSV);
+            List<BigDecimal> placePrices = Helpers.extractCSVPrices(placePricesCSV);
+            List<String> prodNames = (List<String>) Storage.get(PRODUCT_NAMES);
+            List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+            Map<String, Integer> prodNamesIDsMap = Helpers.zipToMap(prodNames, prodIds);
+            Integer prodId = prodNamesIDsMap.get(productName);
             reloadLastEvent();
             LiabilityPage lp = header.navigateToF5();
             lp.updatePrices(prodId, BetType.Win.id, winPrices);
@@ -227,6 +263,11 @@ public class CreateEventSteps implements En {
             resultRace(winnerPosMap);
         });
 
+        When("^I result sport with scores \"([^\"]*)\"$", (String scores) -> {
+            List<String> playerScores = Helpers.extractCSV(scores);
+            resultSport(playerScores);
+        });
+
         When("^I result race with the runners and positions \"([^\"]*)\"$", (String winnersCSV) -> {
             // Expecting list in format [Position]:[RunnerName]. e.g. 1:Runner01
             List<String> posWinnerPairs = Helpers.extractCSV(winnersCSV);
@@ -240,6 +281,10 @@ public class CreateEventSteps implements En {
 
         And("^I settle race$", () -> {
             settleRace();
+        });
+
+        And("^I settle sport$", () -> {
+            settleSport();
         });
 
         When("^I settle race with Exotic prices \"([\\d.,\\s]*)\"$", (String pricesCSV) -> {
@@ -321,8 +366,19 @@ public class CreateEventSteps implements En {
         }, 5, 3);
     }
 
+    private void resultSport(List<String> scores) {
+        String cat = (String) Storage.removeFirst(Storage.KEY.CATEGORIES);
+        String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
+        String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
+        Helpers.retryOnFailure(() -> {
+            header.pickEvent(cat, subcat, event);
+            settlementPage = header.navigateToF6();
+            settlementPage.resultSport(scores);
+        }, 5, 3);
+    }
+
     private void parseUpdateSettlePrices(String pricesCVS, BetType betType) {
-        Integer prodId = (Integer) Storage.getLast(Storage.KEY.PRODUCT_IDS);
+        Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
         List<BigDecimal> prices = Helpers.extractCSVPrices(pricesCVS);
         Assertions.assertThat(prices).as(betType + " prices cucumber input").isNotEmpty();
         settlementPage.updateSettlePrices(prodId, betType.id, prices);
@@ -332,6 +388,10 @@ public class CreateEventSteps implements En {
         settlementPage.accept();
         settlementPage.settle();
         header.deSelectSettled();
+    }
+
+    private void settleSport() {
+        settlementPage.settle();
     }
 
 }

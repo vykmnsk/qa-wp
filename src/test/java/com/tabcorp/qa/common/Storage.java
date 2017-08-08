@@ -16,11 +16,12 @@ public class Storage {
         EVENT_IDS,
         EVENT_NAMES,
         PRODUCT_IDS,
+        PRODUCT_NAMES,
         API_ACCESS_TOKEN,
         CUSTOMER,
         BALANCE_BEFORE,
         BET_IDS,
-        PREV_CUSTOMER,
+        PREV_CUSTOMER
     }
 
     public static void init() {

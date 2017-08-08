@@ -36,12 +36,31 @@ public class BetAPISteps implements En {
     private CustomerSteps customerSteps;
 
     public BetAPISteps() {
-        When("^I place a single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+        When("^I place a single Racing \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
                     Integer bonusBetFlag = 0;
-                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
+                    balanceAfterBet = placeRacingSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
+                });
+
+        When("^I place a single Sports win bet on the player \"([^\"]*)\" on the market \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String player, String market, BigDecimal stake) -> {
+                    String evId = (String) Storage.getLast(EVENT_IDS);
+                    Integer bonusBetFlag = 0;
+                    String betTypeName = "WIN";
+                    balanceAfterBet = placeSportSingleBet(betTypeName, evId, player, stake, bonusBetFlag);
+                });
+
+        When("^I place a single \"([a-zA-Z]+)\" bet for \"([^\"]*)\" product on runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
+                (String betTypeName, String productName, String runner, BigDecimal stake) -> {
+                    String evId = (String) Storage.getLast(EVENT_IDS);
+                    List<String> prodNames = (List<String>) Storage.get(PRODUCT_NAMES);
+                    List<Integer> prodIds = (List<Integer>) Storage.get(PRODUCT_IDS);
+                    Map<String, Integer> prodNamesIDsMap = Helpers.zipToMap(prodNames, prodIds);
+                    Integer prodId = prodNamesIDsMap.get(productName);
+                    Integer bonusBetFlag = 0;
+                    balanceAfterBet = placeRacingSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
                 });
 
         When("^I place a bonus single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d) with bonus wallet as \"([Y|N])\"$",
@@ -50,7 +69,7 @@ public class BetAPISteps implements En {
                     Integer bonusBetFlag = useBonusWallet ? 2 : 1;
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
-                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
+                    balanceAfterBet = placeRacingSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, false);
                 });
 
         When("^I place a unfixed single \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
@@ -58,9 +77,8 @@ public class BetAPISteps implements En {
                     String evId = (String) Storage.getLast(EVENT_IDS);
                     Integer prodId = (Integer) Storage.getLast(PRODUCT_IDS);
                     Integer bonusBetFlag = 0;
-                    balanceAfterBet = placeSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
+                    balanceAfterBet = placeRacingSingleBet(betTypeName, evId, prodId, runner, stake, bonusBetFlag, true);
                 });
-
 
         When("^I place an exotic \"([^\"]*)\" bet on the runners \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runnersCSV, BigDecimal stake) -> {
@@ -220,10 +238,7 @@ public class BetAPISteps implements En {
         log.info("Bet IDs=" + betIds);
         if (null != betTypes) {
             for (int betId : betIds) {
-                List<BetType> placedBetTypes = wapi.getBetTypes(accessToken, betId);
-                assertThat(placedBetTypes)
-                        .as(String.format("Expected Bet Types for %s bet, betId=%d", multiType.exactName, betId))
-                        .isEqualTo(betTypes);
+                verifyBetTypes(accessToken, betId, multiType.exactName, betTypes);
             }
         }
         return response;
@@ -246,15 +261,15 @@ public class BetAPISteps implements En {
         return response;
     }
 
-    private BigDecimal placeSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {
+    private BigDecimal placeRacingSingleBet(String betTypeName, String eventId, Integer prodId, String runner, BigDecimal stake, Integer bonusBetflag, boolean useDefaultPrices) {
         String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
         ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
-        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, useDefaultPrices);
+        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelectionForRacing(resp, runner, prodId, useDefaultPrices);
 
         ReadContext response;
         switch (betTypeName.toUpperCase()) {
             case "WIN":
-                response = api.placeSingleWinBet(accessToken, prodId,
+                response = api.placeSingleWinBetForRacing(accessToken, prodId,
                         selection.get(MPID), selection.get(WIN_PRICE), stake, bonusBetflag);
                 break;
             case "PLACE":
@@ -268,18 +283,40 @@ public class BetAPISteps implements En {
             default:
                 throw new FrameworkError("Unknown BetTypeName=" + betTypeName);
         }
+        Integer betId = getPlacedBetId(response);
+        Storage.add(BET_IDS, betId);
+        List<BetType> expectedBetTypes = Arrays.asList(BetType.fromName(betTypeName));
+        verifyBetTypes(accessToken, betId, "Single " + betTypeName, expectedBetTypes);
+        return api.readNewBalance(response);
+    }
+
+    private BigDecimal placeSportSingleBet(String betTypeName, String eventId, String runner, BigDecimal stake, Integer bonusBetflag) {
+        String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+        ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
+        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelectionForSports(resp, runner);
+
+        ReadContext response;
+        response = wapi.placeSingleWinBetForSports(accessToken, selection.get(MPID), selection.get(WIN_PRICE), stake, bonusBetflag);
+        Integer betId = getPlacedBetId(response);
+        Storage.add(BET_IDS, betId);
+        List<BetType> expectedBetTypes = Arrays.asList(BetType.fromName(betTypeName));
+        verifyBetTypes(accessToken, betId, "Single " + betTypeName, expectedBetTypes);
+        return api.readNewBalance(response);
+    }
+
+    private Integer getPlacedBetId(ReadContext response) {
         List<Integer> betIds = api.readBetIds(response);
         assertThat(betIds.size()).as("Single Bet IDs").isEqualTo(1);
         int betId = betIds.get(0);
-        Storage.add(BET_IDS, betId);
         log.info("Bet ID=" + betId);
+        return betId;
+    }
 
-        List<BetType> expectedBetTypes = Arrays.asList(BetType.fromName(betTypeName));
+    private void verifyBetTypes(String accessToken, Integer betId, String betName, List<BetType> expectedBetTypes) {
         List<BetType> placedBetTypes = api.getBetTypes(accessToken, betId);
         assertThat(placedBetTypes)
-                .as(String.format("Expected Bet Types for Single bet, betId=%d", betId))
+                .as(String.format("Expected Bet Types for %s bet, betId=%d", betName, betId))
                 .isEqualTo(expectedBetTypes);
-        return api.readNewBalance(response);
     }
 
     private BigDecimal oneEventExoticBetStep(String betTypeName, String runnersCSV, BigDecimal stake, boolean isFlexi, boolean isBoxed) {

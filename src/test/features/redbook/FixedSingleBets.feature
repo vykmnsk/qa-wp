@@ -16,10 +16,10 @@ Feature: Placing and Settling several Single bets on the same event
       | Betting | Enable Single | Win |
       | Betting | Enable Single | EW  |
 
-    When I place a single "Win" bet on the runner "Runner01" for $5.50
-    And I place a single "Win" bet on the runner "Runner01" for $3.50
-    And I place a single "Eachway" bet on the runner "Runner02" for $5.50
-    And I place a single "Eachway" bet on the runner "Runner03" for $2.50
+    When I place a single Racing "Win" bet on the runner "Runner01" for $5.50
+    And I place a single Racing "Win" bet on the runner "Runner01" for $3.50
+    And I place a single Racing "Eachway" bet on the runner "Runner02" for $5.50
+    And I place a single Racing "Eachway" bet on the runner "Runner03" for $2.50
     Then customer balance after bet is decreased by $25.00
 
     When I result race with the runners and positions

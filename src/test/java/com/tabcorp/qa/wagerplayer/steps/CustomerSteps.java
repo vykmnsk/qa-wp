@@ -320,15 +320,6 @@ public class CustomerSteps implements En {
                     actionOnIntercept(interceptText, newInterceptOptions, partialAmount);
                 });
 
-        Then("^the default loss limit has to be (\\d+.\\d+)$",(BigDecimal expectedLossLimit) -> {
-            Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
-            String clientIp = custData.getOrDefault("client_ip", null);
-            String accessToken = api.login(custData.get("username"), custData.get("password"), clientIp);
-            BigDecimal actualLossLimit = new MOBI_V2().getCustomerLossLimit(accessToken);
-
-            assertThat(Helpers.roundOff(actualLossLimit)).as("Actual Casino Loss Limit").isEqualTo(Helpers.roundOff(expectedLossLimit));
-        });
-
     }
 
     private void placeInterceptSingleBet(String runner, BigDecimal stake, WAPI.InterceptOption interceptOption, String partialAmount) {
@@ -341,7 +332,7 @@ public class CustomerSteps implements En {
         String eventName = (String) Storage.getLast(KEY.EVENT_NAMES);
         String interceptText = catg + ": " + subCatg + ": " + eventName + " (Racing Live): 1 " + runner;
         ReadContext resp = wapi.getEventMarkets(accessToken, eventId);
-        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelection(resp, runner, prodId, true);
+        Map<WagerPlayerAPI.KEY, String> selection = wapi.readSelectionForRacing(resp, runner, prodId, true);
         new Thread(() -> {
             ReadContext response = wapi.placeSingleWinBetForIntercept(accessToken, prodId, selection.get(MPID), selection.get(WIN_PRICE), stake, bonusBetFlag, interceptOption, partialAmount);
             List<Integer> betIds;

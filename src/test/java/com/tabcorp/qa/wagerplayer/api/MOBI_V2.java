@@ -2,9 +2,11 @@ package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
+import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -80,14 +82,18 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return post(url, fields, true);
     }
 
-    private ReadContext post(String url, Map<String, Object> fields, boolean checkErrors) {
+    private ReadContext post(String url, Map<String, Object> fields, Map<String, String> headers, boolean checkErrors) {
         fields.put("output_type", "json");
-        Object response = REST.post(URL_ROOT + url, fields);
+        Object response = REST.post(URL_ROOT + url, fields, headers);
         ReadContext ctx = parseVerifyJSON(response, RESP_ROOT);
         if (checkErrors) {
             verifyNoErrors(ctx, fields);
         }
         return ctx;
+    }
+
+    private ReadContext post(String url, Map<String, Object> fields, boolean checkErrors) {
+        return post(url, fields, null, checkErrors);
     }
 
     private ReadContext put(String url, String reqJSON) {
@@ -194,12 +200,12 @@ public class MOBI_V2 implements WagerPlayerAPI {
         queryParams.put("bet_id", String.valueOf(betId));
         ReadContext response = get("/customer/bet", queryParams);
         JSONArray betTypeIds = response.read("$..selections.betdetail[*].bet_type");
-        return betTypeIds.stream().map(id -> BetType.fromId(Integer.valueOf(""+id))).collect(Collectors.toList());
+        return betTypeIds.stream().map(id -> BetType.fromId(Integer.valueOf("" + id))).collect(Collectors.toList());
     }
 
 
     @SuppressWarnings("unchecked")
-    public ReadContext placeSingleWinBet(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
+    public ReadContext placeSingleWinBetForRacing(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
         //Ignore productID
         //Added to ensure function signature remains same as to WagerPlayerAPI interface.
         JSONObject prices = new JSONObject();
@@ -430,14 +436,33 @@ public class MOBI_V2 implements WagerPlayerAPI {
         Assertions.assertThat(resultCode).as("Found result code in response is " + resultCode).isEqualToIgnoringCase("Authorised");
     }
 
-    public BigDecimal getCustomerLossLimit(String accessToken) {
-        Map<String,Object> queryParams = new HashMap<>();
-        queryParams.put("access_token",accessToken);
-        ReadContext resp = get("/customer/get_casino_loss_limit",queryParams);
+    public Pair<BigDecimal,String> getCustomerLossLimitAndDefinition(String accessToken) {
 
-        JSONArray lossLimit = resp.read("$..casino_loss_limit_data.casino_loss_limit_amount");
-        Assertions.assertThat(lossLimit).hasSize(1);
-        return new BigDecimal(Double.parseDouble(lossLimit.get(0).toString()));
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("access_token", accessToken);
+        ReadContext ctx = get("/customer/get_casino_loss_limit", queryParams);
+
+        Integer lossLimit = ctx.read("$.casino_loss_limit_data.casino_loss_limit_amount");
+        String lossLimitDefintion = ctx.read("$.casino_loss_limit_data.casino_loss_limit_definition");
+
+        return Pair.of(new BigDecimal(lossLimit),lossLimitDefintion);
     }
+
+    public void setCustomerLossLimit(String accessToken, BigDecimal lossLimit, Integer duration) {
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("casino_limit_amount", lossLimit);
+        fields.put("casino_limit_definition", duration + " hours");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("content-type", "application/x-www-form-urlencoded");
+
+        ReadContext resp = post("/customer/set_casino_loss_limit", fields, headers, true);
+
+        String msg = resp.read("$.success.message");
+        assertThat(msg).isEqualToIgnoringCase("The set_customer_casino_loss_limit request has been submitted successfully");
+    }
+
 
 }
