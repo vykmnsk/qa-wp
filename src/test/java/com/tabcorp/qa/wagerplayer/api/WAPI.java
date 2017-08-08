@@ -586,7 +586,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     private static String jfilter(String attr, String value) {
-        return String.format("[?(@.%s == '%s')]", attr, value);
+        return String.format("[?(@.%s =~ /^%s$/i)]", attr, value);
     }
 
 }

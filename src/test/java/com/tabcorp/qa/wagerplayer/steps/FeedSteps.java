@@ -94,8 +94,6 @@ public class FeedSteps implements En {
         });
 
         Then("^WagerPlayer receives the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
-            // DBG
-            //            eventNameRequested = "QAFEED170807140713232";
             assertThat(eventNameRequested).as("Event created in previous step has name").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
