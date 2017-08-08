@@ -403,7 +403,7 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public JSONArray getExistingEvents(String sessionId, int catId, int latestHours) {
+    public JSONArray getEvents(String sessionId, int catId, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
         fields.put("cid", catId);
@@ -413,18 +413,6 @@ public class WAPI implements WagerPlayerAPI {
         JSONArray events = resp.read(RESP_ROOT + ".events.event.*");
         assertThat(events).withFailMessage("No Events found").isNotEmpty();
         return events;
-    }
-
-    public List<String> getExistingEventNames(String sessionId, int catId, int latestHours) {
-        Map<String, Object> fields = wapiAuthFields(sessionId);
-        fields.put("action", "site_get_events");
-        fields.put("cid", catId);
-        fields.put("latest", latestHours);
-        ReadContext resp = post(fields);
-        log.debug(resp.jsonString());
-        JSONArray events = resp.read(RESP_ROOT + ".events.*");
-        assertThat(events).withFailMessage("No Events found").isNotEmpty();
-        return resp.read(RESP_ROOT + ".events.event[*].name.-content");
     }
 
     public String readAmlStatus(String sessionId) {

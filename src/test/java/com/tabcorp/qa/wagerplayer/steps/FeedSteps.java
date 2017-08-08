@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,42 +81,31 @@ public class FeedSteps implements En {
             }
         });
 
-        Then("^OLD WagerPlayer will receive the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
-            assertThat(eventNameRequested).as("Event created in previous step has name").isNotEmpty();
-            Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
-            int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
-            String sessionId = wapi.login();
-            Helpers.retryOnFailure(() -> {
-                List<String> foundEventNames = wapi.getExistingEventNames(sessionId, catId, 24);
-                assertThat(foundEventNames).as("Looking for Event with name=" + eventNameRequested).anySatisfy(n -> assertThat(n).endsWith(eventNameRequested));
-            }, 5, 3);
-        });
-
         Then("^WagerPlayer receives the \"(Horse Racing|Greyhound Racing)\" Event$", (String catName) -> {
-            assertThat(eventNameRequested).as("Event created in previous step has name").isNotEmpty();
+            assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             int catId = ("Horse Racing".equals(catName) ? HOURSE_RACING_ID : GREYHOUND_RACING_ID);
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
-                JSONArray allEvents = wapi.getExistingEvents(apiSessionId, catId, 24);
-                eventReceived = allEvents.stream()
+                JSONArray events = wapi.getEvents(apiSessionId, catId, 24);
+                eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName((e), eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
 
             }, 5, 3);
-
         });
 
         Then("^The received event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
-            ReadContext resp = wapi.getEventMarkets(apiSessionId, (String) eventReceived.get("id"));
+            assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
+            String eventId = (String) eventReceived.get("id");
+            assertThat(eventId).as("Received Event ID").isNotEmpty();
+            ReadContext resp = wapi.getEventMarkets(apiSessionId, eventId);
             Map selection = wapi.findOneSelectionByName(resp, selName);
             assertThat(selection.get("scratched")).as(String.format("Selection '%s' 'scratched' attribute", selName))
                     .isNotNull().isEqualTo(1);
         });
-
-
     }
 
     private boolean matchByName(Map event, String initialName) {
