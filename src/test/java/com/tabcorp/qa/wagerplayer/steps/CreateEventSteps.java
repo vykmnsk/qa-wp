@@ -141,6 +141,19 @@ public class CreateEventSteps implements En {
             prepareAndCreateEvent(table, false);
         });
 
+        When("^I navigate to F4 Markets page$", () -> {
+            header.navigateToF4();
+        });
+
+        And("^I delay test for \"([^\"]*)\" milliseconds$", (String millis) -> {
+            Helpers.delayInMillis(Integer.valueOf(millis));
+        });
+
+        And("I update Hard Limit as \"([^\"]*)\" and also update Max Hard Limit as \"([^\"]*)\" for runner position \"([^\"]*)\"",
+                (String hardLimit, String maxHardLimit, String runner) -> {
+                    marketsPage.updateHardLimitsForRunner(hardLimit, maxHardLimit, runner);
+                });
+
         And("^I update Exotic Prices$", (DataTable table) -> {
             List<List<String>> priceData = table.raw();
             assertThat(priceData.size()).as("price table rows").isGreaterThan(0);

@@ -331,13 +331,13 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
 
-    When I place a Luxbet Multi Bet "Patent" on the runners "Runner01,Runner11,Runner21" for $400.00 with flexi as "N" and do "Accept,Accept,Accept,Accept,Accept,Accept,Accept" the intercepts with partial amount as $20.00
-    Then customer balance is equal to $2200.00
+    When I place a Luxbet Multi Bet "Patent" on the runners "Runner01,Runner11,Runner21" for $100.00 with flexi as "N" and do "Accept,Accept,Accept,Accept,Accept,Accept,Accept" the intercepts with partial amount as $20.00
+    Then customer balance is equal to $4300.00
 
     When I result/settle created event race with winners "Runner01,Runner02,Runner03"
     When I result/settle created event race with winners "Runner11,Runner12,Runner13"
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
-    Then customer balance is equal to $255400.00
+    Then customer balance is equal to $90600.00
 
   # JIRA bug exists : WAGDOMCI-2675
   Scenario: ACCEPT REJECT PARTIAL Multi PATENT bets on Intercept

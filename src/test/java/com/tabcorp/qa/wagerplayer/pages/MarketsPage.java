@@ -87,6 +87,9 @@ public class MarketsPage extends AppPage {
     @FindBy(css = ("input[type=text][name^='hard_limit[']"))
     private List<WebElement> hardLimitTxts;
 
+    @FindBy(css = ("input[type=number][name^='max_hard_limit[']"))
+    private List<WebElement> maxHardLimitTxts;
+
     @FindBy(css = ("input[type=text][name^='soft_limit[']"))
     private List<WebElement> softLimitTxts;
 
@@ -123,6 +126,10 @@ public class MarketsPage extends AppPage {
     private By addProductBtnCSS = By.cssSelector("input[type=image][name=add_prod]");
 
     private static final Logger log = LoggerFactory.getLogger(MarketsPage.class);
+
+    static final String hardLimit = "199899";
+    static final String softLimit = "199799";
+    static final String interimLimit = "199699";
 
     static Map<List<String>, String> productSettingIDs() {
         return Collections.unmodifiableMap(Stream.of(
@@ -220,13 +227,31 @@ public class MarketsPage extends AppPage {
             WebElement softLimitTxt = softLimitTxts.get(i);
             WebElement interimLimitTxt = interimLimitTxts.get(i);
             hardLimitTxt.clear();
-            hardLimitTxt.sendKeys("999999");
+            hardLimitTxt.sendKeys(hardLimit);
             softLimitTxt.clear();
-            softLimitTxt.sendKeys("998999");
+            softLimitTxt.sendKeys(softLimit);
             interimLimitTxt.clear();
-            interimLimitTxt.sendKeys("997999");
+            interimLimitTxt.sendKeys(interimLimit);
         }
         updateBtn.click();
+    }
+
+    public void updateHardLimitsForRunner(String hardLimit, String maxHardLimit, String runnerPos) {
+        int runnerPosition = 1;
+        for (int i = 0; i < priceTxts.size(); i++) {
+            if (runnerPosition == Integer.valueOf(runnerPos)) {
+                WebElement hardLimitTxt = hardLimitTxts.get(i);
+                hardLimitTxt.clear();
+                hardLimitTxt.sendKeys(hardLimit);
+                updateBtn.click();
+                WebElement maxHardLimitTxt = maxHardLimitTxts.get(i);
+                maxHardLimitTxt.clear();
+                maxHardLimitTxt.sendKeys(maxHardLimit);
+                updateBtn.click();
+                break;
+            }
+            runnerPosition++;
+        }
     }
 
     public void showMarketManagement() {
@@ -281,7 +306,7 @@ public class MarketsPage extends AppPage {
         WebElement chk = prodRow.findElement(crossRaceExoticsCheckbox);
         assertThat(chk.getAttribute("disabled")).as("Cross Race Product checkbox is disabled").isNull();
         String checked = chk.getAttribute("checked");
-        if (null == checked){
+        if (null == checked) {
             chk.click();
         }
         assertThat(checked).as("Checked Cross Race Product " + prodName).isEqualTo("checked");
