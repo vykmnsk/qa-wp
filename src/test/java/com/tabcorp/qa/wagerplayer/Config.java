@@ -96,15 +96,23 @@ public class Config {
     }
 
 
-    private static final String ENV_FEEDMQ_HOST = "WAGERPLAYER_FEEDMQ_HOST";
-    private static final String ENV_FEEDMQ_PORT = "WAGERPLAYER_FEEDMQ_PORT";
-    private static final String ENV_FEEDMQ_USERNAME = "WAGERPLAYER_FEEDMQ_USERNAME";
-    private static final String ENV_FEEDMQ_PASSWORD = "WAGERPLAYER_FEEDMQ_PASSWORD";
-    public static String feedMQHost() { return readVerify(ENV_FEEDMQ_HOST); }
-    public static int feedMQPort() { return Integer.parseInt(readVerify(ENV_FEEDMQ_PORT)); }
-    public static String feedMQUsername() { return readVerify(ENV_FEEDMQ_USERNAME); }
-    public static String feedMQPassword() { return readVerify(ENV_FEEDMQ_PASSWORD); }
+    private static final String ENV_FEEDMQ_PA_HOST = "WAGERPLAYER_FEEDMQ_PA_HOST";
+    private static final String ENV_FEEDMQ_PA_PORT = "WAGERPLAYER_FEEDMQ_PA_PORT";
+    private static final String ENV_FEEDMQ_PA_USERNAME = "WAGERPLAYER_FEEDMQ_PA_USERNAME";
+    private static final String ENV_FEEDMQ_PA_PASSWORD = "WAGERPLAYER_FEEDMQ_PA_PASSWORD";
+    public static String feedMQPAHost() { return readVerify(ENV_FEEDMQ_PA_HOST); }
+    public static int feedMQPAPort() { return Integer.parseInt(readVerify(ENV_FEEDMQ_PA_PORT)); }
+    public static String feedMQPAUsername() { return readVerify(ENV_FEEDMQ_PA_USERNAME); }
+    public static String feedMQPAPassword() { return readVerify(ENV_FEEDMQ_PA_PASSWORD); }
 
+    private static final String ENV_FEEDMQ_WIFT_HOST = "WAGERPLAYER_FEEDMQ_WIFT_HOST";
+    private static final String ENV_FEEDMQ_WIFT_PORT = "WAGERPLAYER_FEEDMQ_WIFT_PORT";
+    private static final String ENV_FEEDMQ_WIFT_USERNAME = "WAGERPLAYER_FEEDMQ_WIFT_USERNAME";
+    private static final String ENV_FEEDMQ_WIFT_PASSWORD = "WAGERPLAYER_FEEDMQ_WIFT_PASSWORD";
+    public static String feedMQWiftHost() { return readVerify(ENV_FEEDMQ_WIFT_HOST); }
+    public static int feedMQWiftPort() { return Integer.parseInt(readVerify(ENV_FEEDMQ_WIFT_PORT)); }
+    public static String feedMQWiftUsername() { return readVerify(ENV_FEEDMQ_WIFT_USERNAME); }
+    public static String feedMQWiftPassword() { return readVerify(ENV_FEEDMQ_WIFT_PASSWORD); }
 
     private static String readVerify(String envVarName) {
         String var = System.getenv(envVarName);

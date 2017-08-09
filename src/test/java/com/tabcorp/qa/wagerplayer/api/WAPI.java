@@ -81,6 +81,16 @@ public class WAPI implements WagerPlayerAPI {
         }
     }
 
+    public enum Category {
+        HORSE_RACING(71),
+        GREYHOUND_RACING(405),
+        HARNESS_RACING(406);
+        public final int id;
+        Category(int id) {
+            this.id = id;
+        }
+    }
+
     private static final Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static Map<String, Object> wapiAuthFields() {
@@ -403,16 +413,16 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public List<String> getExistingEventNames(String sessionId, int catId, int latestHours) {
+    public JSONArray getEvents(String sessionId, Category category, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
-        fields.put("cid", catId);
+        fields.put("cid", category.id);
         fields.put("latest", latestHours);
         ReadContext resp = post(fields);
         log.debug(resp.jsonString());
-        JSONArray events = resp.read(RESP_ROOT + ".events.*");
+        JSONArray events = resp.read(RESP_ROOT + ".events.event.*");
         assertThat(events).withFailMessage("No Events found").isNotEmpty();
-        return resp.read(RESP_ROOT + ".events.event[*].name.-content");
+        return events;
     }
 
     public String readAmlStatus(String sessionId) {
@@ -435,6 +445,13 @@ public class WAPI implements WagerPlayerAPI {
             selections.add(sel);
         }
         return selections;
+    }
+
+    public Map findOneSelectionByName(ReadContext resp, String selName) {
+        String selPath = RESP_ROOT + ".markets.market[*].selections.selection" + jfilter("name", selName);
+        JSONArray selections = resp.read(selPath);
+        assertThat(selections).as("Expected to find 1 selection at path=" + selPath).hasSize(1);
+        return (Map) selections.get(0);
     }
 
     public Map<KEY, String> readSelectionForRacing(ReadContext resp, String selName, Integer prodId, boolean withPrices) {
@@ -567,7 +584,7 @@ public class WAPI implements WagerPlayerAPI {
     }
 
     private static String jfilter(String attr, String value) {
-        return String.format("[?(@.%s == '%s')]", attr, value);
+        return String.format("[?(@.%s =~ /^%s$/i)]", attr, value);
     }
 
 }
