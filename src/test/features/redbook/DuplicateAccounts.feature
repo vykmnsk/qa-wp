@@ -4,6 +4,11 @@ Feature: Duplicate Account Validations - UK and EU Customers (Stories: SUN-4729,
 
 # Automated test scenarios under JIRA tasks SUN-5310 and SUN-5311
 
+  Background:
+    Given I am logged into WP UI and on Home Page
+    And I edit the Master Controller Settings
+      | Enable Duplicate Account Checking on Customer Sign-Up | Y |
+
   @dup-accts-new
   Scenario Outline: <country> Customer Sign-up (Successful Customer Validation)
     When I create a new customer via API with data
@@ -32,7 +37,6 @@ Feature: Duplicate Account Validations - UK and EU Customers (Stories: SUN-4729,
 
 # Account 01: (SUN-5225) UK Customer sign-up with unique data - Customer Created
 # Account 02: (SUN-5238) EU Customer sign-up with unique data - Customer Created
-
 
   @dup-accts-dup
   Scenario Outline: <country> Customer Sign-up (Unsuccessful Customer Validation - Duplicate data)
@@ -268,8 +272,7 @@ Feature: Duplicate Account Validations - UK and EU Customers (Stories: SUN-4729,
 
   @dup-accts-clo
   Scenario Outline: <country> Customer Sign-up (Customer Validation) and manually update AML status to <newamlstatus>
-    When I login with valid username and password
-    And I create a new customer via API with data
+    When I create a new customer via API with data
       | salutation            | <salutation>            |
       | firstname             | <firstname>             |
       | dob                   | <dob>                   |

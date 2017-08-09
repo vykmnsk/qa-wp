@@ -40,6 +40,7 @@ public class CustomerSteps implements En {
     private InterceptPage intercept;
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
+    private MasterControllerPage masCtrlPage;
     private static final Logger log = LoggerFactory.getLogger(CustomerSteps.class);
 
     public CustomerSteps() {
@@ -94,6 +95,14 @@ public class CustomerSteps implements En {
             }
 
             Storage.put(BALANCE_BEFORE, requiredBalance);
+        });
+
+        Given("^I edit the Master Controller Settings$", (DataTable table) -> {
+            StrictHashMap<String, String> settings = new StrictHashMap<>();
+            settings.putAll(table.asMap(String.class, String.class));
+            masCtrlPage = new MasterControllerPage();
+            masCtrlPage.load();
+            masCtrlPage.enterSettings(settings.getBoolean("Enable Duplicate Account Checking on Customer Sign-Up"));
         });
 
         When("^I create a new customer via API with data$", (DataTable table) -> {
