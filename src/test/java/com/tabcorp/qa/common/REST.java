@@ -23,16 +23,14 @@ public class REST {
     public static Object post(String url, Map<String, Object> fields, Map<String, String> headers) {
         HttpResponse<String> response;
         try {
-
-            log.info("sending REST headers=" + headers);
-            log.info("sending REST fields=" + fields);
+            log.debug("sending POST headers=" + headers);
+            log.debug("sending POST fields=" + fields);
             response = Unirest.post(url)
                     .headers(headers)
                     .fields(fields)
                     .asString();
         } catch (UnirestException e) {
-            log.info("REST URL=" + url);
-            throw new FrameworkError(e);
+            throw new FrameworkError(String.format("POST to URL='%s': %s", url, e));
         }
         return verifyAndParseResponse(response);
     }
@@ -45,30 +43,28 @@ public class REST {
         fields.put("output_type", "json");
         HttpResponse<String> response;
         try {
+            log.debug("sending POST query string=" + pair);
+            log.debug("sending POST fields=" + fields);
             response = Unirest.post(url)
                     .queryString(fields)
                     .queryString(pair.getKey(), pair.getValue())
                     .asString();
         } catch (UnirestException e) {
-            log.info("REST URL=" + url);
-            throw new FrameworkError(e);
+            throw new FrameworkError(String.format("POST with QueryString to URL='%s': %s", url, e));
         }
         return verifyAndParseResponse(response);
     }
 
     public static Object put(String url, String reqJSON) {
-        log.info("PUT Request : " + reqJSON);
-
         HttpResponse<String> response;
         try {
+            log.debug("PUT Request : " + reqJSON);
             response = Unirest.put(url)
                     .header("accept", "application/json")
                     .body(reqJSON)
                     .asString();
         } catch (UnirestException e) {
-            log.info("REST URL for PUT=" + url);
-            log.info("PUT Request JSON=" + reqJSON);
-            throw new FrameworkError(e);
+            throw new FrameworkError(String.format("PUT URL='%s': %s", url, e));
         }
         return verifyAndParseResponse(response);
     }
@@ -76,13 +72,12 @@ public class REST {
     public static Object get(String url, Map<String, Object> queryParams) {
         HttpResponse<String> response;
         try {
-            log.info("sending GET queryPrams=" + queryParams);
+            log.debug("sending GET queryPrams=" + queryParams);
             response = Unirest.get(url)
                     .queryString(queryParams)
                     .asString();
         } catch (UnirestException e) {
-            log.info("GET URL=" + url);
-            throw new FrameworkError(e);
+            throw new FrameworkError(String.format("GET URL='%s': %s", url, e));
         }
         return verifyAndParseResponse(response);
     }
