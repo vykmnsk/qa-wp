@@ -76,7 +76,10 @@ Feature: Placing and Settling multi-multi Bets
     Examples:
       | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetType1 | BetType2 | BetType3 | BetOn                      | Stake               | Flexi   | Cost  | Payout  |
       | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Doubles,Trixie,Patent | Win      | Win      | Win      | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | N,N,N,N | 45.00 | 7605.00 |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Doubles,Trixie,Patent | Place    | Place    | Place    | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | N,N,N,N | 45.00 | 389.58  |
+
+    Examples:
+      | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetType1 | BetType2 | BetType3 | BetOn                      | Stake               | Flexi   | Cost  | Payout |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Doubles,Trixie,Patent | Place    | Place    | Place    | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | N,N,N,N | 45.00 | 389.58 |
       #TODO | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR  | Treble,Doubles,Trixie,Patent | Eachway | Eachway | Eachway | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | N,N,N,N | 3.00   | 3026.52 |
 
   Scenario Outline: Racing Multi-Multi <MultiType> bets
@@ -146,13 +149,9 @@ Feature: Placing and Settling multi-multi Bets
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
     Then customer balance since last bet is increased by $<Payout>
 
-  @smoke
-    Examples:
-      | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType     | BetOn                      | Stake     | Flexi | Cost | Payout  |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Trixie | Runner01,Runner11,Runner21 | 3.00,3.00 | Y,Y   | 6.00 | 2442.00 |
-
     Examples:
       | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetOn                      | Stake               | Flexi   | Cost  | Payout  |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Trixie                | Runner01,Runner11,Runner21 | 3.00,3.00           | Y,Y     | 6.00  | 2442.00 |
       | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Trixie                | Runner01,Runner11,Runner21 | 3.00,3.00           | N,N     | 15.00 | 4323.00 |
       | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Trixie                | Runner01,Runner11,Runner21 | 3.00,3.00           | Y,Y     | 6.00  | 2442.00 |
       | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Doubles,Trixie,Patent | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | Y,Y,Y,Y | 11.94 | 3035.46 |

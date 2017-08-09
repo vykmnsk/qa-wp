@@ -138,19 +138,15 @@ Feature: Placing and Settling multi Bets
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
     Then customer balance since last bet is increased by $<Payout>
 
-  @smoke
-    Examples:
-      | Category1    | Subcategory1 | Category2    | Subcategory2 | BetType1 | BetType2 | BetType3 | BetOn                      | Stake | Flexi | Cost | Payout |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Place    | Place    | Place    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 57.26  |
-
     Examples:
       | Category1        | Subcategory1 | Category2        | Subcategory2 | BetType1 | BetType2 | BetType3 | BetOn                      | Stake | Flexi | Cost | Payout  |
+      | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Place    | Place    | Place    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 57.26   |
       | Horse Racing     | PAKENHAM     | Horse Racing     | SEYMOUR      | Win      | Win      | Win      | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 1815.00 |
       | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Win      | Win      | Win      | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 1815.00 |
       | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Win      | Win      | Win      | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 1815.00 |
       | Greyhound Racing | CORK         | Greyhound Racing | HOBART       | Place    | Place    | Place    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 57.26   |
       | Harness Racing   | ALBANY       | Harness Racing   | ALBION PARK  | Place    | Place    | Place    | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00 | 57.26   |
-      #TODO  | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Eachway  | Eachway  | Win,Place | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00      | 165.00  |
+      #TODO  | Horse Racing | PAKENHAM   | Horse Racing  | SEYMOUR  | Eachway  | Eachway  | Win,Place | Runner01,Runner11,Runner21 | 3.00  | N     | 3.00      | 165.00  |
 
   Scenario Outline: Racing 3-Event <MultiType> bet
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"

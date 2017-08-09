@@ -71,13 +71,13 @@ public class CustomerSteps implements En {
             String clientIp = custData.containsKey("client_ip") ? custData.get("client_ip") : null;
             String accessToken = api.login(custData.get("username"), custData.get("password"), clientIp);
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
-            Helpers.retryOnFailure(() -> {
-                String actualAmlStatus = api.readAmlStatus(accessToken);
-                assertThat(actualAmlStatus).contains("verified");
-            }, 10, 2);
             Storage.put(API_ACCESS_TOKEN, accessToken);
 
             if (Config.isLuxbet()) {
+                Helpers.retryOnFailure(() -> {
+                    String actualAmlStatus = api.readAmlStatus(accessToken);
+                    assertThat(actualAmlStatus).isEqualToIgnoringCase("account_verified");
+                }, 10, 2);
                 String statusMsg = wapi.depositCash(accessToken, requiredBalance);
                 assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
             } else if (Config.isRedbook()) {
