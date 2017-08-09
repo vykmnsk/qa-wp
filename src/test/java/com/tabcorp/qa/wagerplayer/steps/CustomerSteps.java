@@ -71,6 +71,10 @@ public class CustomerSteps implements En {
             String clientIp = custData.containsKey("client_ip") ? custData.get("client_ip") : null;
             String accessToken = api.login(custData.get("username"), custData.get("password"), clientIp);
             assertThat(accessToken).as("session ID / accessToken").isNotEmpty();
+            Helpers.retryOnFailure(() -> {
+                String actualAmlStatus = api.readAmlStatus(accessToken);
+                assertThat(actualAmlStatus).contains("verified");
+            }, 10, 2);
             Storage.put(API_ACCESS_TOKEN, accessToken);
 
             if (Config.isLuxbet()) {
@@ -468,7 +472,9 @@ public class CustomerSteps implements En {
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         StrictHashMap<String, String> cust = new StrictHashMap<>();
         cust.putAll(custFiltered);
-        cust.put("lastname", "Auto" + RandomStringUtils.randomAlphabetic(30));
+        if (Config.isRedbook()) {
+            cust.put("lastname", "Auto" + RandomStringUtils.randomAlphabetic(30));
+        }
         cust.put("username", "AutoUser" + RandomStringUtils.randomNumeric(9));
         String password = RandomStringUtils.randomAlphabetic(7) + RandomStringUtils.randomNumeric(3);
         cust.put("password", password);
