@@ -81,7 +81,7 @@ Feature: Create Sunbets Events in WagerPlayer UI
     Then I can see success status with message "Market display updated"
     And event status is "L"
 
-  @smoke
+   @smoke
     Examples:
       | Category     | Subcategory   | NumOfRunners | RaceNumber | PlaceFraction | NoOfPlaces |
       | Horse Racing | WOLVERHAMPTON | 8            | 1          | 1/5           | 3          |

@@ -39,7 +39,6 @@ Feature: Dead Heats with several single bets
     And I settle race
     Then customer balance since last bet is increased by $<Payout>
 
-  @smoke
     Examples:
       | Type  | Category     | Subcategory   | PlacePrices                  | NumOfPlaces | WinnerWithPositions                            | Payout |
       | THIRD | Horse Racing | WOLVERHAMPTON | 1.80, 1.55, 1.85, 2.05, 1.65 | 3           | 1:Runner01, 2:Runner02, 3:Runner03, 3:Runner04 | 63.19  |

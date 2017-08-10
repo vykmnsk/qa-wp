@@ -45,7 +45,6 @@ Feature: Placing and Settling multi Bets
     When I result/settle created event race with winners "Runner11, Runner12, Runner13"
     Then customer balance since last bet is increased by $<Payout>
 
-  @smoke
     Examples:
       | Category     | Subcategory   | BetType | NumOfPlaces | BetOn              | Stake | Deduction | Payout |
       | Horse Racing | WOLVERHAMPTON | Win     | 3           | Runner01, Runner11 | 3.00  | 3.00      | 7.59   |

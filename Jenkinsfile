@@ -31,12 +31,6 @@ pipeline {
                 sh 'ENV=src/env_files/php7_env  TEST_TAGS="install-dependencies" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
-
-            post {
-                always {
-                    sh 'ENV=src/env_files/php7_env docker-compose logs testservice'
-                }
-            }
         }
 
         /****************
@@ -44,10 +38,18 @@ pipeline {
          * Just to check if the url was reachable from the jenkins worker.
          ****************/
 
-        stage('common : login tests') {
+        stage('gatekeeper tests') {
             steps {
-                sh 'ENV=src/env_files/php7_env TEST_TAGS="-t @login" docker-compose up -d  --force-recreate --build'
-                sh 'exit $(docker wait testservice)'
+                parallel(
+                        "login tests": {
+                            sh 'ENV=src/env_files/php7_env TEST_TAGS="-t @login" docker-compose up -d  --force-recreate --build'
+                            sh 'exit $(docker wait testservice)'
+                        },
+                        "loss limit tests": {
+                            sh 'docker build -t "wagerplayer-red:io" .'
+                            sh 'docker run -e TEST_TAGS="-t @loss-limit" --env-file=src/env_files/php7_env wagerplayer-red:io --rm=false'
+                        }
+                )
             }
 
             post {
@@ -59,7 +61,7 @@ pipeline {
 
         stage('redbook smoke tests') {
             steps {
-                sh 'ENV=src/env_files/php7_env TEST_TAGS="-t @smoke -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
+                sh 'ENV=src/env_files/php7_env TEST_TAGS="-t @smoke -t ~@login -t ~@luxbet -t ~@luxbet-mobile" docker-compose up -d  --force-recreate --build'
                 sh 'exit $(docker wait testservice)'
             }
 
@@ -97,7 +99,7 @@ pipeline {
 
         always {
             sh 'docker-compose down'
-            sh 'echo "To ensure conatiners have been brought down."' 
+            sh 'echo "To ensure conatiners have been brought down."'
             sh 'docker ps -a'
         }
 
@@ -123,5 +125,4 @@ pipeline {
             }
         }
     }
-
 }

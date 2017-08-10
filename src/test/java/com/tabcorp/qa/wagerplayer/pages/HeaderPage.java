@@ -77,7 +77,7 @@ public class HeaderPage extends AppPage {
             wait.until(ExpectedConditions.textToBePresentInElement(event, eventVal));
             (new Select(event)).selectByVisibleText(eventVal);
             Assertions.assertThat(event.getText()).as("Event Name").contains(eventVal);
-        }, 5, 1);
+        }, 15, 1);
     }
 
     public void navigateToF3(String catVal, String subcatVal) {
