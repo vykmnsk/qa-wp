@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LossLimitSteps implements En {
 
-    private MOBI_V2 mobi_v2 = new MOBI_V2();
+    private MOBI_V2 mobi_v2;
     private WagerPlayerAPI api = Config.getAPI();
 
     public LossLimitSteps() {
@@ -38,6 +38,7 @@ public class LossLimitSteps implements En {
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
             String clientIp = custData.getOrDefault("client_ip", null);
             String accessToken = api.login(custData.get("username"), custData.get("password"), clientIp);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
             mobi_v2.setCustomerLossLimit(accessToken, lossLimit, duration);
         });
 

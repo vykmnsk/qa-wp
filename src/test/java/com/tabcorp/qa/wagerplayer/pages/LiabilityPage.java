@@ -14,12 +14,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 
 public class LiabilityPage extends AppPage {
@@ -65,7 +62,7 @@ public class LiabilityPage extends AppPage {
                 continue;
             }
             Helpers.retryOnFailure(() -> {
-            String updatedPriceText = updateElementText(priceCell, priceValue.toString());
+                String updatedPriceText = updateElementText(priceCell, priceValue.toString());
                 assertThat(NumberUtils.isNumber(updatedPriceText))
                         .as(String.format("Price value entered '%s' is a Number", updatedPriceText))
                         .isTrue();

@@ -135,13 +135,11 @@ public class Helpers {
     public static void retryOnFailure(Runnable block, int maxTries, int sleepSeconds) {
         for (int i = 1; i <= maxTries; i++) {
             try {
-                Thread.sleep((long) sleepSeconds * 1000);
+                if (i > 1) Thread.sleep((long) sleepSeconds * 1000);
                 block.run();
                 return;
-            } catch (AssertionError ae) {
-                log.info(String.format("Re-trying %d. Exception: %s", i, ae.getMessage()));
-            } catch (TimeoutException se) {
-                log.info(String.format("Re-trying %d. Exception: %s", i, se.getMessage()));
+            } catch (AssertionError | TimeoutException e) {
+                log.info(String.format("Re-tried %d. Exception: %s", i, e.getMessage()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
