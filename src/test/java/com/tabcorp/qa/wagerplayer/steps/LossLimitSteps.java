@@ -9,7 +9,6 @@ import cucumber.api.java8.En;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +24,7 @@ public class LossLimitSteps implements En {
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
             String accessToken = api.login(custData.get("username"), custData.get("password"), null);
 
+            MOBI_V2 mobi_v2 = new MOBI_V2();
             Pair<BigDecimal,String> lossLimitData = mobi_v2.getCustomerLossLimitAndDefinition(accessToken);
             BigDecimal actualLossLimit = lossLimitData.getLeft();
             assertThat(Helpers.roundOff(actualLossLimit)).as("Actual Casino Loss Limit").isEqualTo(Helpers.roundOff(expectedLossLimit));
