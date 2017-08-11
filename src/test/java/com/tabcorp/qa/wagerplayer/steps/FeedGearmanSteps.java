@@ -30,6 +30,10 @@ import java.util.zip.DeflaterOutputStream;
  * Created by klindy on 11/8/17.
  */
 public class FeedGearmanSteps implements En {
+    final String WORKER_NAME = "ss_market_create"; //"ss_burrito_market_update"
+    final String WORKLOAD_TYPE = "ss_snapshot";
+
+
     public static Logger log = LoggerFactory.getLogger(FeedSteps.class);
 
     private String eventNameRequested;
@@ -43,9 +47,7 @@ public class FeedGearmanSteps implements En {
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
             int startInMinutes = 30;
-            String worker = "ss_burrito_market_update";
-            String workloadType = "ss_snapshot";
-            String workload = prepareWorkload(templateFile, eventId, eventNameRequested, startInMinutes, worker, workloadType);
+            String workload = prepareWorkload(templateFile, eventId, eventNameRequested, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
 
             String jobType = "ss_snapshot";
             try {
@@ -61,7 +63,6 @@ public class FeedGearmanSteps implements En {
                 client.addServer(server);
 
                 GearmanJobReturn gearmanJobReturn;
-//                gearmanJobReturn = client.submitJob(jobType, objectMapper.writeValueAsBytes(item));
                 gearmanJobReturn = client.submitJob(jobType, workload.getBytes("UTF-8"));
                 GearmanJobEvent gearmanJobEvent = gearmanJobReturn.poll();
                 while (gearmanJobEvent.getEventType() != GearmanJobEventType.GEARMAN_EOF) {
