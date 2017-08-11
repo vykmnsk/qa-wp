@@ -4,6 +4,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -211,5 +214,16 @@ public class Helpers {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static JSONObject readJSON(String templateFile) {
+        JSONParser parser = new JSONParser();
+        JSONObject json;
+        try {
+            json = (JSONObject) parser.parse(readResourceFile(templateFile));
+        } catch (ParseException pe) {
+            throw new FrameworkError(pe);
+        }
+        return json;
     }
 }

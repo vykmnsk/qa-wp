@@ -84,7 +84,8 @@ public class WAPI implements WagerPlayerAPI {
     public enum Category {
         HORSE_RACING(71),
         GREYHOUND_RACING(405),
-        HARNESS_RACING(406);
+        HARNESS_RACING(406),
+        TENNIS(10448);
         public final int id;
         Category(int id) {
             this.id = id;

@@ -29,7 +29,7 @@ public class FeedSteps implements En {
     private final static String EXCHANGE_TYPE = "direct";
     private final static String ALTERNATE_EXCHANGE_NAME = "wift_primary";
     public static Logger log = LoggerFactory.getLogger(FeedSteps.class);
-    private WAPI wapi = new WAPI();
+    private WAPI wapi;
     private String apiSessionId;
     private String eventNameRequested;
     private Map eventReceived;
@@ -86,6 +86,7 @@ public class FeedSteps implements En {
 
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
+            wapi = new WAPI();
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
                 JSONArray events = wapi.getEvents(apiSessionId, category, 24);
