@@ -1,6 +1,5 @@
-@feed @redbook
+@feed @rabbitmq @redbook
 Feature: Event Feeds
-
 
   Scenario: PA Feed a Race Event
     When I login in "PA" RabbitMQ and enqueue an Event message based on "feeds/pa-horse-racing.json"

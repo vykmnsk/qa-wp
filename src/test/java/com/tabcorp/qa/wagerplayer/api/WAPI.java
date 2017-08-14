@@ -8,6 +8,7 @@ import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
 import static com.tabcorp.qa.common.Storage.KEY.EVENT_IDS;
 import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_IDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class WAPI implements WagerPlayerAPI {
     private static final String URL = Config.wapiURL();
@@ -85,7 +88,7 @@ public class WAPI implements WagerPlayerAPI {
         HORSE_RACING(71),
         GREYHOUND_RACING(405),
         HARNESS_RACING(406),
-        TENNIS(10448);
+        TENNIS(24);
         public final int id;
         Category(int id) {
             this.id = id;
@@ -420,9 +423,12 @@ public class WAPI implements WagerPlayerAPI {
         fields.put("cid", category.id);
         fields.put("latest", latestHours);
         ReadContext resp = post(fields);
-        log.debug(resp.jsonString());
-        JSONArray events = resp.read(RESP_ROOT + ".events.event.*");
-        assertThat(events).withFailMessage("No Events found").isNotEmpty();
+
+        String path = RESP_ROOT + ".events.event.*";
+        String errMsg = String.format("Events in response: %s", resp.jsonString());
+        assertThatCode(() -> resp.read(path)).as(errMsg).doesNotThrowAnyException();
+        JSONArray events = resp.read(path);
+        assertThat(events).as(errMsg).isNotEmpty();
         return events;
     }
 

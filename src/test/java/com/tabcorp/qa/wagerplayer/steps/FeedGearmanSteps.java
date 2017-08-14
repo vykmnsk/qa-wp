@@ -30,7 +30,8 @@ import java.util.zip.DeflaterOutputStream;
  * Created by klindy on 11/8/17.
  */
 public class FeedGearmanSteps implements En {
-    final String WORKER_NAME = "ss_market_create"; //"ss_burrito_market_update"
+    final String WORKER_NAME = "ss_market_create";
+//    final String WORKER_NAME = "ss_burrito_market_update";
     final String WORKLOAD_TYPE = "ss_snapshot";
 
 
@@ -48,10 +49,9 @@ public class FeedGearmanSteps implements En {
                     RandomStringUtils.randomAlphanumeric(12));
             int startInMinutes = 30;
             String workload = prepareWorkload(templateFile, eventId, eventNameRequested, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
-
-            String jobType = "ss_snapshot";
+            log.trace("Workload for Gearman: {}", workload);
             try {
-                log.info("Submitting the job to the worker: {} ", jobType);
+                log.info("Submitting job for eventName={} to worker={} of type={}", eventNameRequested, WORKER_NAME, WORKLOAD_TYPE);
                 Gearman gearman;
                 try {
                     gearman = new GearmanImpl();
@@ -63,7 +63,7 @@ public class FeedGearmanSteps implements En {
                 client.addServer(server);
 
                 GearmanJobReturn gearmanJobReturn;
-                gearmanJobReturn = client.submitJob(jobType, workload.getBytes("UTF-8"));
+                gearmanJobReturn = client.submitJob(WORKLOAD_TYPE, workload.getBytes("UTF-8"));
                 GearmanJobEvent gearmanJobEvent = gearmanJobReturn.poll();
                 while (gearmanJobEvent.getEventType() != GearmanJobEventType.GEARMAN_EOF) {
                     gearmanJobEvent = gearmanJobReturn.poll();
@@ -80,6 +80,7 @@ public class FeedGearmanSteps implements En {
     private String prepareWorkload(String templateFile, String eventId, String eventName, int inMinutes, String worker, String workloadType) {
         JSONObject payloadTempl = Helpers.readJSON(templateFile);
         JSONObject payload = updateJSON(payloadTempl, eventId, eventName, inMinutes);
+        log.debug("Payload for Gearman: {}", payload);
         JSONObject workload = new JSONObject();
         workload.put("snapshot", compressAndEncode(payload.toJSONString()));
         workload.put("resourceName", eventName);

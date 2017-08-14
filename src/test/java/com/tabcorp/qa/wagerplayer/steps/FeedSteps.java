@@ -82,6 +82,10 @@ public class FeedSteps implements En {
         });
 
         Then("^WagerPlayer receives the Event in category \"([^\"]+)\"$", (String catName) -> {
+//            /*DBG*/ eventNameRequested = "QAFEED17081414175286";
+            /*DBG*/ eventNameRequested = "QAFEED170814142129394";
+
+
             WAPI.Category category = WAPI.Category.valueOf(Helpers.normalize(catName).toUpperCase());
 
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
@@ -96,7 +100,7 @@ public class FeedSteps implements En {
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
 
-            }, 5, 3);
+            }, 1, 3);
         });
 
         Then("^The received Event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
