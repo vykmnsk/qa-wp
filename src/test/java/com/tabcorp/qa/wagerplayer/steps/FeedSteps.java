@@ -36,14 +36,13 @@ public class FeedSteps implements En {
     private final int FEED_TRAVEL_SECONDS = 2;
 
     public FeedSteps() {
-        When("^I login in \"(PA|WIFT)\" RabbitMQ and enqueue an Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
+        When("^I feed \"(PA|WIFT)\" RabbitMQ with Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
             final String baseName = "QAFEED";
             eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
             String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
             String payload = preparePayload(templateFile, eventId, eventNameRequested, 30);
-
             ConnectionFactory factory = new ConnectionFactory();
             factory.setVirtualHost("/");
             switch(feedType) {
@@ -72,7 +71,7 @@ public class FeedSteps implements En {
                 channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true, false, args);
                 log.info("connected to rabbitMQ!");
                 channel.basicPublish(EXCHANGE_NAME, "", null, payload.getBytes());
-                log.info("Sent '" + payload + "'");
+                log.info("Sent payload to RabbitMQ'" + payload + "'");
 
                 channel.close();
                 connection.close();

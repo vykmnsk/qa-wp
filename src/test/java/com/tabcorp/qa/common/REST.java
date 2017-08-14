@@ -29,6 +29,7 @@ public class REST {
                     .headers(headers)
                     .fields(fields)
                     .asString();
+            log.debug("POST response={}", response.getBody());
         } catch (UnirestException e) {
             throw new FrameworkError(String.format("POST to URL='%s': %s", url, e));
         }
