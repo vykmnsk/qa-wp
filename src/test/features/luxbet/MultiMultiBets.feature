@@ -4,6 +4,7 @@ Feature: Placing and Settling multi-multi Bets
   Background:
     Given A new default customer with $500.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
+    And I update the customer AML status to "Manually Verified"
 
   Scenario Outline: Racing Multi-Multi <MultiType> bets
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"

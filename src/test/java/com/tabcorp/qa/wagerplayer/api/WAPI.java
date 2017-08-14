@@ -165,6 +165,7 @@ public class WAPI implements WagerPlayerAPI {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_deposit");
         fields.put("amount", cashAmount);
+        fields.put("deposit_type", 14);
         ReadContext resp = post(fields);
         String msg = resp.read(RESP_ROOT + ".account[0].message");
         int transId = resp.read(RESP_ROOT + ".account[0].transaction_id");
