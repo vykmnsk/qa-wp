@@ -20,7 +20,7 @@ Feature: Event Feeds
       | WIFT | Horse Racing     | wift-horse-racing-scratched-capton.json     | Capton    |
       | PA   | Greyhound Racing | pa-greyhound-racing-scratched-guinness.json | Guinness  |
 
-  Scenario Outline: <type> Feed: Create <category> Event update with Scratched selection
+  Scenario Outline: <type> Feed: Create <category> Event then Update with Scratched selection
     When I feed "<type>" RabbitMQ with Event message based on "feeds/<template1>"
     Then WagerPlayer receives the Event in category "<category>"
     When I feed "<type>" RabbitMQ with Event message based on "feeds/<template2>"
