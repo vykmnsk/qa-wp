@@ -81,16 +81,6 @@ public class WAPI implements WagerPlayerAPI {
         }
     }
 
-    public enum Category {
-        HORSE_RACING(71),
-        GREYHOUND_RACING(405),
-        HARNESS_RACING(406);
-        public final int id;
-        Category(int id) {
-            this.id = id;
-        }
-    }
-
     private static final Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static Map<String, Object> wapiAuthFields() {
@@ -414,10 +404,10 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public JSONArray getEvents(String sessionId, Category category, int latestHours) {
+    public JSONArray getEvents(String sessionId, int subcatId, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
-        fields.put("cid", category.id);
+        fields.put("scid", subcatId);
         fields.put("latest", latestHours);
         ReadContext resp = post(fields);
         log.debug(resp.jsonString());

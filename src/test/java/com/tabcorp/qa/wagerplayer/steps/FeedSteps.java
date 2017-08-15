@@ -80,20 +80,27 @@ public class FeedSteps implements En {
             }
         });
 
-        Then("^WagerPlayer receives the Event in category \"([^\"]+)\"$", (String catName) -> {
-            WAPI.Category category = WAPI.Category.valueOf(Helpers.normalize(catName).toUpperCase());
+        Then("^WagerPlayer receives the Event in \"([^\"]+)\"-\"([^\"]+)\"$", (String catName, String subcatNme) -> {
+            Map<String, Map<String, Integer>> categories = Helpers.loadYamlResource("categories.yml");
+
+            String catNameNormed = Helpers.normalize(catName.toUpperCase());
+            String subcatNameNormed = Helpers.normalize(subcatNme.toUpperCase());
+            Map<String, Integer> subCats = categories.get(catNameNormed);
+            assertThat(subCats).withFailMessage(String.format("No category found with name '%s'", catNameNormed)).isNotNull();
+
+            Integer subcatId = subCats.get(subcatNameNormed);
+            assertThat(subcatId).withFailMessage(String.format("No subcategory found with name '%s'", subcatNameNormed)).isNotNull();
 
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
-                JSONArray events = wapi.getEvents(apiSessionId, category, 24);
+                JSONArray events = wapi.getEvents(apiSessionId, subcatId, 24);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName((e), eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
-
             }, 5, 3);
         });
 
