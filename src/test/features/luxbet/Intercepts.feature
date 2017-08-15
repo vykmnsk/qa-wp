@@ -4,6 +4,7 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
   Background:
     Given A new default customer with $5000.00 balance is created and logged in API
     When I am logged into WP UI and on Home Page
+    And I update the customer AML status to "Manually Verified"
     And I modify Intercept on Bet Placement Racing to "Yes" on customer config for default customer
 
   Scenario Outline: <interceptAction> Single bet on Intercept
@@ -399,10 +400,10 @@ Feature: ACCEPT REJECT PARTIAL on Intercept bets
       | E/W                | yes       |
     And I update fixed place prices "2.85, 2.00, 2.05, 2.40, 1.45, 2.15, 2.00, 3.55"
 
-    When I place a Luxbet Multi Bet "Patent" on the runners "Runner01,Runner11,Runner21" for $400.00 with flexi as "N" and do "Accept,Reject,Partial,Accept,Accept,Accept,Accept" the intercepts with partial amount as $20.00
-    Then customer balance is equal to $2980.00
+    When I place a Luxbet Multi Bet "Patent" on the runners "Runner01,Runner11,Runner21" for $100.00 with flexi as "N" and do "Accept,Reject,Partial,Accept,Accept,Accept,Accept" the intercepts with partial amount as $20.00
+    Then customer balance is equal to $4480.00
 
     When I result/settle created event race with winners "Runner01,Runner02,Runner03"
     When I result/settle created event race with winners "Runner11,Runner12,Runner13"
     When I result/settle created event race with winners "Runner21,Runner22,Runner23"
-    Then customer balance is equal to $186880.00
+    Then customer balance is equal to $74280.00

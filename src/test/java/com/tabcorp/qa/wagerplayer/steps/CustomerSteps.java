@@ -75,10 +75,6 @@ public class CustomerSteps implements En {
             Storage.put(API_ACCESS_TOKEN, accessToken);
 
             if (Config.isLuxbet()) {
-                Helpers.retryOnFailure(() -> {
-                    String actualAmlStatus = api.readAmlStatus(accessToken);
-                    assertThat(actualAmlStatus).isEqualToIgnoringCase("account_verified");
-                }, 10, 2);
                 String statusMsg = wapi.depositCash(accessToken, requiredBalance);
                 assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
             } else if (Config.isRedbook()) {

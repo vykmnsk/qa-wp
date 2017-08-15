@@ -4,6 +4,7 @@ Feature: Create and verify event in Luxbet WagerPlayer
   Background:
     Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
+    And I update the customer AML status to "Manually Verified"
 
   @smoke
   Scenario: Deductions for 3 place 1 scratched runner

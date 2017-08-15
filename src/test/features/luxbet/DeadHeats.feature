@@ -4,6 +4,7 @@ Feature: Deadheats testing on a Luxbet event
   Background:
     Given A new default customer with $100.00 balance is created and logged in API
     And I am logged into WP UI and on Home Page
+    And I update the customer AML status to "Manually Verified"
 
   Scenario Outline: Deadheat at <type>
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"

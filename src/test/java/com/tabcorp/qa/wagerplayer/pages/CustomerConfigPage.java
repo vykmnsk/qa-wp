@@ -43,16 +43,20 @@ public class CustomerConfigPage extends AppPage {
         interceptOnBetRacingYes.click();
         scrollTo(updateButton);
         updateButton.click();
-
-        driver.close();
-        driver.switchTo().window(customerConfigWindow);
-        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
+        closeWindow();
     }
 
     public void updateAmlStatus(String newamlstatus) {
         wait.until(ExpectedConditions.visibilityOf(aml_status));
         (new Select(aml_status)).selectByVisibleText(newamlstatus);
         update.click();
+        closeWindow();
+    }
+
+    private void closeWindow() {
+        driver.close();
+        driver.switchTo().window(customerConfigWindow);
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
     }
 
 }
