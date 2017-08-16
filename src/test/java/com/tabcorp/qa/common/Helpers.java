@@ -142,7 +142,7 @@ public class Helpers {
                 block.run();
                 return;
             } catch (AssertionError | TimeoutException e) {
-                log.info(String.format("Re-tried %d. Exception: %s", i, e.getMessage()));
+                log.info(String.format("Tried %d. Exception: %s", i, e.getMessage()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -174,10 +174,9 @@ public class Helpers {
                 .collect(Collectors.toList());
     }
 
-
-    public static Map<String, String> loadYamlResource(String filename) {
+    public static Map loadYamlResource(String filename) {
         InputStream input = Helpers.class.getClassLoader().getResourceAsStream(filename);
-        return (Map<String, String>) (new Yaml()).load(input);
+        return (Map) (new Yaml()).load(input);
     }
 
     public static String getTargetDirPath() {

@@ -11,16 +11,28 @@ import com.tabcorp.qa.wagerplayer.api.WAPI;
 import cucumber.api.java8.En;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.gearman.Gearman;
+import org.gearman.GearmanClient;
+import org.gearman.GearmanJobEvent;
+import org.gearman.GearmanJobEventType;
+import org.gearman.GearmanJobReturn;
+import org.gearman.GearmanServer;
+import org.gearman.impl.GearmanImpl;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,14 +48,13 @@ public class FeedSteps implements En {
     private final int FEED_TRAVEL_SECONDS = 2;
 
     public FeedSteps() {
-        When("^I login in \"(PA|WIFT)\" RabbitMQ and enqueue an Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
+        When("^I feed \"(PA|WIFT)\" RabbitMQ with Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
             final String baseName = "QAFEED";
             eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
             String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
-            String payload = preparePayload(templateFile, eventId, eventNameRequested, 30);
-
+            String payload = prepareRabbitMQPayload(templateFile, eventId, eventNameRequested, 30);
             ConnectionFactory factory = new ConnectionFactory();
             factory.setVirtualHost("/");
             switch(feedType) {
@@ -67,12 +78,12 @@ public class FeedSteps implements En {
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
 
-                Map<String, Object> args = new HashMap<String, Object>();
+                Map<String, Object> args = new HashMap<>();
                 args.put("alternate-exchange", ALTERNATE_EXCHANGE_NAME);
                 channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true, false, args);
                 log.info("connected to rabbitMQ!");
                 channel.basicPublish(EXCHANGE_NAME, "", null, payload.getBytes());
-                log.info("Sent '" + payload + "'");
+                log.info("Sent payload to RabbitMQ'" + payload + "'");
 
                 channel.close();
                 connection.close();
@@ -81,26 +92,67 @@ public class FeedSteps implements En {
             }
         });
 
-        Then("^WagerPlayer receives the Event in category \"([^\"]+)\"$", (String catName) -> {
-//            /*DBG*/ eventNameRequested = "QAFEED17081414175286";
-            /*DBG*/ eventNameRequested = "QAFEED170814142129394";
+        When("^I feed Gearman with Event message based on \"([^\"]*)\"$", (String templateFile) -> {
+            final String WORKER_NAME = "ss_market_create";
+            // final String WORKER_NAME = "ss_burrito_market_update";
+            final String WORKLOAD_TYPE = "ss_snapshot";
 
+            final String baseName = "QAFEED";
+            eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
+            String eventId = String.format("%s_%s",
+                    RandomStringUtils.randomNumeric(5),
+                    RandomStringUtils.randomAlphanumeric(12));
+            int startInMinutes = 30;
+            String workload = prepareGearmanWorkload(templateFile, eventId, eventNameRequested, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
+            log.trace("Workload for Gearman: {}", workload);
+            try {
+                log.info("Submitting job for eventName={} to worker={} of type={}", eventNameRequested, WORKER_NAME, WORKLOAD_TYPE);
+                Gearman gearman;
+                try {
+                    gearman = new GearmanImpl();
+                } catch (IOException e) {
+                    throw new FrameworkError(e);
+                }
+                GearmanServer server = gearman.createGearmanServer("php7-rds0-gearman.sunppw.in.cld", 4730);
+                final GearmanClient client = gearman.createGearmanClient();
+                client.addServer(server);
 
-            WAPI.Category category = WAPI.Category.valueOf(Helpers.normalize(catName).toUpperCase());
+                GearmanJobReturn gearmanJobReturn;
+                gearmanJobReturn = client.submitJob(WORKLOAD_TYPE, workload.getBytes("UTF-8"));
+                GearmanJobEvent gearmanJobEvent = gearmanJobReturn.poll();
+                while (gearmanJobEvent.getEventType() != GearmanJobEventType.GEARMAN_EOF) {
+                    gearmanJobEvent = gearmanJobReturn.poll();
+                    log.debug(".");
+                }
+                log.info("Job Taken by Gearman: {}", gearmanJobEvent);
+            } catch (Exception e) {
+                throw new FrameworkError(e);
+            }
+        });
+
+        Then("^WagerPlayer receives the Event in \"([^\"]+)\"-\"([^\"]+)\"$", (String catName, String subcatNme) -> {
+            Map<String, Map<String, Integer>> categories = Helpers.loadYamlResource("categories.yml");
+
+            String catNameNormed = Helpers.normalize(catName.toUpperCase());
+            String subcatNameNormed = Helpers.normalize(subcatNme.toUpperCase());
+            Map<String, Integer> subCats = categories.get(catNameNormed);
+            assertThat(subCats).withFailMessage(String.format("No category found with name '%s'", catNameNormed)).isNotNull();
+
+            Integer subcatId = subCats.get(subcatNameNormed);
+            assertThat(subcatId).withFailMessage(String.format("No subcategory found with name '%s'", subcatNameNormed)).isNotNull();
 
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             wapi = new WAPI();
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
-                JSONArray events = wapi.getEvents(apiSessionId, category, 24);
+                JSONArray events = wapi.getEvents(apiSessionId, subcatId, 24);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName((e), eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
-
-            }, 1, 3);
+            }, 5, 3);
         });
 
         Then("^The received Event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
@@ -114,14 +166,7 @@ public class FeedSteps implements En {
         });
     }
 
-    private boolean matchByName(Map event, String initialName) {
-        Map nameMap = (Map) event.get("name");
-        String name = nameMap.get("-content").toString();
-        return name.endsWith(initialName);
-
-    }
-
-    private String preparePayload(String templateFile, String id, String name, int inMinutes) {
+    private String prepareRabbitMQPayload(String templateFile, String id, String name, int inMinutes) {
         JSONParser parser = new JSONParser();
         JSONObject json;
         try {
@@ -135,6 +180,42 @@ public class FeedSteps implements En {
         json.put("name", name);
         json.put("start_time", startTimeStamp);
         return json.toJSONString();
+    }
+
+    private String prepareGearmanWorkload(String templateFile, String eventId, String eventName, int inMinutes, String worker, String workloadType) {
+        JSONObject payload = Helpers.readJSON(templateFile);
+        LocalDateTime startTime = LocalDateTime.now().plusMinutes(inMinutes);
+        String startTimeStamp = startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        payload.put("Id", eventId);
+        payload.put("FixtureName", eventName);
+        payload.put("StartTime", startTimeStamp);
+        log.debug("Payload for Gearman: {}", payload);
+
+        JSONObject workload = new JSONObject();
+        workload.put("snapshot", compressAndEncode(payload.toJSONString()));
+        workload.put("resourceName", eventName);
+        workload.put("marketWorkerName", worker);
+        workload.put("type", workloadType);
+        return workload.toJSONString();
+    }
+
+    public static String compressAndEncode(String input) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        DeflaterOutputStream def = new DeflaterOutputStream(out, new Deflater(-1, true));
+        try {
+            def.write(input.getBytes());
+            def.close();
+        } catch (IOException e) {
+            throw new FrameworkError(e);
+        }
+        return Base64.getEncoder().encodeToString(out.toByteArray());
+    }
+
+    private boolean matchByName(Map event, String initialName) {
+        Map nameMap = (Map) event.get("name");
+        String name = nameMap.get("-content").toString();
+        return name.endsWith(initialName);
+
     }
 
 }

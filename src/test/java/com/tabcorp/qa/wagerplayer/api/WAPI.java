@@ -8,7 +8,6 @@ import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
@@ -81,17 +79,6 @@ public class WAPI implements WagerPlayerAPI {
 
         InterceptOption(String name) {
             exactName = name;
-        }
-    }
-
-    public enum Category {
-        HORSE_RACING(71),
-        GREYHOUND_RACING(405),
-        HARNESS_RACING(406),
-        TENNIS(24);
-        public final int id;
-        Category(int id) {
-            this.id = id;
         }
     }
 
@@ -418,10 +405,10 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
-    public JSONArray getEvents(String sessionId, Category category, int latestHours) {
+    public JSONArray getEvents(String sessionId, int subcatId, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
-        fields.put("cid", category.id);
+        fields.put("scid", subcatId);
         fields.put("latest", latestHours);
         ReadContext resp = post(fields);
 

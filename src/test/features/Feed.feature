@@ -1,15 +1,38 @@
-@feed @rabbitmq @redbook
+@redbook @feed @rabbitmq 
 Feature: Event Feeds
 
-  Scenario: PA Feed a Race Event
-    When I login in "PA" RabbitMQ and enqueue an Event message based on "feeds/pa-horse-racing.json"
-    Then WagerPlayer receives the Event in category "Horse Racing"
+  @smoke
+  Scenario Outline: <type> Feed: Create <category> Event
+    When I feed "<type>" RabbitMQ with Event message based on "feeds/<template>"
+    Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
+    Examples:
+      | type | category         | subcategory | template             |
+      | PA   | Horse Racing     | CHESTER     | pa-hr-chester.json   |
+      | WIFT | Horse Racing     | BENDIGO     | wift-hr-bendigo.json |
+      | PA   | Greyhound Racing | HOVE        | pa-gh-hove.json      |
 
-  Scenario: WIFT Feed a Race Event
-    When I login in "WIFT" RabbitMQ and enqueue an Event message based on "feeds/wift-horse-racing.json"
-    Then WagerPlayer receives the Event in category "Horse Racing"
+  Scenario Outline: <type> Feed: Create <category> Event with a Scratched selection
+    When I feed "<type>" RabbitMQ with Event message based on "feeds/<template>"
+    Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
+    And The received Event contains scratched selection for "<selection>"
+    Examples:
+      | type | category         | subcategory | template                      | selection |
+      | WIFT | Horse Racing     | BENDIGO     | wift-hr-scratched-capton.json | Capton    |
+      | PA   | Greyhound Racing | HOVE        | pa-gh-scratched-guinness.json | Guinness  |
 
-  Scenario: WIFT Feed a Race Event with Scratched runner
-    When I login in "WIFT" RabbitMQ and enqueue an Event message based on "feeds/wift-horse-racing-scratched-capton.json"
-    Then WagerPlayer receives the Event in category "Horse Racing"
-    And The received Event contains scratched selection for "CAPTON"
+  Scenario Outline: <type> Feed: Create <category> Event then Update with Scratched selection
+    When I feed "<type>" RabbitMQ with Event message based on "feeds/<template1>"
+    Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
+    When I feed "<type>" RabbitMQ with Event message based on "feeds/<template2>"
+    Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
+    And The received Event contains scratched selection for "<selection>"
+    Examples:
+      | type | category         | subcategory | template1            | template2                     | selection |
+      | WIFT | Horse Racing     | BENDIGO     | wift-hr-bendigo.json | wift-hr-scratched-capton.json | Capton    |
+      | PA   | Greyhound Racing | HOVE        | pa-gh-hove.json      | pa-gh-scratched-guinness.json | Guinness  |
+
+  @wip @gearman
+  Scenario: Gearman Feed from Sporting Solutions
+    When I feed Gearman with Event message based on "feeds/gearman-tennis.json"
+    Then WagerPlayer receives the Event in "Tennis"-"ATP- World Tour Finals"
+
