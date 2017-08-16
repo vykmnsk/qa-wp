@@ -1,4 +1,4 @@
-@redbook @feed @rabbitmq 
+@redbook @feed @rabbitmq
 Feature: Event Feeds
 
   @smoke
@@ -16,9 +16,10 @@ Feature: Event Feeds
     Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
     And The received Event contains scratched selection for "<selection>"
     Examples:
-      | type | category         | subcategory | template                      | selection |
-      | WIFT | Horse Racing     | BENDIGO     | wift-hr-scratched-capton.json | Capton    |
-      | PA   | Greyhound Racing | HOVE        | pa-gh-scratched-guinness.json | Guinness  |
+      | type | category         | subcategory | template                              | selection |
+      | PA   | Horse Racing     | CHESTER     | pa-hr-chester-scratched-daschas.json  | Daschas   |
+      | WIFT | Horse Racing     | BENDIGO     | wift-hr-bendigo-scratched-capton.json | Capton    |
+      | PA   | Greyhound Racing | HOVE        | pa-gh-hove-scratched-guinness.json    | Guinness  |
 
   Scenario Outline: <type> Feed: Create <category> Event then Update with Scratched selection
     When I feed "<type>" RabbitMQ with Event message based on "feeds/<template1>"
@@ -27,8 +28,8 @@ Feature: Event Feeds
     Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
     And The received Event contains scratched selection for "<selection>"
     Examples:
-      | type | category         | subcategory | template1            | template2                     | selection |
-      | WIFT | Horse Racing     | BENDIGO     | wift-hr-bendigo.json | wift-hr-scratched-capton.json | Capton    |
-      | PA   | Greyhound Racing | HOVE        | pa-gh-hove.json      | pa-gh-scratched-guinness.json | Guinness  |
+      | type | category         | subcategory | template1            | template2                             | selection |
+      | WIFT | Horse Racing     | BENDIGO     | wift-hr-bendigo.json | wift-hr-bendigo-scratched-capton.json | Capton    |
+      | PA   | Greyhound Racing | HOVE        | pa-gh-hove.json      | pa-gh-hove-scratched-guinness.json    | Guinness  |
 
 
