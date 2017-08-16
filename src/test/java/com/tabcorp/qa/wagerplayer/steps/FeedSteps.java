@@ -36,14 +36,13 @@ public class FeedSteps implements En {
     private final int FEED_TRAVEL_SECONDS = 2;
 
     public FeedSteps() {
-        When("^I login in \"(PA|WIFT)\" RabbitMQ and enqueue an Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
+        When("^I feed \"(PA|WIFT)\" RabbitMQ with Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
             final String baseName = "QAFEED";
             eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
             String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
             String payload = preparePayload(templateFile, eventId, eventNameRequested, 30);
-
             ConnectionFactory factory = new ConnectionFactory();
             factory.setVirtualHost("/");
             switch(feedType) {
@@ -72,7 +71,7 @@ public class FeedSteps implements En {
                 channel.exchangeDeclare(EXCHANGE_NAME, EXCHANGE_TYPE, true, false, args);
                 log.info("connected to rabbitMQ!");
                 channel.basicPublish(EXCHANGE_NAME, "", null, payload.getBytes());
-                log.info("Sent '" + payload + "'");
+                log.info("Sent payload to RabbitMQ'" + payload + "'");
 
                 channel.close();
                 connection.close();
@@ -81,20 +80,27 @@ public class FeedSteps implements En {
             }
         });
 
-        Then("^WagerPlayer receives the Event in category \"([^\"]+)\"$", (String catName) -> {
-            WAPI.Category category = WAPI.Category.valueOf(Helpers.normalize(catName).toUpperCase());
+        Then("^WagerPlayer receives the Event in \"([^\"]+)\"-\"([^\"]+)\"$", (String catName, String subcatNme) -> {
+            Map<String, Map<String, Integer>> categories = Helpers.loadYamlResource("categories.yml");
+
+            String catNameNormed = Helpers.normalize(catName.toUpperCase());
+            String subcatNameNormed = Helpers.normalize(subcatNme.toUpperCase());
+            Map<String, Integer> subCats = categories.get(catNameNormed);
+            assertThat(subCats).withFailMessage(String.format("No category found with name '%s'", catNameNormed)).isNotNull();
+
+            Integer subcatId = subCats.get(subcatNameNormed);
+            assertThat(subcatId).withFailMessage(String.format("No subcategory found with name '%s'", subcatNameNormed)).isNotNull();
 
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
-                JSONArray events = wapi.getEvents(apiSessionId, category, 24);
+                JSONArray events = wapi.getEvents(apiSessionId, subcatId, 24);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName((e), eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
-
             }, 5, 3);
         });
 
