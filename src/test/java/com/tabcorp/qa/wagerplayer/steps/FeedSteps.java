@@ -77,7 +77,7 @@ public class FeedSteps implements En {
                 channel.close();
                 connection.close();
             } catch (Exception e) {
-                throw new FrameworkError(e);
+                throw new FrameworkError("Problem communicating with RabbitMQ: " + e.getMessage());
             }
         });
 

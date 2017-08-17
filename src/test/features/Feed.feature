@@ -27,7 +27,7 @@ Feature: Event Feeds
       | PA   | Greyhound Racing | HOVE        | pa-gh-hove-scratched-guinness.json   | Guinness  |
   @wift-feed
     Examples:
-      | type | category     | subcategory | template                              | selection |
+      | type | category     | subcategory | template                              | scratched |
       | WIFT | Horse Racing | BENDIGO     | wift-hr-bendigo-scratched-capton.json | Capton    |
 
   @scratched
