@@ -46,7 +46,7 @@ Feature: Event Feeds
       | type | category     | subcategory | template1            | template2                             | selection |
       | WIFT | Horse Racing | BENDIGO     | wift-hr-bendigo.json | wift-hr-bendigo-scratched-capton.json | Capton    |
 
-  @replaced @wip
+  @replaced
   Scenario Outline: <type> Feed: Create <category> Event with a Scratched and Replaced selection
     When I feed "<type>" RabbitMQ with Event message based on "feeds/<template>"
     Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
@@ -56,3 +56,7 @@ Feature: Event Feeds
     Examples:
       | type | category         | subcategory | template                                    | scratched | replacement |
       | PA   | Greyhound Racing | Newcastle   | pa-gh-newcastle-replaced-mollys-tourbo.json | Mollys    | Tourbo      |
+  @wift-feed
+    Examples:
+      | type | category         | subcategory | template                                      | scratched | replacement |
+      | WIFT | Greyhound Racing | Addington   | wift-gh-addington-replaced-mollys-tourbo.json | Mollys    | Tourbo      |
