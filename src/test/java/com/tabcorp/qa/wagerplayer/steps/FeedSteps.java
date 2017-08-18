@@ -40,12 +40,13 @@ public class FeedSteps implements En {
     private final static String EXCHANGE_NAME = "wift_all";
     private final static String EXCHANGE_TYPE = "direct";
     private final static String ALTERNATE_EXCHANGE_NAME = "wift_primary";
-    public static Logger log = LoggerFactory.getLogger(FeedSteps.class);
+    private final int FEED_TRAVEL_SECONDS = 2;
     private WAPI wapi;
     private String apiSessionId;
     private String eventNameRequested;
     private Map eventReceived;
-    private final int FEED_TRAVEL_SECONDS = 2;
+    private Integer scratchedPosition;
+    public static Logger log = LoggerFactory.getLogger(FeedSteps.class);
 
     public FeedSteps() {
         When("^I feed \"(PA|WIFT)\" RabbitMQ with Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
@@ -88,7 +89,7 @@ public class FeedSteps implements En {
                 channel.close();
                 connection.close();
             } catch (Exception e) {
-                throw new FrameworkError(e);
+                throw new FrameworkError("Problem communicating with RabbitMQ: " + e.getMessage());
             }
         });
 
@@ -157,13 +158,26 @@ public class FeedSteps implements En {
 
         Then("^The received Event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
             assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
-            String eventId = (String) eventReceived.get("id");
-            assertThat(eventId).as("Received Event ID").isNotEmpty();
-            ReadContext resp = wapi.getEventMarkets(apiSessionId, eventId);
-            Map selection = wapi.findOneSelectionByName(resp, selName);
+            Map selection = getSelection((String) eventReceived.get("id"), selName);
+            scratchedPosition = Integer.valueOf((String)selection.get("position"));
             assertThat(selection.get("scratched")).as(String.format("Selection '%s' 'scratched' attribute", selName))
                     .isNotNull().isEqualTo(1);
         });
+
+        Then("^The received Event contains normal selection for \"([^\"]+)\" with the same position as scratched$", (String selName) -> {
+            assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
+            assertThat(scratchedPosition).as("Scratched position from the previous step").isNotNull();
+            Map selection = getSelection((String) eventReceived.get("id"), selName);
+            Integer replacedPosition = Integer.valueOf((String)selection.get("position"));
+            assertThat(replacedPosition).as("Replacement position match Scratched").isEqualTo(scratchedPosition);
+        });
+
+    }
+
+    private Map getSelection(String eventId, String selName) {
+        assertThat(eventId).as("Received Event ID").isNotEmpty();
+        ReadContext resp = wapi.getEventMarkets(apiSessionId, eventId);
+        return wapi.findOneSelectionByName(resp, selName);
     }
 
     private String prepareRabbitMQPayload(String templateFile, String id, String name, int inMinutes) {
