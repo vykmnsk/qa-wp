@@ -12,11 +12,17 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.time.LocalDate;
@@ -185,7 +191,7 @@ public class Helpers {
                 timestamp("HHmmssS"),
                 normalize(StringUtils.left(baseName, 50)));
         String savePath = Helpers.getTargetDirPath() + shotFilename;
-        File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         try {
             FileUtils.copyFile(srcFile, new File(savePath));
         } catch (IOException ioe) {
@@ -209,6 +215,18 @@ public class Helpers {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static Object extractByXpath(String response, String Xpath) {
+        InputSource source = new InputSource(new StringReader(response));
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+        try {
+            XPathExpression expr = xpath.compile(Xpath);
+            return expr.evaluate(source);
+        } catch (Exception e) {
+            throw new FrameworkError(String.format("Something went wrong in Helpers::extractByXpath method : %s", e));
         }
     }
 }

@@ -21,6 +21,7 @@ public class Config {
     public static String moby_V2_URL() {
         return readVerify("WAGERPLAYER_MOBIV2_URL");
     }
+    public static String env_URL() {return readVerify("ENV_URL"); }
     public static String luxMobileURL() {
         return readVerify("WAGERPLAYER_LUXMOBILE_URL");
     }
