@@ -64,7 +64,9 @@ public class HeaderPage extends AppPage {
     public void pickCategories(String catVal, String subcatVal) {
         switchToHeaderFrame();
         wait.until(ExpectedConditions.visibilityOf(category));
-        (new Select(category)).selectByVisibleText(catVal);
+        Select catSelect = new Select(category);
+        catSelect.selectByVisibleText("Category"); //to refresh when repeated
+        catSelect.selectByVisibleText(catVal);
         wait.until(ExpectedConditions.visibilityOf(subcategory));
         wait.until(ExpectedConditions.textToBePresentInElement(subcategory, subcatVal));
         (new Select(subcategory)).selectByVisibleText(subcatVal);
@@ -77,7 +79,7 @@ public class HeaderPage extends AppPage {
             wait.until(ExpectedConditions.textToBePresentInElement(event, eventVal));
             (new Select(event)).selectByVisibleText(eventVal);
             Assertions.assertThat(event.getText()).as("Event Name").contains(eventVal);
-        }, 15, 1);
+        }, 3, 1);
     }
 
     public void navigateToF3(String catVal, String subcatVal) {
