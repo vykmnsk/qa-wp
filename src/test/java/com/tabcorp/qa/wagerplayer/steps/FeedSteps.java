@@ -105,7 +105,7 @@ public class FeedSteps implements En {
                     RandomStringUtils.randomAlphanumeric(12));
             int startInMinutes = 30;
             String workload = prepareGearmanWorkload(templateFile, eventId, eventNameRequested, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
-            log.trace("Workload for Gearman: {}", workload);
+            log.debug("Workload for Gearman: {}", workload);
             try {
                 log.info("Submitting job for eventName={} to worker={} of type={}", eventNameRequested, WORKER_NAME, WORKLOAD_TYPE);
                 Gearman gearman;
@@ -200,9 +200,11 @@ public class FeedSteps implements En {
         JSONObject payload = Helpers.readJSON(templateFile);
         LocalDateTime startTime = LocalDateTime.now().plusMinutes(inMinutes);
         String startTimeStamp = startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        String nowTimeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         payload.put("Id", eventId);
         payload.put("FixtureName", eventName);
         payload.put("StartTime", startTimeStamp);
+        payload.put("TimeStamp", nowTimeStamp);
         log.debug("Payload for Gearman: {}", payload);
 
         JSONObject workload = new JSONObject();
