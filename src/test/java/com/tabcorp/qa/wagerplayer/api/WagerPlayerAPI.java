@@ -36,6 +36,8 @@ public interface WagerPlayerAPI {
 
     String createNewCustomer(Map custData);
 
+    List<String> createCustomerFails(Map custData);
+
     String  readAmlStatus(String accessToken);
 
     BigDecimal readNewBalance(ReadContext resp);

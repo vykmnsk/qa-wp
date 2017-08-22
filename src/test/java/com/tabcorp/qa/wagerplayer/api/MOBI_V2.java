@@ -353,7 +353,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return response.read("$.success.message");
     }
 
-    public List<String> createNewCustomerWithErrors(Map custData) {
+    public List<String> createCustomerFails(Map custData) {
         ReadContext resp = post("/customer", custData, false);
         Map success = resp.read("$.success");
         assertThat(success).as("Expect success").isNull();

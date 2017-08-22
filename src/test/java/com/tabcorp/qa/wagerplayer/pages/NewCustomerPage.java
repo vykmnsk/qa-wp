@@ -131,6 +131,7 @@ public class NewCustomerPage extends AppPage {
         custMobileNo.sendKeys(cust.get("telephone"));
         residentialStreetAddress.sendKeys(cust.get("street"));
         residentialSuburb.sendKeys(cust.get("suburb"));
+        residentialCity.clear();
         residentialCity.sendKeys(cust.get("city"));
         residentialPostCode.sendKeys(cust.get("postcode"));
         new Select(residentialCountry).selectByVisibleText(cust.get("country"));
@@ -140,9 +141,10 @@ public class NewCustomerPage extends AppPage {
         }
         mailingStreetAddress.sendKeys(cust.get("street"));
         mailingSuburb.sendKeys(cust.get("suburb"));
-        mailingCity.sendKeys(cust.get("city"));
         mailingPostCode.sendKeys(cust.get("postcode"));
         mailingCountry.sendKeys(cust.get("country"));
+        mailingCity.clear();
+        mailingCity.sendKeys(cust.get("city"));
         if (Config.isLuxbet()) {
             new Select(residentialState).selectByVisibleText(cust.get("state"));
             new Select(mailingState).selectByVisibleText(cust.get("state"));

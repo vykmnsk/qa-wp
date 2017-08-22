@@ -151,6 +151,19 @@ public class WAPI implements WagerPlayerAPI {
         return msg;
     }
 
+    public List<String> createCustomerFails(Map custData) {
+        Map<String, Object> fields = wapiAuthFields();
+        fields.put("action", "account_insert_customer");
+        fields.putAll(custData);
+        fields.put("output_type", "json");
+        ReadContext resp = post(fields, false);
+        //String ctx = resp.read(RESP_ROOT);
+        String error = resp.read(RESP_ROOT + ".msg").toString();
+        List<String> msg = new ArrayList<>();
+        msg.add(error);
+        return msg;
+    }
+
     public String depositCash(String sessionId, BigDecimal cashAmount) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_deposit");

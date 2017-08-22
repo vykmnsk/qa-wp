@@ -34,6 +34,7 @@ public class CustomerSteps implements En {
     //for API
     private WagerPlayerAPI api = Config.getAPI();
     private WAPI wapi = new WAPI();
+    List<String> responseMessages;
     //for UI
     private HeaderPage header;
     private FooterPage footer;
@@ -111,6 +112,12 @@ public class CustomerSteps implements En {
             log.info("New Customer created: " + custData);
         });
 
+        When("^I try to create a new customer via API with data from a non approved country$", (DataTable table) -> {
+            Map<String, String> custDataInput = table.asMap(String.class, String.class);
+            Map<String, String> custData = adjustCustomerData(custDataInput);
+            responseMessages = api.createCustomerFails(custData);
+        });
+
         When("^I create a new customer via API with old customer data$", (DataTable table) -> {
             Map<String, String> custDataInput = table.asMap(String.class, String.class);
             Map<String, String> custData = adjustCustomerData(custDataInput);
@@ -127,14 +134,13 @@ public class CustomerSteps implements En {
             boolean isExisting = "existing".equals(action);
             Map<String, String> custDataInput = table.asMap(String.class, String.class);
             Map<String, String> custData = adjustCustomerData(custDataInput);
-            MOBI_V2 mobi = new MOBI_V2();
             if (isExisting) {
                 Map<String, String> existCustData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
                 custData.replace("lastname", existCustData.get("lastname"));
                 custData.replace("postcode", existCustData.get("postcode"));
                 custData.replace("dob", existCustData.get("dob"));
             }
-            List<String> errors = mobi.createNewCustomerWithErrors(custData);
+            List<String> errors = api.createCustomerFails(custData);
             assertThat(errors).as("Errors Messages from API").contains(custData.get("api_resp_message"));
         });
 
@@ -175,6 +181,10 @@ public class CustomerSteps implements En {
                 assertThat(actualAmlStatus).isEqualToIgnoringCase(expectedAmlStatus);
             }, 10, 2);
             Storage.put(Storage.KEY.API_ACCESS_TOKEN, accessToken);
+        });
+
+        Then("the customer should not be created", () -> {
+            assertThat(responseMessages.get(0)).as("Reject Message from API").isEqualTo("Access from your current location is prohibited");
         });
 
         When("^I update the customer AML status to \"([^\"]*)\"$", (String newamlstatus) -> {
