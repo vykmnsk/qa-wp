@@ -97,8 +97,8 @@ public class FeedSteps implements En {
             final String WORKER_NAME = "ss_market_create";
             // final String WORKER_NAME = "ss_burrito_market_update";
             final String WORKLOAD_TYPE = "ss_snapshot";
-
             final String baseName = "QAFEED";
+
             eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
             String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
@@ -114,7 +114,8 @@ public class FeedSteps implements En {
                 } catch (IOException e) {
                     throw new FrameworkError(e);
                 }
-                GearmanServer server = gearman.createGearmanServer("php7-rds0-gearman.sunppw.in.cld", 4730);
+                GearmanServer server = gearman.createGearmanServer(Config.feedMQGearmanHost(), Config.feedMQGearmanPort());
+
                 final GearmanClient client = gearman.createGearmanClient();
                 client.addServer(server);
 
