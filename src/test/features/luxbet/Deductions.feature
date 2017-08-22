@@ -1,5 +1,5 @@
 @luxbet @deductions
-Feature: Create and verify event in Luxbet WagerPlayer
+Feature: Deductions testing in Luxbet WagerPlayer
 
   Background:
     Given A new default customer with $100.00 balance is created and logged in API

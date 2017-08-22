@@ -10,7 +10,7 @@ Feature: Placing and Settling multi-multi Bets
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
     And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
-      | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
+      | prices  | 2.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -29,7 +29,7 @@ Feature: Placing and Settling multi-multi Bets
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
     And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
-      | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
+      | prices  | 2.50, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -48,7 +48,7 @@ Feature: Placing and Settling multi-multi Bets
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
     And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
-      | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
+      | prices  | 1.50, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -75,8 +75,8 @@ Feature: Placing and Settling multi-multi Bets
 
   @smoke
     Examples:
-      | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetType1 | BetType2 | BetType3 | BetOn                      | Stake               | Flexi   | Cost  | Payout  |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Doubles,Trixie,Patent | Win      | Win      | Win      | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | N,N,N,N | 45.00 | 7605.00 |
+      | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetType1 | BetType2 | BetType3 | BetOn                      | Stake               | Flexi   | Cost  | Payout |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Treble,Doubles,Trixie,Patent | Win      | Win      | Win      | Runner01,Runner11,Runner21 | 3.00,3.00,3.00,3.00 | N,N,N,N | 45.00 | 191.25 |
 
     Examples:
       | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                    | BetType1 | BetType2 | BetType3 | BetOn                      | Stake               | Flexi   | Cost  | Payout |
@@ -161,7 +161,7 @@ Feature: Placing and Settling multi-multi Bets
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
     And I create a default Racing event with details
       | runners | Runner01, Runner02, Runner03, Runner04, Runner05, Runner06, Runner07, Runner08 |
-      | prices  | 5.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
+      | prices  | 3.00, 6.00, 13.00, 2.40, 19.00, 4.40, 26.00, 11.00                             |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -180,7 +180,7 @@ Feature: Placing and Settling multi-multi Bets
     When I enter specifics category "<Category2>" and subcategory "<Subcategory2>"
     And I create a default Racing event with details
       | runners | Runner11, Runner12, Runner13, Runner14, Runner15, Runner16, Runner17, Runner18 |
-      | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
+      | prices  | 2.50, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -199,7 +199,7 @@ Feature: Placing and Settling multi-multi Bets
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
     And I create a default Racing event with details
       | runners | Runner21, Runner22, Runner23, Runner24, Runner25, Runner26, Runner27, Runner28 |
-      | prices  | 11.00, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                               |
+      | prices  | 3.50, 6.00, 6.50, 8.50, 3.20, 7.00, 6.00, 15.00                                |
     And I enable "Luxbook DVP Fixed" product settings
       | Betting | Enable Single | Win   |
       | Betting | Enable Single | Place |
@@ -244,11 +244,11 @@ Feature: Placing and Settling multi-multi Bets
     Then customer balance since last bet is increased by $<Payout>
 
     Examples:
-      | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                       | BetOn                               | Stake               | Flexi   | Cost   | Payout  |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | 4-Fold,Doubles,Trebles          | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00      | N,N,N   | 33.00  | 2508.00 |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Doubles,Trebles,Yankee,Lucky 15 | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00,3.00 | N,N,N,N | 108.00 | 7605.00 |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | 4-Fold,Doubles,Trebles          | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00      | Y,Y,Y   | 9.00   | 569.25  |
-      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Doubles,Trebles,Yankee,Lucky 15 | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00,3.00 | Y,Y,Y,Y | 11.97  | 967.57  |
+      | Category1    | Subcategory1 | Category2    | Subcategory2 | MultiType                       | BetOn                               | Stake               | Flexi   | Cost   | Payout |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | 4-Fold,Doubles,Trebles          | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00      | N,N,N   | 33.00  | 159.00 |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Doubles,Trebles,Yankee,Lucky 15 | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00,3.00 | N,N,N,N | 108.00 | 504.00 |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | 4-Fold,Doubles,Trebles          | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00      | Y,Y,Y   | 9.00   | 33.07  |
+      | Horse Racing | PAKENHAM     | Horse Racing | SEYMOUR      | Doubles,Trebles,Yankee,Lucky 15 | Runner01,Runner11,Runner21,Runner31 | 3.00,3.00,3.00,3.00 | Y,Y,Y,Y | 11.97  | 59.79  |
 
   Scenario Outline: Racing Multi <MultiType> bets
     When I enter specifics category "<Category1>" and subcategory "<Subcategory1>"
