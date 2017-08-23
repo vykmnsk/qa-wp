@@ -405,6 +405,38 @@ public class WAPI implements WagerPlayerAPI {
         return post(fields);
     }
 
+
+    public JSONArray getNext(String sessionId, int inMinutes) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "site_get_next");
+        fields.put("category_group", "sport");
+        fields.put("include_bet_in_run", 1);
+        fields.put("minutes", inMinutes);
+        fields.put("limit", 100); //max
+        ReadContext resp = post(fields);
+
+        String path = RESP_ROOT + ".events.event.*";
+        String errMsg = String.format("Events in response: %s", resp.jsonString());
+        assertThatCode(() -> resp.read(path)).as(errMsg).doesNotThrowAnyException();
+        JSONArray events = resp.read(path);
+        assertThat(events).as(errMsg).isNotEmpty();
+        return events;
+    }
+
+    public JSONArray getSportResults(String sessionId, int catId) {
+        Map<String, Object> fields = wapiAuthFields(sessionId);
+        fields.put("action", "site_get_sports_results");
+        fields.put("cid", catId);
+        ReadContext resp = post(fields);
+
+        String path = RESP_ROOT + ".events.event.*";
+        String errMsg = String.format("Events in response: %s", resp.jsonString());
+        assertThatCode(() -> resp.read(path)).as(errMsg).doesNotThrowAnyException();
+        JSONArray events = resp.read(path);
+        assertThat(events).as(errMsg).isNotEmpty();
+        return events;
+    }
+
     public JSONArray getEvents(String sessionId, int subcatId, int latestHours) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");

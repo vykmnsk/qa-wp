@@ -63,5 +63,7 @@ Feature: Event Feeds
 
   @wip @gearman
   Scenario: Gearman Feed from Sporting Solutions
-    When I feed Gearman with Event message based on "feeds/gearman-tennis.json"
-    Then WagerPlayer receives the Event in "Tennis"-"COUPE_ROGERS_MENS_SINGLES"
+#    When I feed Gearman with Event message based on "feeds/gearman-volleyball-intl-friendly.json"
+    Then WagerPlayer receives the Event in "Volleyball"-"International Friendly"
+#    When I feed Gearman with Event message based on "feeds/gearman-tennis-western-southern-open.json"
+#    Then WagerPlayer receives the Event in "Tennis"-"Western & Southern Open"

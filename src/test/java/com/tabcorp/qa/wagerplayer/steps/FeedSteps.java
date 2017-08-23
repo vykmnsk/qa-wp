@@ -95,7 +95,7 @@ public class FeedSteps implements En {
 
         When("^I feed Gearman with Event message based on \"([^\"]*)\"$", (String templateFile) -> {
             final String WORKER_NAME = "ss_market_create";
-            // final String WORKER_NAME = "ss_burrito_market_update";
+//             final String WORKER_NAME = "ss_snapshot";
             final String WORKLOAD_TYPE = "ss_snapshot";
             final String baseName = "QAFEED";
 
@@ -143,18 +143,21 @@ public class FeedSteps implements En {
             Integer subcatId = subCats.get(subcatNameNormed);
             assertThat(subcatId).withFailMessage(String.format("No subcategory found with name '%s'", subcatNameNormed)).isNotNull();
 
+            //DBG
+            eventNameRequested = "QAFEED170823145335478";
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             wapi = new WAPI();
             apiSessionId = wapi.login();
             Helpers.retryOnFailure(() -> {
                 JSONArray events = wapi.getEvents(apiSessionId, subcatId, 24);
+//                JSONArray events = wapi.getNext(apiSessionId, 30);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName((e), eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
-            }, 5, 3);
+            }, 1, 3);
         });
 
         Then("^The received Event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {

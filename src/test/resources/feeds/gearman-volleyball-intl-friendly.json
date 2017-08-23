@@ -1,0 +1,67 @@
+{
+  "FixtureName": "Estonia v Spain3",
+  "Epoch": 4,
+  "LastEpochChangeReason": [
+    20
+  ],
+  "Id": "GznyTm_8IP4MytCzC-KRgZ86xCs",
+  "StartTime": "2017-08-18T15:30:00",
+  "Sequence": 2,
+  "MatchStatus": "10",
+  "Tags": {
+    "StartTime": "2017-08-18T15:30:00Z",
+    "TradeMode": "Manual",
+    "AutomaticServices": "All",
+    "MetaId": "5OY511OBXb9astBtF+RDVvG6dmrntc1zoYb6BzBvDjeE+fzQ8LQGIzvDuFKmpFisPTn5dVsETf3SLxbaN2L6YA==",
+    "GroupId": "d9ea6c6a-93e3-42e4-8435-675f9b20ac2e",
+    "DefinitionId": "17c2fc0f-7189-474b-94d7-1ce85332028b",
+    "DefinitionName": "Volleyball",
+    "PreMatchOnly": false,
+    "CompetitionName": "International Friendly",
+    "CompetitionType": "Unknown",
+    "TournamentType": "Unknown",
+    "TournamentName": "Unknown",
+    "Round": "Unknown",
+    "Jurisdiction": "Unknown",
+    "Gender": "Unknown",
+    "CompetitionId": "bb9b2710-adf2-459e-9906-6d1a0da705dd",
+    "SSLNCompetitionName": "Friendly",
+    "SSLNCompetitionID": "fc233bda-bdeb-482d-a657-247aeb34bbd8",
+    "SSLNTournament": "Unknown",
+    "SSLNTournamentType": "Unknown",
+    "SSLNGender": "Mens",
+    "SSLNAgeClass": "NONE",
+    "SSLNSurface": "Unknown",
+    "SSLNJurisdiction": "International",
+    "ConsumeInPlayPrices": "Unknown",
+    "AAMSId": "Unknown",
+    "IsTradedRB": false,
+    "Sport": "Volleyball"
+  },
+  "GameState": {},
+  "Markets": [],
+  "RollingMarkets": [],
+  "Participants": [
+    {
+      "Id": 1,
+      "Name": "Estonia3",
+      "Tags": {
+        "HomeOrAway": "Home",
+        "IndividualOrTeam": "Team",
+        "SSLNParticipantID": "66d4cbe4-80d7-4ed2-aa27-7e6bfcb977e7"
+      },
+      "SubParticpants": []
+    },
+    {
+      "Id": 2,
+      "Name": "Spain",
+      "Tags": {
+        "HomeOrAway": "Away",
+        "IndividualOrTeam": "Team",
+        "SSLNParticipantID": "d40e1f13-3786-477e-b337-dce96100e48e"
+      },
+      "SubParticpants": []
+    }
+  ],
+  "TimeStamp": "2017-08-18T08:24:12"
+}
