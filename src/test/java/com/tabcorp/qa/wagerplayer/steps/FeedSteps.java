@@ -144,7 +144,7 @@ public class FeedSteps implements En {
             assertThat(subcatId).withFailMessage(String.format("No subcategory found with name '%s'", subcatNameNormed)).isNotNull();
 
             //DBG
-            eventNameRequested = "QAFEED170823145335478";
+//            eventNameRequested = "QAFEED170823145335478";
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             wapi = new WAPI();
