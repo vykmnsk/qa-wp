@@ -165,7 +165,7 @@ public class FeedSteps implements En {
                         .filter(e -> matchByName(e, eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
-            }, 1, 3);
+            }, 3, 5);
         });
 
         Then("^The received Event contains scratched selection for \"([^\"]+)\"$", (String selName) -> {
