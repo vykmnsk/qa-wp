@@ -105,7 +105,7 @@ public class Helpers {
         return String.format("%s%s~%d", baseName, timestamp("yy:MM:dd:HH:mm:ss"), uniqPart);
     }
 
-    public static String createUniqueNameForFeed(String baseName) {
+    public static String createUniqueNameCompact(String baseName) {
         int uniqPart = randomBetweenInclusive(0, 999);
         return String.format("%s%s%d", baseName, timestamp("yyMMddHHmmss"), uniqPart);
     }

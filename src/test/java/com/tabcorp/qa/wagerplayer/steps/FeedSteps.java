@@ -9,7 +9,6 @@ import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import cucumber.api.java8.En;
-import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gearman.Gearman;
 import org.gearman.GearmanClient;
@@ -18,6 +17,7 @@ import org.gearman.GearmanJobEventType;
 import org.gearman.GearmanJobReturn;
 import org.gearman.GearmanServer;
 import org.gearman.impl.GearmanImpl;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -41,6 +42,8 @@ public class FeedSteps implements En {
     private final static String EXCHANGE_TYPE = "direct";
     private final static String ALTERNATE_EXCHANGE_NAME = "wift_primary";
     private final int FEED_TRAVEL_SECONDS = 2;
+    private final int FEED_EVENT_STARTS_IN_MINS = 30;
+    private final int SERVER_OFFSET_HOURS = 0;
     private WAPI wapi;
     private String apiSessionId;
     private String eventNameRequested;
@@ -51,11 +54,11 @@ public class FeedSteps implements En {
     public FeedSteps() {
         When("^I feed \"(PA|WIFT)\" RabbitMQ with Event message based on \"([^\"]+)\"$", (String feedType, String templateFile) -> {
             final String baseName = "QAFEED";
-            eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
+            eventNameRequested = Helpers.createUniqueNameCompact(baseName);
             String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
-            String payload = prepareRabbitMQPayload(templateFile, eventId, eventNameRequested, 30);
+            String payload = prepareRabbitMQPayload(templateFile, eventId, eventNameRequested, FEED_EVENT_STARTS_IN_MINS);
             ConnectionFactory factory = new ConnectionFactory();
             factory.setVirtualHost("/");
             switch(feedType) {
@@ -94,17 +97,19 @@ public class FeedSteps implements En {
         });
 
         When("^I feed Gearman with Event message based on \"([^\"]*)\"$", (String templateFile) -> {
-            final String WORKER_NAME = "ss_market_create";
-//             final String WORKER_NAME = "ss_snapshot";
+//            final String WORKER_NAME = "ss_market_create";
+             final String WORKER_NAME = "ss_snapshot";
             final String WORKLOAD_TYPE = "ss_snapshot";
-            final String baseName = "QAFEED";
 
-            eventNameRequested = Helpers.createUniqueNameForFeed(baseName);
+            final String participantName1 = "QAFEED";
+            final String participantName2 = Helpers.createUniqueNameCompact("");
+            eventNameRequested = createSportEventName(participantName1, participantName2);
+
             String eventId = String.format("%s_%s",
                     RandomStringUtils.randomNumeric(5),
                     RandomStringUtils.randomAlphanumeric(12));
             int startInMinutes = 30;
-            String workload = prepareGearmanWorkload(templateFile, eventId, eventNameRequested, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
+            String workload = prepareGearmanWorkload(templateFile, eventId, participantName1, participantName2, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
             log.debug("Workload for Gearman: {}", workload);
             try {
                 log.info("Submitting job for eventName={} to worker={} of type={}", eventNameRequested, WORKER_NAME, WORKLOAD_TYPE);
@@ -143,18 +148,21 @@ public class FeedSteps implements En {
             Integer subcatId = subCats.get(subcatNameNormed);
             assertThat(subcatId).withFailMessage(String.format("No subcategory found with name '%s'", subcatNameNormed)).isNotNull();
 
-            //DBG
-//            eventNameRequested = "QAFEED170823145335478";
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
             wapi = new WAPI();
             apiSessionId = wapi.login();
+
+            final int EXTRA_WAIT_MINS = 10;
+            LocalDateTime from = LocalDateTime.now().plusHours(SERVER_OFFSET_HOURS);
+            LocalDateTime to = LocalDateTime.now().plusMinutes(FEED_EVENT_STARTS_IN_MINS + EXTRA_WAIT_MINS).plusHours(SERVER_OFFSET_HOURS);
+
             Helpers.retryOnFailure(() -> {
-                JSONArray events = wapi.getEvents(apiSessionId, subcatId, 24);
+                List<Map> events = wapi.getEvents(apiSessionId, subcatId, from, to);
 //                JSONArray events = wapi.getNext(apiSessionId, 30);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
-                        .filter(e -> matchByName((e), eventNameRequested))
+                        .filter(e -> matchByName(e, eventNameRequested))
                         .findFirst().orElse(null);
                 assertThat(eventReceived).withFailMessage(String.format("No Events found matching name: '%s'", eventNameRequested)).isNotNull();
             }, 1, 3);
@@ -176,6 +184,10 @@ public class FeedSteps implements En {
             assertThat(replacedPosition).as("Replacement position match Scratched").isEqualTo(scratchedPosition);
         });
 
+    }
+
+    private String createSportEventName(String participantName1, String participantName2) {
+        return String.format("%s v %s", participantName1, participantName2);
     }
 
     private Map getSelection(String eventId, String selName) {
@@ -200,15 +212,23 @@ public class FeedSteps implements En {
         return json.toJSONString();
     }
 
-    private String prepareGearmanWorkload(String templateFile, String eventId, String eventName, int inMinutes, String worker, String workloadType) {
+    private String prepareGearmanWorkload(String templateFile, String eventId, String participantName1, String participantName2, int inMinutes, String worker, String workloadType) {
         JSONObject payload = Helpers.readJSON(templateFile);
         LocalDateTime startTime = LocalDateTime.now().plusMinutes(inMinutes);
         String startTimeStamp = startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         String nowTimeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        String eventName = createSportEventName(participantName1, participantName2);
         payload.put("Id", eventId);
         payload.put("FixtureName", eventName);
         payload.put("StartTime", startTimeStamp);
         payload.put("TimeStamp", nowTimeStamp);
+
+        JSONArray participants = (JSONArray) payload.get("Participants");
+        JSONObject participant1 = (JSONObject) participants.get(0);
+        JSONObject participant2 = (JSONObject) participants.get(1);
+        participant1.put("Name", participantName1);
+        participant2.put("Name", participantName2);
+
         log.debug("Payload for Gearman: {}", payload);
 
         JSONObject workload = new JSONObject();

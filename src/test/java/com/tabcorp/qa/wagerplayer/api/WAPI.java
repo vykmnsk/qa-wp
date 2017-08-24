@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -437,20 +439,34 @@ public class WAPI implements WagerPlayerAPI {
         return events;
     }
 
-    public JSONArray getEvents(String sessionId, int subcatId, int latestHours) {
+    public List<Map> getEvents(String sessionId, int subcatId, LocalDateTime from, LocalDateTime to) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "site_get_events");
         fields.put("scid", subcatId);
-        fields.put("latest", latestHours);
+        fields.put("date_from", formatDate(from));
+        fields.put("time_from", formatTime(from));
+        fields.put("date_to", formatDate(to));
+        fields.put("time_to", formatTime(to));
+        fields.put("all_status", 1);
+
         ReadContext resp = post(fields);
 
         String path = RESP_ROOT + ".events.event.*";
         String errMsg = String.format("Events in response: %s", resp.jsonString());
         assertThatCode(() -> resp.read(path)).as(errMsg).doesNotThrowAnyException();
-        JSONArray events = resp.read(path);
+        List<Map> events = resp.read(path);
         assertThat(events).as(errMsg).isNotEmpty();
         return events;
     }
+
+    private String formatDate(LocalDateTime dt) {
+        return dt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    private String formatTime(LocalDateTime dt) {
+        return dt.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+    }
+
 
     public String readAmlStatus(String sessionId) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
