@@ -359,8 +359,8 @@ public class CreateEventSteps implements En {
         String cat = (String) Storage.removeFirst(Storage.KEY.CATEGORIES);
         String subcat = (String) Storage.removeFirst(Storage.KEY.SUBCATEGORIES);
         String event = (String) Storage.removeFirst(Storage.KEY.EVENT_NAMES);
+        header.pickEvent(cat, subcat, event);
         Helpers.retryOnFailure(() -> {
-            header.pickEvent(cat, subcat, event);
             settlementPage = header.navigateToF6();
             settlementPage.resultRace(winners);
         }, 5, 3);

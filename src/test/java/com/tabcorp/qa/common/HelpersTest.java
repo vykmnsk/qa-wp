@@ -21,6 +21,13 @@ public class HelpersTest {
     }
 
     @Test
+    public void canGetCorrectValueUsingXPath() {
+        String xmlString = "<resp><hi>XPATH-TESTS-DATA</hi></resp>";
+        String actualValue = Helpers.extractByXpath(xmlString,"/resp/hi").toString();
+        assertThat(actualValue).isEqualTo("XPATH-TESTS-DATA");
+    }
+
+    @Test
     public void canGenerateRandomPricesAsManyAsExpected() {
         final int COUNT = 5;
         List<BigDecimal> prices = Helpers.generateRandomPrices(1, 100, COUNT);
