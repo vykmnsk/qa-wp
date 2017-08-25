@@ -97,7 +97,6 @@ public class FeedSteps implements En {
         });
 
         When("^I feed Gearman with Event message based on \"([^\"]*)\"$", (String templateFile) -> {
-//            final String WORKER_NAME = "ss_market_create";
              final String WORKER_NAME = "ss_snapshot";
             final String WORKLOAD_TYPE = "ss_snapshot";
 
@@ -159,7 +158,6 @@ public class FeedSteps implements En {
 
             Helpers.retryOnFailure(() -> {
                 List<Map> events = wapi.getEvents(apiSessionId, subcatId, from, to);
-//                JSONArray events = wapi.getNext(apiSessionId, 30);
                 eventReceived = events.stream()
                         .map(e -> (Map) e)
                         .filter(e -> matchByName(e, eventNameRequested))
