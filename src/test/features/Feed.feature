@@ -5,6 +5,7 @@ Feature: Event Feeds
   Scenario Outline: <type> Feed: Create <category> Event
     When I feed "<type>" RabbitMQ with Event message based on "feeds/<template>"
     Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
+
   @pa-feed
     Examples:
       | type | category         | subcategory | template           |
@@ -60,3 +61,17 @@ Feature: Event Feeds
     Examples:
       | type | category         | subcategory | template                                      | scratched | replacement |
       | WIFT | Greyhound Racing | Addington   | wift-gh-addington-replaced-mollys-tourbo.json | Mollys    | Tourbo      |
+
+
+  @gearman
+  Scenario Outline: Gearman Feed from Sporting Solutions
+    When I feed Gearman with Event message based on "feeds/<template>"
+    Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
+
+  @smoke
+    Examples:
+      | category   | subcategory            | template                              |
+      | Volleyball | International Friendly | gearman-volleyball-intl-friendly.json |
+    Examples:
+      | category | subcategory          | template                            |
+      | Football | NPL Women - Victoria | gearman-football-npl-women-vic.json |

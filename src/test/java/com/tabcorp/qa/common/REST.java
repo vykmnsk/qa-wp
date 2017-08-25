@@ -22,6 +22,7 @@ public class REST {
     public static Object post(String url, Map<String, Object> fields, Map<String, String> headers) {
         HttpResponse<String> response;
         try {
+            log.debug("sending POST URL=" + url);
             log.debug("sending POST headers=" + headers);
             log.debug("sending POST fields=" + fields);
             response = Unirest.post(url)

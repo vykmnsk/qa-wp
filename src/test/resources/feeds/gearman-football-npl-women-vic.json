@@ -1,0 +1,72 @@
+{
+  "FixtureName": "Calder United (Women) v Bayside United FC (Women)",
+  "Epoch": 3,
+  "LastEpochChangeReason": [
+    40
+  ],
+  "Id": "cuELg2C2RvIm6wjXmKBVB2KQTcM",
+  "StartTime": "2017-08-18T10:30:00",
+  "Sequence": 1,
+  "MatchStatus": "10",
+  "Tags": {
+    "StartTime": "2017-08-18T10:30:00Z",
+    "TradeMode": "Manual",
+    "AutomaticServices": "All",
+    "MetaId": "3dWj7sVSoKl+4L5AnWUsagJKk6VluyHTOMJD9ihuu4mtQMoIKt3pNTvDuFKmpFisRprriZueyk9wSfhDRdkHWA==",
+    "GroupId": "a427596f-d54a-4959-8836-52b5361156f0",
+    "DefinitionId": "76a7eee8-dfd0-4c87-aeec-1841640b64c3",
+    "DefinitionName": "Primary Markets",
+    "PreMatchOnly": false,
+    "CompetitionName": "NPL Women - Victoria",
+    "CompetitionType": "Unknown",
+    "TournamentType": "Unknown",
+    "TournamentName": "Unknown",
+    "Round": "Unknown",
+    "Jurisdiction": "Australia",
+    "Gender": "Unknown",
+    "CompetitionId": "718fc32d-5160-47af-b013-37929c722533",
+    "SSLNCompetitionName": "NPL Victoria Women",
+    "SSLNCompetitionID": "718fc32d-5160-47af-b013-37929c722533",
+    "SSLNTournament": "Unknown",
+    "SSLNTournamentType": "Unknown",
+    "SSLNGender": "Womens",
+    "SSLNAgeClass": "NONE",
+    "SSLNSurface": "Unknown",
+    "SSLNJurisdiction": "Australia",
+    "ConsumeInPlayPrices": "Unknown",
+    "AAMSId": "27332.56408",
+    "neutralvenue": "false",
+    "stadium_id": "8694",
+    "stadium": "Keilor Park Recreation Reserve (1)",
+    "MatchLength": "90",
+    "GSRId": "849599",
+    "IsTradedRB": false,
+    "Sport": "Football"
+  },
+  "GameState": {},
+  "Markets": [],
+  "RollingMarkets": [],
+  "Participants": [
+    {
+      "Id": 1,
+      "Name": "TEST2 Calder",
+      "Tags": {
+        "HomeOrAway": "Home",
+        "IndividualOrTeam": "Team",
+        "SSLNParticipantID": "ad59f293-06d1-4f93-96c7-f91bf4c243f4"
+      },
+      "SubParticpants": []
+    },
+    {
+      "Id": 2,
+      "Name": "Bayside",
+      "Tags": {
+        "HomeOrAway": "Away",
+        "IndividualOrTeam": "Team",
+        "SSLNParticipantID": "496c8084-68c4-48cf-9cf6-04f7488fd78c"
+      },
+      "SubParticpants": []
+    }
+  ],
+  "TimeStamp": "2017-08-18T07:12:33"
+}

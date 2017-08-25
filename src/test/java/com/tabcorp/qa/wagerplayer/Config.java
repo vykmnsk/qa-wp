@@ -53,6 +53,10 @@ public class Config {
     public static String feedMQWiftUsername() { return readVerify("WAGERPLAYER_FEEDMQ_WIFT_USERNAME"); }
     public static String feedMQWiftPassword() { return readVerify("WAGERPLAYER_FEEDMQ_WIFT_PASSWORD"); }
 
+    public static String feedMQGearmanHost() { return readVerify("WAGERPLAYER_FEEDMQ_GEARMAN_HOST"); }
+    public static int feedMQGearmanPort() { return Integer.parseInt(readVerify("WAGERPLAYER_FEEDMQ_GEARMAN_PORT")); }
+
+
     public static String testEventBaseName() {
         return "QAWP-";
     }
