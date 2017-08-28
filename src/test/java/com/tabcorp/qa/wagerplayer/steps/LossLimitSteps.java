@@ -10,8 +10,11 @@ import cucumber.api.java8.En;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
 import static com.tabcorp.qa.common.Storage.KEY.PLAYTECH_API_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +48,13 @@ public class LossLimitSteps implements En {
             mobi_v2.setCustomerLossLimit(accessToken, lossLimit, duration);
         });
 
-        When("^I try to get a PlayTech token for the new customer$", () -> {
+        When("^I use a promo code \"([^\"]*)\"$", (String promoCode) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
+            mobi_v2.applyPromo(accessToken, promoCode);
+        });
+
+        When("^I get a PlayTech token for the new customer$", () -> {
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
             playTech = new PlayTech();
             String accessToken = playTech.login(custData.get("username"), custData.get("password"));
@@ -53,25 +62,30 @@ public class LossLimitSteps implements En {
             Storage.put(PLAYTECH_API_ACCESS_TOKEN, accessToken);
         });
 
-        And("^I spin a \"([^\"]*)\" Casino \"([^\"]*)\" game with a stake of \\$(\\d+.\\d\\d)$", (String gameProvider, String gameType, BigDecimal stake) -> {
+        And("^I spin a \"([^\"]*)\" Casino \"([^\"]*)\" game with a stake of ([^\"]*)$", (String gameProvider, String gameType, String stakesAsString) -> {
             String accessToken = (String) Storage.get(PLAYTECH_API_ACCESS_TOKEN);
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
 
             PlayTech playTech = new PlayTech();
-            betResponse = playTech.placeBet(accessToken, custData, stake, gameProvider, gameType);
+            List<String> stakesAsList = Helpers.extractCSV(stakesAsString);
+
+            List<Double> stakes = Helpers.convertList(stakesAsList,Double::parseDouble);
+            stakes.forEach(stake -> {
+                betResponse = playTech.placeBet(accessToken, custData, new BigDecimal(stake), gameProvider, gameType);
+            });
         });
 
         Then("^the message should be \"([^\"]*)\"$", (String message) -> {
             assertThat(betResponse).isNotEmpty();
             String myXpath = "/*[local-name()='walletBatchResponse']/*[local-name()='gameMultiBalanceTransactionResponse']/*[local-name()='errorText']";
-            String actualMessage = Helpers.extractByXpath(betResponse,myXpath).toString();
+            String actualMessage = Helpers.extractByXpath(betResponse, myXpath).toString();
             assertThat(actualMessage).isEqualToIgnoringCase(message);
         });
 
         And("^the error code should be (\\d+)$", (Integer expectedErrorCode) -> {
             assertThat(betResponse).isNotEmpty();
             String myXpath = "/*[local-name()='walletBatchResponse']/*[local-name()='gameMultiBalanceTransactionResponse']/*[local-name()='errorCode']";
-            String actualErrorCode = Helpers.extractByXpath(betResponse,myXpath).toString();
+            String actualErrorCode = Helpers.extractByXpath(betResponse, myXpath).toString();
             assertThat(actualErrorCode).as("Error Code").isEqualTo(expectedErrorCode.toString());
         });
 

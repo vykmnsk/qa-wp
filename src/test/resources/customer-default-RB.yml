@@ -11,6 +11,7 @@ country: GB
 currency_code: GBP
 secret_question: Favourite Holiday Spot?
 manual_verification: Y
+client_ip: 212.58.244.18
 #
 postal_postcode: 5006
 postal_county: North Adelaide

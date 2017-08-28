@@ -2,8 +2,6 @@ package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
-import com.tabcorp.qa.wagerplayer.steps.CustomerSteps;
-import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -11,7 +9,6 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;

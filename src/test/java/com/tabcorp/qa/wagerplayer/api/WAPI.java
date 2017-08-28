@@ -14,18 +14,11 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.tabcorp.qa.common.Storage.KEY.API_ACCESS_TOKEN;
-import static com.tabcorp.qa.common.Storage.KEY.EVENT_IDS;
-import static com.tabcorp.qa.common.Storage.KEY.PRODUCT_IDS;
+import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 

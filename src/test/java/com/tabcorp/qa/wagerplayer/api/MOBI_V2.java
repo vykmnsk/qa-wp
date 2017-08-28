@@ -2,7 +2,6 @@ package com.tabcorp.qa.wagerplayer.api;
 
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
-import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
@@ -402,6 +401,15 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return key;
     }
 
+    public void applyPromo(String accessToken, String promoCode) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("promotion_code", promoCode);
+        ReadContext response = post("/customer/promo", fields);
+        String activationStatus = response.read("$.activation");
+        Assertions.assertThat(activationStatus).as("Found activationStatus in response is " + activationStatus).isEqualToIgnoringCase("Success");
+    }
+
     public String getStoredCardReference(String accessToken) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
@@ -423,20 +431,33 @@ public class MOBI_V2 implements WagerPlayerAPI {
         Assertions.assertThat(resultCode).as("Result code is not matching with ").isNotEqualToIgnoringCase("payout-submit-received");
     }
 
+    public void useExistingCardToDeposit(String accessToken, String paymentMethod, BigDecimal deposit, String depositReference, String additionalData, String selectedCardReference,String promoCode) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("payment_method", paymentMethod.toLowerCase());
+        fields.put("amount", String.valueOf(deposit));
+        fields.put("deposit_reference", depositReference);
+        fields.put("additional_data",additionalData);
+        fields.put("selected_card_reference",selectedCardReference);
+        fields.put("promo_code",promoCode);
+        ReadContext response = post("/payment/deposit/stored", fields);
+        String resultCode = response.read("$.results.result_code");
+        Assertions.assertThat(resultCode).as("Found result code in response is " + resultCode).isEqualToIgnoringCase("Authorised");
+    }
+
     public void addCardAndDeposit(String accessToken, String paymentReference, String cardEncryption, String cardType, BigDecimal deposit) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
         fields.put("card_encrypted", cardEncryption);
-        fields.put("payment_method", cardType);
+        fields.put("payment_method", cardType.toLowerCase());
         fields.put("amount", String.valueOf(deposit));
         fields.put("deposit_reference", paymentReference);
-        fields.put("output_type", "json");
         ReadContext response = post("/payment/deposit/card", fields);
         String resultCode = response.read("$.results.result_code");
         Assertions.assertThat(resultCode).as("Found result code in response is " + resultCode).isEqualToIgnoringCase("Authorised");
     }
 
-    public Pair<BigDecimal,String> getCustomerLossLimitAndDefinition(String accessToken) {
+    public Pair<BigDecimal, String> getCustomerLossLimitAndDefinition(String accessToken) {
 
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("access_token", accessToken);
@@ -445,7 +466,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         Integer lossLimit = ctx.read("$.casino_loss_limit_data.casino_loss_limit_amount");
         String lossLimitDefintion = ctx.read("$.casino_loss_limit_data.casino_loss_limit_definition");
 
-        return Pair.of(new BigDecimal(lossLimit),lossLimitDefintion);
+        return Pair.of(new BigDecimal(lossLimit), lossLimitDefintion);
     }
 
     public void setCustomerLossLimit(String accessToken, BigDecimal lossLimit, Integer duration) {

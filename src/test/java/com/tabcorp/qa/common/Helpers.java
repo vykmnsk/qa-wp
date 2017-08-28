@@ -1,5 +1,6 @@
 package com.tabcorp.qa.common;
 
+import com.tabcorp.qa.adyen.ClientSideEncrypter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -7,12 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -20,7 +16,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +23,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -238,4 +235,24 @@ public class Helpers {
             throw new FrameworkError(String.format("Something went wrong in Helpers::extractByXpath method : %s", e));
         }
     }
+
+    // helper method to convert a list from one data type to another
+    public static <T, U> List<U> convertList(List<T> from, Function<T, U> function) {
+        return from.stream().map(function).collect(Collectors.toList());
+    }
+
+    public static String adyenEncode(org.json.JSONObject json) throws Exception {
+        String publicKey = Helpers.readResourceFile("adyen-encryption-key.txt");
+        return adyenEncode(json, publicKey);
+    }
+
+    private static String adyenEncode(org.json.JSONObject json, String publicKey) throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        ClientSideEncrypter encrypter = new ClientSideEncrypter(publicKey);
+        json.put("generationtime", simpleDateFormat.format(new Date()));
+        return encrypter.encrypt(json.toString());
+    }
+
 }
+

@@ -1,5 +1,6 @@
 #Env vars required
 ### for Redbook
+- ENV_URL= [http://pre-wagering.test.sunbets.co.uk |  corresponding env]
 - WAGERPLAYER_APP_NAME=redbook
 - WAGERPLAYER_BASE_URL
 - WAGERPLAYER_USERNAME
@@ -14,16 +15,7 @@
 
 ### for Luxbet
 - WAGERPLAYER_APP_NAME=luxbet
-- WAGERPLAYER_BASE_URL
-- WAGERPLAYER_USERNAME
-- WAGERPLAYER_PASSWORD
-- WAGERPLAYER_WAPI_URL
-- WAGERPLAYER_WAPI_USERNAME
-- WAGERPLAYER_WAPI_PASSWORD
-- WAGERPLAYER_CUSTOMER_USERNAME
-- WAGERPLAYER_CUSTOMER_PASSWORD
-- WAGERPLAYER_CLIENT_IP
-- WAGERPLAYER_RUN_MODE=[ DOCKER | anything-else ]
+-  Use the above mentioned env variables with the correct values.
 
 ### for LuxbetMobile
 - WAGERPLAYER_APP_NAME=luxbet

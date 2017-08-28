@@ -38,8 +38,7 @@ public class PlayTech {
             cfg.setDirectoryForTemplateLoading(new File(PLAYTECH_RSC_PATH));
             cfg.setDefaultEncoding("UTF-8");
         } catch (Exception e) {
-            System.out.println("Something went wrong in PlayTech::getTemplateConfiguration method");
-
+            throw new FrameworkError(String.format("Something went wrong in PlayTech::getTemplateConfiguration method : %s ",e));
         }
         return cfg;
     }

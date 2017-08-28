@@ -1,8 +1,7 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
-import com.tabcorp.qa.adyen.Card;
-import com.tabcorp.qa.common.*;
 import com.jayway.jsonpath.ReadContext;
+import com.tabcorp.qa.common.*;
 import com.tabcorp.qa.common.Storage.KEY;
 import com.tabcorp.qa.mobile.pages.LuxbetMobilePage;
 import com.tabcorp.qa.wagerplayer.Config;
@@ -15,13 +14,17 @@ import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.assertj.core.api.Assertions;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -80,14 +83,31 @@ public class CustomerSteps implements En {
                 String statusMsg = wapi.depositCash(accessToken, requiredBalance, WAPI.DepositType.CashDeposit);
                 assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
             } else if (Config.isRedbook()) {
-                addCCMakeDeposit(
-                        custData.get("CardNumber"),
-                        custData.get("CVC"),
-                        custData.get("ExpiryMonth"),
-                        custData.get("ExpiryYear"),
-                        custData.get("CardHolderName"),
-                        custData.get("CardType"),
-                        requiredBalance);
+
+                final MOBI_V2 mobi = new MOBI_V2();
+
+                // if becomes obsolete try:
+                // String encryptionKey = mobi.getEncryptionKey(accessToken);
+
+                JSONObject jsonObject = new JSONObject();
+                String cardEncryption;
+
+                jsonObject.put("number", custData.get("CardNumber"));
+                jsonObject.put("holderName", custData.get("CVC"));
+                jsonObject.put("cvc", custData.get("CVC"));
+                jsonObject.put("expiryMonth", custData.get("ExpiryYear"));
+                jsonObject.put("expiryYear", custData.get("ExpiryYear"));
+                jsonObject.put("holderName", custData.get("CardHolderName"));
+
+                try {
+                    cardEncryption = Helpers.adyenEncode(jsonObject);
+                } catch (Exception e) {
+                    throw new FrameworkError(String.format("Something went wrong in addCCMakeDeposit method : %s", e));
+                }
+
+                String paymentReference = mobi.getPaymentRefence(accessToken);
+                mobi.addCardAndDeposit(accessToken, paymentReference, cardEncryption, custData.get("CardType").toLowerCase(), requiredBalance);
+
             } else {
                 throw new FrameworkError("Unknown App name=" + Config.appName());
             }
@@ -270,6 +290,24 @@ public class CustomerSteps implements En {
                     deposit);
         });
 
+        Then("^I deposit \\$(\\d+.\\d\\d) using stored \"([^\"]*)\" card using promo code \"([^\"]*)\"$", (BigDecimal depositAmount, String cardType, String promoCode) -> {
+            String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+            MOBI_V2 api = new MOBI_V2();
+            String depositReference = api.getPaymentRefence(accessToken);
+            String storedCardReference = api.getStoredCardReference(accessToken);
+            String encryptedCVV;
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("cvc", "737");
+
+            try {
+                encryptedCVV = Helpers.adyenEncode(jsonObject);
+            } catch (Exception e) {
+                throw new FrameworkError(String.format("Something went wrong in deposit using stored card Loss Limit Step  : %s", e));
+            }
+
+            api.useExistingCardToDeposit(accessToken, cardType, depositAmount, depositReference, encryptedCVV, storedCardReference, promoCode);
+        });
+
         Then("^I withdraw \\$(\\d+.\\d\\d) using stored \"([^\"]*)\" card$", (BigDecimal withdrawAmount, String cardType) -> {
             String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
             MOBI_V2 api = new MOBI_V2();
@@ -287,9 +325,13 @@ public class CustomerSteps implements En {
 
         Then("^customer balance is equal to \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBalance) -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
-            BigDecimal currentBalance = api.getBalance(accessToken);
-            assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
-            Storage.put(BALANCE_BEFORE, currentBalance);
+            //added the retryOnFailure because the customer balance  for a few features
+            // such as Casino Bonus BuyIn takes some time to reflect the promo code changes.
+            Helpers.retryOnFailure(() -> {
+                BigDecimal currentBalance = api.getBalance(accessToken);
+                assertThat(Helpers.roundOff(currentBalance)).isEqualTo(Helpers.roundOff(expectedBalance));
+                Storage.put(BALANCE_BEFORE, currentBalance);
+            }, 5, 5);
         });
 
         Then("^customer bonus bet balance is equal to \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBalance) -> {
@@ -461,24 +503,25 @@ public class CustomerSteps implements En {
         assertThat(cardNumbers).as("Card data contains only numbers").allMatch(NumberUtils::isNumber);
         Helpers.verifyNotExpired(Integer.parseInt(expMonth), Integer.parseInt(expYear));
 
+        String cardEncryption;
         final MOBI_V2 mobi = new MOBI_V2();
         String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
 
-        String publicKey = Helpers.readResourceFile("adyen-encryption-key.txt");
         // if becomes obsolete try:
         // String encryptionKey = mobi.getEncryptionKey(accessToken);
-        Card card = new Card();
-        card.setNumber(cardNumber);
-        card.setCvc(cvc);
-        card.setExpiryMonth(expMonth);
-        card.setExpiryYear(expYear);
-        card.setCardHolderName(cardHolderName);
-        card.setGenerationTime(new Date());
-        String cardEncryption;
+
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("number", cardNumber);
+        jsonObject.put("holderName", cardHolderName);
+        jsonObject.put("cvc", cvc);
+        jsonObject.put("expiryMonth", expMonth);
+        jsonObject.put("expiryYear", expYear);
+
         try {
-            cardEncryption = card.serialize(publicKey);
+            cardEncryption = Helpers.adyenEncode(jsonObject);
         } catch (Exception e) {
-            throw new FrameworkError(e);
+            throw new FrameworkError(String.format("Something went wrong in addCCMakeDeposit method : %s", e));
         }
 
         String paymentReference = mobi.getPaymentRefence(accessToken);
