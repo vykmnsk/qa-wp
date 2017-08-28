@@ -1,6 +1,8 @@
 package com.tabcorp.qa.wagerplayer.pages;
 
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.wagerplayer.api.WAPI;
+import com.tabcorp.qa.wagerplayer.steps.CustomerSteps;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -21,17 +23,26 @@ public class DepositPage extends AppPage {
     @FindBy(css = "a#method_999")
     public WebElement manualTabLink;
 
+    @FindBy(css = ("a#restrictions_menu"))
+    public WebElement depositRestrictionsTabLink;
+
     @FindBy(css = "select[name=type_select]")
     public WebElement transactionType;
 
     @FindBy(css = "input[name=amount]")
     public WebElement amountTextBox;
 
+    @FindBy(css = ("input#DAILY_DEPOSIT_LIMIT"))
+    public WebElement dailyDepositLimitTextBox;
+
     @FindBy(css = "input[value=Readback]")
     public WebElement readbackButton;
 
     @FindBy(css = "input[name=go]")
     public WebElement submit;
+
+    @FindBy(css = ("input[value=Save]"))
+    public WebElement save;
 
     @FindBy(css = "input[name=cancel]")
     public WebElement cancel;
@@ -44,6 +55,15 @@ public class DepositPage extends AppPage {
 
     @FindBy(css = "a[id=deposits]")
     public WebElement depositsTabLink;
+
+    @FindBy(css = ("a#method_3"))
+    public WebElement bankToBankTabLink;
+
+    @FindBy(css = ("input[name=amount]"))
+    public WebElement bankToBankAmountTextBox;
+
+    @FindBy(css = ("div#error_message"))
+    public WebElement bankToBankLimitExceededErrorMessage;
 
     @FindBy(css = "table#trans_list")
     public WebElement transactionTable;
@@ -68,8 +88,21 @@ public class DepositPage extends AppPage {
         manualTabWindow = driver.getWindowHandle();
     }
 
-    public String depositCash(BigDecimal amount) {
-        new Select(transactionType).selectByVisibleText("- Cash Deposit");
+    public void selectDepositRestrictionsTab() {
+        depositRestrictionsTabLink.click();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("deposit_screen"));
+        driver.switchTo().frame(0);
+        manualTabWindow = driver.getWindowHandle();
+    }
+
+    public void selectBankToBankTab() {
+        bankToBankTabLink.click();
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("deposit_screen"));
+        manualTabWindow = driver.getWindowHandle();
+    }
+
+    public String depositCash(BigDecimal amount, WAPI.DepositType depositType) {
+        new Select(transactionType).selectByValue(depositType.toString());
         wait.until(ExpectedConditions.visibilityOf(amountTextBox));
         amountTextBox.sendKeys(amount.toString());
 
@@ -112,6 +145,28 @@ public class DepositPage extends AppPage {
         driver.close();
         driver.switchTo().window(depositsWindow);
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
+    }
+
+    public void updateDailyDepositLimit(BigDecimal cashAmount) {
+        wait.until(ExpectedConditions.visibilityOf(dailyDepositLimitTextBox));
+        dailyDepositLimitTextBox.sendKeys(cashAmount.toString());
+        save.click();
+
+        driver.close();
+        driver.switchTo().window(depositsWindow);
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
+    }
+
+    public void depositBankToBank(BigDecimal cashAmount) {
+        selectBankToBankTab();
+        wait.until(ExpectedConditions.visibilityOf(bankToBankAmountTextBox));
+        bankToBankAmountTextBox.sendKeys(cashAmount.toString());
+    }
+
+    public void verifyDepositBankToBankFails(String errorMsg) {
+        Helpers.delayInMillis(2000);
+        assertThat(bankToBankAmountTextBox.getText()).isEqualTo("");
+        assertThat(bankToBankLimitExceededErrorMessage.getText()).isEqualTo(errorMsg);
     }
 
 }

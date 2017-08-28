@@ -42,6 +42,7 @@ public class CustomerSteps implements En {
     private CustomersPage customersPage;
     private NewCustomerPage newCustPage;
     private MasterControllerPage masCtrlPage;
+    private DepositPage depositPage;
     private static final Logger log = LoggerFactory.getLogger(CustomerSteps.class);
 
     public CustomerSteps() {
@@ -76,7 +77,7 @@ public class CustomerSteps implements En {
             Storage.put(API_ACCESS_TOKEN, accessToken);
 
             if (Config.isLuxbet()) {
-                String statusMsg = wapi.depositCash(accessToken, requiredBalance);
+                String statusMsg = wapi.depositCash(accessToken, requiredBalance, WAPI.DepositType.CashDeposit);
                 assertThat(statusMsg).isEqualToIgnoringCase(requiredBalance + " " + custData.get("currency_code") + " successfully deposited");
             } else if (Config.isRedbook()) {
                 addCCMakeDeposit(
@@ -110,6 +111,13 @@ public class CustomerSteps implements En {
             Storage.put(CUSTOMER, custData);
             Storage.put(PREV_CUSTOMER, custData);
             log.info("New Customer created: " + custData);
+        });
+
+        And("^I update the daily deposit limit to \\$(\\d+.\\d\\d)$", (BigDecimal cashAmount) -> {
+            DepositPage depositPage = customersPage.openDepositWindow();
+            depositPage.verifyLoaded();
+            depositPage.selectDepositRestrictionsTab();
+            depositPage.updateDailyDepositLimit(cashAmount);
         });
 
         When("^I try to create a new customer via API with data from a non approved country$", (DataTable table) -> {
@@ -206,28 +214,36 @@ public class CustomerSteps implements En {
             Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
             lmp.verifyDisplaysUsername(custData.get("username"));
         });
-        When("^the customer deposits (\\d+\\.\\d\\d) cash via API$", (BigDecimal cashAmount) -> {
-            String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
-
+        When("^the customer deposits \\$(\\d+.\\d\\d) as \"([^\"]*)\" via API$", (BigDecimal cashAmount, String depositType) -> {
             //TODO implement depositCash in MOBI and remove the following login
             String sessionId = loginStoredCustomer();
-            String statusMsg = wapi.depositCash(sessionId, cashAmount);
+            String statusMsg = wapi.depositCash(sessionId, cashAmount, WAPI.DepositType.valueOf(depositType));
 
             Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
             String expectedMsg = String.format("%s %s successfully deposited", cashAmount, custData.get("currency_code"));
             assertThat(statusMsg).as("deposit status message").isEqualToIgnoringCase(expectedMsg);
         });
 
-        When("^the customer deposits (\\d+\\.\\d\\d) cash via UI$", (BigDecimal cashAmount) -> {
+        When("^the customer deposits \\$(\\d+.\\d\\d) as \"([^\"]*)\" via UI$", (BigDecimal cashAmount, WAPI.DepositType depositType) -> {
             DepositPage depositPage = customersPage.openDepositWindow();
             depositPage.verifyLoaded();
             depositPage.selectManualTab();
 
-            String transMsg = depositPage.depositCash(cashAmount);
+            String transMsg = depositPage.depositCash(cashAmount, depositType);
             assertThat(transMsg).contains("successfully");
 
             Map<String, String> custData = (Map<String, String>) Storage.get(KEY.CUSTOMER);
             depositPage.verifyTransactionRecord(transMsg, cashAmount, custData.get("currency_code"));
+        });
+
+        When("^the customer deposits \\$(\\d+.\\d\\d) as \"([^\"]*)\" using BankToBank tab via UI$", (BigDecimal cashAmount, String depositType) -> {
+            depositPage = customersPage.openDepositWindow();
+            depositPage.verifyLoaded();
+            depositPage.depositBankToBank(cashAmount);
+        });
+
+        Then("the error message \"([^\"]*)\" is received$", (String errorMsg) -> {
+            depositPage.verifyDepositBankToBankFails(errorMsg);
         });
 
         When("^I activate promotion code \"([^\"]*)\" for default customer in WP with activation note \"([^\"]*)\"", (String promoCode, String activationNote) -> {

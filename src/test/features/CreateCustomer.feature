@@ -29,7 +29,7 @@ Feature: Create New Customer
       | postal_city           | <postal_city>           |
       | postal_country        | <postal_country>        |
     Then the customer AML status in <UIorAPI> is updated to <amlStatus>
-    And the customer deposits <depositAmount> cash via <UIorAPI>
+    And the customer deposits $<depositAmount> as "CashDeposit" via <UIorAPI>
 
 # TODO remove? WAPI::account_deposit doesnt work in Redbook
 #  @redbook @api

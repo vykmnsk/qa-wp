@@ -26,7 +26,7 @@ Feature: Bonus Bets
       | client_ip             | <client_ip>             |
       | manual_verification   | <manual_verification>   |
     Then the customer AML status in <UIorAPI> is updated to <amlStatus>
-    And the customer deposits <depositAmount> cash via <UIorAPI>
+    And the customer deposits $<depositAmount> as "CashDeposit" via <UIorAPI>
 
     When I activate promotion code "SIGNUP101 - Sign Up - AUD $100.00" for default customer in WP with activation note "Bonus bet Promo Code"
     Then customer bonus bet balance is equal to $100.00

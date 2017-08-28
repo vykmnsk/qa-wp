@@ -84,6 +84,27 @@ public class WAPI implements WagerPlayerAPI {
         }
     }
 
+    public enum DepositType {
+        CashDeposit(14),
+        BankToBank(103),
+        PayoutSport(170),
+        PayoutRacing(171),
+        PayoutExotics(178),
+        VoidedSport(174),
+        VoidedRacing(175),
+        VoidedExotics(180),
+        BonusOnWinnings(191),
+        DebtWriteOff(194),
+        EFTDeposit(13),
+        Poli(131);
+
+        public final int id;
+
+        DepositType(int code) {
+            id = code;
+        }
+    }
+
     private static final Logger log = LoggerFactory.getLogger(WAPI.class);
 
     private static Map<String, Object> wapiAuthFields() {
@@ -160,18 +181,15 @@ public class WAPI implements WagerPlayerAPI {
         fields.putAll(custData);
         fields.put("output_type", "json");
         ReadContext resp = post(fields, false);
-        //String ctx = resp.read(RESP_ROOT);
-        String error = resp.read(RESP_ROOT + ".msg").toString();
-        List<String> msg = new ArrayList<>();
-        msg.add(error);
-        return msg;
+        List<String> errorMsg = resp.read(RESP_ROOT + "..msg");
+        return errorMsg;
     }
 
-    public String depositCash(String sessionId, BigDecimal cashAmount) {
+    public String depositCash(String sessionId, BigDecimal cashAmount, DepositType depositType) {
         Map<String, Object> fields = wapiAuthFields(sessionId);
         fields.put("action", "account_deposit");
         fields.put("amount", cashAmount);
-        fields.put("deposit_type", 14);
+        fields.put("deposit_type", depositType.id);
         ReadContext resp = post(fields);
         String msg = resp.read(RESP_ROOT + ".account[0].message");
         int transId = resp.read(RESP_ROOT + ".account[0].transaction_id");
