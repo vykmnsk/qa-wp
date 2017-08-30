@@ -93,9 +93,8 @@ public class CustomerSteps implements En {
                 String cardEncryption;
 
                 jsonObject.put("number", custData.get("CardNumber"));
-                jsonObject.put("holderName", custData.get("CVC"));
                 jsonObject.put("cvc", custData.get("CVC"));
-                jsonObject.put("expiryMonth", custData.get("ExpiryYear"));
+                jsonObject.put("expiryMonth", custData.get("ExpiryMonth"));
                 jsonObject.put("expiryYear", custData.get("ExpiryYear"));
                 jsonObject.put("holderName", custData.get("CardHolderName"));
 
