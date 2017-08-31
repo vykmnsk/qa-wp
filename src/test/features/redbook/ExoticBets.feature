@@ -21,6 +21,7 @@ Feature: Placing and Settling Exotic Bets for a Single Event
     And I settle race with Exotic prices "<ExoticPrices>"
     Then customer balance since last bet is increased by $<Payout>
 
+  @smoke
     Examples:
       | ProductName | BetType | BetOn              | Stake | Deduction | Payout | ExoticPrices |
       | Forecast SP | Exotic  | Runner01, Runner02 | 2.00  | 2.00      | 10.40  | 5.20         |

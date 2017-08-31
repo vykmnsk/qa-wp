@@ -45,6 +45,7 @@ Feature: Placing and Settling multi Bets
     When I result/settle created event race with winners "Runner11, Runner12, Runner13"
     Then customer balance since last bet is increased by $<Payout>
 
+  @smoke
     Examples:
       | Category     | Subcategory   | BetType | NumOfPlaces | BetOn              | Stake | Deduction | Payout |
       | Horse Racing | WOLVERHAMPTON | Win     | 3           | Runner01, Runner11 | 3.00  | 3.00      | 7.59   |
@@ -128,11 +129,7 @@ Feature: Placing and Settling multi Bets
       | Horse Racing     | WOLVERHAMPTON | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
       | Greyhound Racing | HARLOW        | Treble    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 8.00      | 105.25 |
       | Greyhound Racing | HARLOW        | Trixie    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 32.00     | 266.93 |
-
-  @smoke
-    Examples:
-      | Category         | Subcategory | MultiType | BetType | NumOfPlaces | BetOn                        | Stake | Deduction | Payout |
-      | Greyhound Racing | HARLOW      | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
+      | Greyhound Racing | HARLOW        | Patent    | Win     | 3           | Runner01, Runner11, Runner21 | 8.00  | 56.00     | 335.73 |
 
 
   Scenario Outline: Multi bet with 4 events <Category>  <Multitype>

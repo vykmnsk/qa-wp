@@ -50,7 +50,7 @@ Feature: Create New Customer
       | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0463254781 | N/A      | 13a Alan Ave | N/A      | SEAFORTH | 2092     | NSW        | AU      | Australia/Sydney | Favourite Holiday Spot? | AUD           |               | 61.9.192.13    | N/A                 | account_verified | 10000.00      |               |               |              |                 |             |                |
       | API     | Mr         | Harry     | Mann     | 1981-01-01 | @example.com          | 0413658250 | N/A      | 123+ABC+ST   | Auckland | MtEden   | 3000     | Wellington | NZ      | Australia/Sydney | Favourite Holiday Spot? | AUD           |               | 121.72.165.118 | N/A                 | unverified       | 1000.00       | POBox1015     | Northcliff    | Nicholston   | 873             | BlueValley  | IM             |
 
-  @redbook @ui
+  @wip @redbook @ui
     Examples:
       | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street       | city     | suburb         | postcode | state | country        | timezone      | secret_question         | currency_code | deposit_limit | client_ip | manual_verification | amlStatus  | depositAmount |
       | UI      | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0421147741 | Level5   | 13a Alan Ave | SEAFORTH | Seaforth North | 2092     | N/A   | United Kingdom | Europe/London | Favourite Holiday Spot? | GBP           | N/A           | N/A       | N/A                 | Unverified | 10000.00      |
