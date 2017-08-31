@@ -99,7 +99,7 @@ public class DepositPage extends AppPage {
     }
 
     public String depositCash(BigDecimal amount, WAPI.DepositType depositType) {
-        new Select(transactionType).selectByValue(depositType.toString());
+        new Select(transactionType).selectByValue(String.valueOf(depositType.id));
         wait.until(ExpectedConditions.visibilityOf(amountTextBox));
         amountTextBox.sendKeys(amount.toString());
 
