@@ -85,7 +85,15 @@ public class PlayTech {
         return accessToken;
     }
 
-    public String placeBet(String accessToken, Map<String, String> custData, BigDecimal betValue, String gameProvider, String gameType) {
+    public String placeWinBet(String accessToken, Map<String, String> custData, BigDecimal stake, String gameProvider, String gameType) {
+           return placeBet(accessToken, custData, stake, gameProvider, gameType,"place-and-win-bet.ftl");
+    }
+
+    public String placeBet(String accessToken, Map<String, String> custData, BigDecimal stake, String gameProvider, String gameType) {
+        return placeBet(accessToken, custData, stake, gameProvider, gameType,"bet.ftl");
+    }
+
+    private String placeBet(String accessToken, Map<String, String> custData, BigDecimal betValue, String gameProvider, String gameType,String templateFile) {
 
         // Add a different prefix to the message id ike "auto-xxx" easier to debug
         String messageID = messageIDPrefix.concat(Integer.toString(Helpers.randomBetweenInclusive(0, MAX_MESSAGE_ID_RANGE)));
@@ -93,7 +101,7 @@ public class PlayTech {
         gameProvider = (gameProvider == null ? "rhino" : gameProvider);
         String timeStamp = Helpers.timestamp("yyyy/MM/dd HH:mm:ss.SSS");
         gameType = (gameType == null ? "jdean" : gameType);
-        String betAmount = betValue.negate().toString();
+        String betAmount = betValue.toString();
         String currency = "GBP";
 
         Map<String, Object> templateData = new HashMap<>();
@@ -110,7 +118,7 @@ public class PlayTech {
         templateData.put("transactionCode", transactionCode);
 
         try {
-            Template template = getTemplateConfig().getTemplate("bet.ftl");
+            Template template = getTemplateConfig().getTemplate(templateFile);
             String requestPayload = getRequestPayLoad(templateData, template);
 
             Map<String, String> headers = new HashMap<>();
@@ -121,6 +129,20 @@ public class PlayTech {
             throw new FrameworkError(String.format("Something went wrong in PlayTech::placeBet method : %s", e));
         }
 
+    }
+
+    public static String getErrorMessage(String betResponse) {
+        String myXpath = "/*[local-name()='walletBatchResponse']/*[local-name()='gameMultiBalanceTransactionResponse']/*[local-name()='errorText']";
+        String errorText = Helpers.extractByXpath(betResponse, myXpath).toString();
+        assertThat(errorText).as("Playtech::Error-Text").isNotNull();
+        return errorText;
+    }
+
+    public static String getErrorCode(String betResponse) {
+        String myXpath = "/*[local-name()='walletBatchResponse']/*[local-name()='gameMultiBalanceTransactionResponse']/*[local-name()='errorCode']";
+        String errorCode = Helpers.extractByXpath(betResponse, myXpath).toString();
+        assertThat(errorCode).as("Playtech::Error-Code").isNotNull();
+        return errorCode;
     }
 
 
