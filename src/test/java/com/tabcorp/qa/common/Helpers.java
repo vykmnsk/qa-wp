@@ -139,10 +139,10 @@ public class Helpers {
                 if (i > 1) Thread.sleep((long) sleepSeconds * 1000);
                 block.run();
                 return;
-            } catch (AssertionError | TimeoutException e) {
-                log.info(String.format("Tried %d. Exception: %s", i, e.getMessage()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+            } catch (AssertionError | WebDriverException e ) {
+                log.info(String.format("Tried %d. Exception: %s", i, e.getMessage()));
             }
         }
         throw new FrameworkError(String.format("Exhausted %d attempts for previous Exceptions", maxTries));
