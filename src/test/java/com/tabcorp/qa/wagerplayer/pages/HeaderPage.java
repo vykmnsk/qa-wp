@@ -63,13 +63,15 @@ public class HeaderPage extends AppPage {
 
     public void pickCategories(String catVal, String subcatVal) {
         switchToHeaderFrame();
-        wait.until(ExpectedConditions.visibilityOf(category));
-        Select catSelect = new Select(category);
-        catSelect.selectByVisibleText("Category"); //to refresh when repeated
-        catSelect.selectByVisibleText(catVal);
-        wait.until(ExpectedConditions.visibilityOf(subcategory));
-        wait.until(ExpectedConditions.textToBePresentInElement(subcategory, subcatVal));
-        (new Select(subcategory)).selectByVisibleText(subcatVal);
+        Helpers.retryOnFailure(()-> {
+            wait.until(ExpectedConditions.visibilityOf(category));
+            Select catSelect = new Select(category);
+            catSelect.selectByVisibleText("Category"); //to refresh when repeated
+            catSelect.selectByVisibleText(catVal);
+            wait.until(ExpectedConditions.visibilityOf(subcategory));
+            wait.until(ExpectedConditions.textToBePresentInElement(subcategory, subcatVal));
+            (new Select(subcategory)).selectByVisibleText(subcatVal);
+        }, 3, 1);
     }
 
     public void pickEvent(String catVal, String subcatVal, String eventVal) {
