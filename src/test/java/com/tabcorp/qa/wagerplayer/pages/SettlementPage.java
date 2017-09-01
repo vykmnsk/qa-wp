@@ -53,32 +53,37 @@ public class SettlementPage extends AppPage {
     @FindBy(css = ".f6_settle_live_products input[type=hidden][id='precise_price']")
     List<WebElement> hiddenSettlePrices;
 
-    @FindBy(css = ("table[id=deductions_table] > tbody > tr"))
+    @FindBy(css = "table[id=deductions_table] > tbody > tr")
     List<WebElement> deductionsRows;
 
-    @FindBy(css = ("td[align=left] table#no_padding_table_inner"))
+    @FindBy(css = "td[align=left] table#no_padding_table_inner")
     WebElement resultPricesTable;
 
-    @FindBy(css = ("input[id=settle]"))
+    @FindBy(css = "input[id=settle]")
     WebElement disabledSettleButton;
 
-    @FindBy(css = ("input[name^=home_score][onblur*=ft]"))
+    @FindBy(css = "input[name^=home_score][onblur*=ft]")
     WebElement firstPlayerFT;
 
-    @FindBy(css = ("input[name^=away_score][onblur*=ft]"))
+    @FindBy(css = "input[name^=away_score][onblur*=ft]")
     WebElement secondPlayerFT;
 
-    @FindBy(css = ("input[name^=settle_market]"))
+    @FindBy(css = "input[name^=settle_market]")
     WebElement winnerSportCheck;
 
-    @FindBy(css = ("font[color=green]"))
+    @FindBy(css = "font[color=green]")
     WebElement resultedLabel;
+
+    @FindBy(css ="#main_table tr th")
+    WebElement pageHeader;
 
     private By priceSelector = By.cssSelector("input[id^='price']");
 
     public void load() {
         driver.switchTo().defaultContent();
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("frame_bottom"));
+        wait.until(ExpectedConditions.visibilityOf(pageHeader));
+        assertThat(pageHeader.getText()).as("Page Header").isEqualTo("Settle");
     }
 
     public void resultRace(Map<String, String> winners) {

@@ -229,6 +229,7 @@ Feature: Placing and Settling multi Bets
       | Greyhound Racing | HARLOW        | Lucky 15  | Win     | Runner01, Runner11, Runner21, Runner31 | 2.00  | 30.00     | 272.98 | 3           |
 
 
+  @multi5
   Scenario Outline: Multi bet with 5 events <Category>  <Multitype>
 
     When I enter specifics category "<Category>" and subcategory "<Subcategory>"
