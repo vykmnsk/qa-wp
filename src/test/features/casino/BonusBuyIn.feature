@@ -43,3 +43,4 @@ Feature: BonusBuyIn Balance and Loss-Limit
       | $40.00    | Playtech     | fatesisters | 150.00, 40.00, 3.00 | $150.00 | Error : 24 Hour Loss Limit Breached | 129       |
       | $40.00    | Playtech     | fatesisters | 200.00, 1.00        | $150.00 | Error : 24 Hour Loss Limit Breached | 129       |
       | $40.00    | Playtech     | fatesisters | 80.00               | $150.00 |                                     | 0         |
+
