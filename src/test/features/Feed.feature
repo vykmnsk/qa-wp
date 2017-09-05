@@ -70,8 +70,12 @@ Feature: Event Feeds
 
   @smoke
     Examples:
-      | category   | subcategory            | template                              |
-      | Volleyball | International Friendly | gearman-volleyball-intl-friendly.json |
-    Examples:
       | category | subcategory          | template                            |
       | Football | NPL Women - Victoria | gearman-football-npl-women-vic.json |
+
+    Examples:
+      | category | subcategory    | template                             |
+      | Football | Premier League | gearman-football-premier-league.json |
+
+
+
