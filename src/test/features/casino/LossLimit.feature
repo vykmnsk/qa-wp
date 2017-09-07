@@ -33,12 +33,6 @@ Feature: Sunbets Casino Loss Limit
       | GameProvider | GameType | Stake            | Balance   |
       | rhino        | jdean    | 2000.00, 2000.00 | $24000.00 |
 
-#   needs to be developed as part of a new pull request
-#   Scenario: As an admin user , I should be  able to change the loss limit of a user
-#     Then  the admin should be able to update the loss limit to $1200 for 24 hours
-#     And the loss limit should be $1200 and loss limit definition should be "24 hours"
-
-  @cv
   Scenario Outline: Place a Sunbets bet after loss limit is breached
     When I update the loss limit to $1200.00 for 24 hours
     And I place multiple spins on "<GameProvider>" Casino "<GameType>" game with a stake of <Casino Stake>
@@ -58,5 +52,6 @@ Feature: Sunbets Casino Loss Limit
       | Category     | Subcategory   | Product           | BetType | BetOn    | Stake | WinPrices  | GameProvider | GameType | Casino Stake     | FinalBalance |
       | Horse Racing | WOLVERHAMPTON | Luxbook DVP Fixed | Win     | Runner01 | 2.50  | 4.20, 4.10 | rhino        | jdean    | 2000.00, 2000.00 | $17997.50    |
 
-#    When I feed "PA" RabbitMQ with Event message based on "feeds/pa-gh-hove.json"
-#    And WagerPlayer receives the Event in "Greyhound Racing"-"Hove"
+
+  # TODO : Create an event via feeds(not via Wagerplayer Admin UI ) and get the market ID & event ID from it.
+  # TODO : so that it is completely Api / feeds driven and less prone to non determinism. Yet to be done.

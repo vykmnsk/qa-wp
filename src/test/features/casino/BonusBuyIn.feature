@@ -23,7 +23,7 @@ Feature: BonusBuyIn Balance and Loss-Limit
   Scenario Outline: Customer Balance should consider the bonus money after bets are placed
     And I update the loss limit to <LossLimit> for 24 hours
     And customer balance is equal to <Balance>
-    When I spin a "<GameProvider>" Casino "<GameType>" game with a stake of <Stake>
+    And I place multiple spins on "<GameProvider>" Casino "<GameType>" game with a stake of <Stake>
     Then customer balance is equal to <FinalBalance>
 
     Examples:
@@ -34,7 +34,7 @@ Feature: BonusBuyIn Balance and Loss-Limit
   Scenario Outline: Casino Bonus is excluded from Casino loss
     And I update the loss limit to <LossLimit> for 24 hours
     And customer balance is equal to <Balance>
-    When I spin a "<GameProvider>" Casino "<GameType>" game with a stake of <Stake>
+    And I place multiple spins on "<GameProvider>" Casino "<GameType>" game with a stake of <Stake>
     Then the message should be "<ErrorMessage>"
     And the error code should be <ErrorCode>
 
