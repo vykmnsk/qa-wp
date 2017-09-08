@@ -16,12 +16,12 @@ import java.util.Map;
 import static com.tabcorp.qa.common.Storage.KEY.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LossLimitSteps implements En {
+public class CasinoSteps implements En {
 
     private PlayTech playTech;
     private WagerPlayerAPI api = Config.getAPI();
 
-    public LossLimitSteps() {
+    public CasinoSteps() {
 
         Then("^the loss limit should be \\$(\\d+.\\d\\d) and loss limit definition should be \"([^\"]*)\"$", (BigDecimal expectedLossLimit, String expectedLossLimitDefinition) -> {
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
@@ -97,6 +97,14 @@ public class LossLimitSteps implements En {
             assertThat(betResponse).isNotEmpty();
             String actualErrorCode = PlayTech.getErrorCode(betResponse);
             assertThat(actualErrorCode).as("Error Code").isEqualTo(expectedErrorCode.toString());
+        });
+
+        Then("^I should get a Microgaming token for the customer successfully$", () -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
+            String microGamingAccessToken = mobi_v2.getMicrogamingToken(accessToken);
+            assertThat(microGamingAccessToken).isNotNull();
+            Storage.add(MICROGAMING_API_ACCESS_TOKEN,microGamingAccessToken);
         });
 
     }
