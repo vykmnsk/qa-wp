@@ -1,10 +1,16 @@
 package com.tabcorp.qa.wagerplayer.api;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
+import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONNavi;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
@@ -214,6 +220,51 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return betTypeIds.stream().map(id -> BetType.fromId(Integer.valueOf("" + id))).collect(Collectors.toList());
     }
 
+    public List<String> placeExternalBet(String acessToken, Integer betExtId, BigDecimal stake, String betDescription, String serviceName, String betType, String betStatus) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", acessToken);
+        fields.put("bet_stake", stake.toString());
+        fields.put("ext_id", betExtId);
+        fields.put("bet_desc", betDescription);
+        if (!betType.isEmpty()) {
+            fields.put("bet_type", betType);
+        }
+        fields.put("show_transaction_id", "true");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("api_user_service_name", serviceName);
+
+        ReadContext resp = post("/external/bet/place", fields, headers,true);
+        List<String> contentStatus = resp.read("$..content");
+        List<String> txnId = resp.read("$..transaction_id");
+
+        assertThat(contentStatus).contains(betStatus);
+        log.debug("Place External Bet Payload = " + fields);
+        log.debug("Place External Bet Txn Id = " + txnId);
+        log.debug("Place External Bet status=" + contentStatus);
+        return resp.read("$..transaction_id");
+    }
+
+    public List<String> settleExternalBet(String accessToken, Integer betExtId, BigDecimal payout, String numSettles, String betStatus, String serviceName) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("bet_payout", payout.toString());
+        fields.put("ext_id", betExtId);
+        fields.put("num_settles", numSettles);
+        fields.put("show_transaction_id", "true");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("api_user_service_name", serviceName);
+
+        ReadContext resp = post("/external/bet/settle", fields, headers, true);
+        List<String> contentStatus = resp.read("$..content");
+//        List<String> txnId = resp.read("$..transaction_id");
+
+        assertThat(contentStatus).contains(betStatus);
+        log.debug("Settle External Bet Payload = " + fields);
+        log.debug("Settle External Bet status=" + contentStatus);
+        return resp.read("$..transaction_id");
+    }
 
     @SuppressWarnings("unchecked")
     public ReadContext placeSingleWinBetForRacing(String accessToken, Integer productId, String mpid, String winPrice, BigDecimal stake, Integer unused) {
@@ -380,6 +431,23 @@ public class MOBI_V2 implements WagerPlayerAPI {
         String custId = response.read("$.success.customer_id");
         log.info("Customer ID=" + custId);
         return response.read("$.success.message");
+    }
+
+    public ReadContext getCustomerStatement(String accessToken) {
+        Map<String, Object> field = new HashMap<>();
+        field.put("access_token", accessToken);
+
+        ReadContext response = get("/customer/statement", field);
+        List<String> custStmtRecords = response.read("$.records");
+        assertThat(custStmtRecords).isNotEmpty();
+        return response;
+    }
+
+    public Map extractTransRecord(ReadContext custTransRecords, String transId) {
+        List<Map> extractedRecord = custTransRecords.read("$.records" + jfilter("trans_id", transId));
+        log.debug("Extracted Transaction Records=" + extractedRecord);
+        assertThat(extractedRecord).hasSize(1).as("Extracted Record");
+        return extractedRecord.get(0);
     }
 
     public String readAmlStatus(String accessToken) {

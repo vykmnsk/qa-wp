@@ -24,7 +24,9 @@ public class Storage {
         BALANCE_BEFORE,
         BET_IDS,
         PREV_CUSTOMER,
-        BET_RESPONSE
+        BET_RESPONSE,
+        BET_EXT_ID,
+        TXN_ID
     }
 
     public static void init() {

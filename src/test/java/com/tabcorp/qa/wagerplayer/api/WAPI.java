@@ -547,7 +547,7 @@ public class WAPI implements WagerPlayerAPI {
         return readAttrOneOnly(resp, mktPath, "id");
     }
 
-    private static String readPriceAttr(ReadContext resp, String pricePath, String betTypeName, String attrName) {
+    private String readPriceAttr(ReadContext resp, String pricePath, String betTypeName, String attrName) {
         String path = pricePath + jfilter("bet_type_name", betTypeName);
         // TODO shall we consider returning 1.0?
         // return readAttrOrElse(resp, path, attrName, "1");
@@ -616,10 +616,6 @@ public class WAPI implements WagerPlayerAPI {
             uuid = prepareSelectionsForMultiBet(accessToken, selections, prodIds, multiType, betTypes);
         }
         return uuid;
-    }
-
-    private static String jfilter(String attr, String value) {
-        return String.format("[?(@.%s =~ /^%s$/i)]", attr, value);
     }
 
 }

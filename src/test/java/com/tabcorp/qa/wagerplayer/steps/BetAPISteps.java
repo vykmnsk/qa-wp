@@ -1,16 +1,14 @@
 package com.tabcorp.qa.wagerplayer.steps;
 
 import com.jayway.jsonpath.ReadContext;
-import com.tabcorp.qa.common.BetType;
-import com.tabcorp.qa.common.FrameworkError;
-import com.tabcorp.qa.common.Helpers;
-import com.tabcorp.qa.common.Storage;
+import com.tabcorp.qa.common.*;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.DataTable;
 import cucumber.api.java8.En;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +30,41 @@ public class BetAPISteps implements En {
     private CustomerSteps customerSteps;
 
     public BetAPISteps() {
+        When("^I place an External bet for \\$(\\d+.\\d\\d)$",
+                (BigDecimal stake, DataTable table) -> {
+                    StrictHashMap<String, String> settings = new StrictHashMap<>();
+                    settings.putAll(table.asMap(String.class, String.class));
+                    String betDescription = settings.get("bet description");
+                    String serviceName = settings.get("service name");
+                    String betType =  settings.get("bet type");
+                    String expectedBetStatus =  settings.get("bet status");
+                    String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+                    String genExtId = RandomStringUtils.randomNumeric(5);
+                    Integer betExtId = Integer.parseInt(genExtId);
+                    Storage.put(Storage.KEY.BET_EXT_ID, betExtId);
+                    MOBI_V2 mobi = new MOBI_V2();
+                    List<String> txnId = mobi.placeExternalBet(accessToken, betExtId, stake, betDescription, serviceName, betType, expectedBetStatus);
+                    assertThat(txnId).as("Place Bet Trans Id").isNotEmpty();
+                    Storage.put(Storage.KEY.TXN_ID, txnId.get(0));
+                });
+
+        When("^I settle an External bet for \\$(\\d+.\\d\\d)$",
+                (BigDecimal payout, DataTable table) -> {
+                    StrictHashMap<String, String> settings = new StrictHashMap<>();
+                    settings.putAll(table.asMap(String.class, String.class));
+                    String numSettles = settings.get("num settles");
+                    String expectedBetStatus = settings.get("bet status");
+                    String serviceName = settings.get("service name");
+                    String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+                    Integer betExtId = (Integer) Storage.get(BET_EXT_ID);
+
+                    MOBI_V2 mobi = new MOBI_V2();
+                    List<String> txnId = mobi.settleExternalBet(accessToken, betExtId, payout, numSettles, expectedBetStatus, serviceName);
+                    assertThat(txnId).as("Settle Bet Trans Id").isNotEmpty();
+                    Storage.put(Storage.KEY.TXN_ID, txnId.get(0));
+                });
+
+
         When("^I place a single Racing \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {
                     String evId = (String) Storage.getLast(EVENT_IDS);

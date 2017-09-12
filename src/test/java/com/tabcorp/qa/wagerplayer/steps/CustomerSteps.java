@@ -14,6 +14,7 @@ import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.assertj.core.api.Assertions;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +131,25 @@ public class CustomerSteps implements En {
             Storage.put(CUSTOMER, custData);
             Storage.put(PREV_CUSTOMER, custData);
             log.info("New Customer created: " + custData);
+        });
+
+        When("^I verify customer statement via API$", (DataTable table) -> { ;
+            StrictHashMap<String, String> txnData = new StrictHashMap<>();
+            txnData.putAll(table.asMap(String.class, String.class));
+            String accessToken = (String) Storage.get(Storage.KEY.API_ACCESS_TOKEN);
+            MOBI_V2 mobi = new MOBI_V2();
+            ReadContext custTransRecords = mobi.getCustomerStatement(accessToken);
+            String transId = Storage.get(Storage.KEY.TXN_ID).toString();
+            Map transRecord = mobi.extractTransRecord(custTransRecords, transId);
+
+            Assertions.assertThat(transRecord.get("type")).isEqualTo(txnData.get("type"));
+            Assertions.assertThat(transRecord.get("dr")).isEqualTo(txnData.get("debit amount"));
+            Assertions.assertThat(transRecord.get("cr")).isEqualTo(txnData.get("credit amount"));
+            Assertions.assertThat(transRecord.get("balance")).isEqualTo(txnData.get("balance"));
+
+            String txnDesc = (txnData.get("type")+ ": " + Storage.get(Storage.KEY.BET_EXT_ID) + " - " + txnData.get("description"));
+            log.debug("Transaction Desc=" + txnDesc);
+            Assertions.assertThat(transRecord.get("description")).isEqualTo(txnDesc);
         });
 
         And("^I update the daily deposit limit to \\$(\\d+.\\d\\d)$", (BigDecimal cashAmount) -> {

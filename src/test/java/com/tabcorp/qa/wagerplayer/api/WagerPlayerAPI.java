@@ -59,4 +59,8 @@ public interface WagerPlayerAPI {
         return ctx;
     }
 
+    default String jfilter(String attr, String value) {
+        return String.format("[?(@.%s =~ /^%s$/i)]", attr, value);
+    }
+
 }
