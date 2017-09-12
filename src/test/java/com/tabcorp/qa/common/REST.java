@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class REST {
         return verifyAndParseResponse(response);
     }
 
-    private static Object verifyAndParseResponse(HttpResponse<String> response) {
+    public static Object verifyAndParseResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
 
         String body = response.getBody();
@@ -105,20 +106,19 @@ public class REST {
         return body;
     }
 
-    public static HttpResponse<String> postXML(String url, String requestBody, Map<String, String> headers) {
+    public static HttpResponse<String> postWithBody(String url, String requestBody, Map<String, String> headers) {
         HttpResponse<String> response;
 
         try {
-            log.debug("sending POST XML headers=" + headers);
+            log.debug("sending POST with Body headers=" + headers);
             response = Unirest.post(url)
                     .headers(headers)
                     .body(requestBody)
                     .asString();
         } catch (UnirestException e) {
-            throw new FrameworkError(String.format("POST with QueryString to URL='%s': %s", url, e));
+            throw new FrameworkError(String.format("POST with Body to URL='%s': %s", url, e));
         }
-        log.debug("response from xml POST=" + response);
-        verifyXMLResponse(response);
+        log.debug("response from POST with Body=" + response);
         return response;
     }
 

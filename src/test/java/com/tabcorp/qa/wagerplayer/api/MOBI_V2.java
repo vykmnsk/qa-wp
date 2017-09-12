@@ -1,16 +1,11 @@
 package com.tabcorp.qa.wagerplayer.api;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
+import com.mashape.unirest.http.HttpResponse;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
-import com.tabcorp.qa.common.Storage;
-import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONNavi;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.json.simple.JSONObject;
@@ -27,6 +22,18 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
     private static String URL_ROOT = Config.moby_V2_URL();
     private static final String RESP_ROOT = "$";
+
+    public enum PromoBalanceTypes {
+        BONUS_BALANCE("bonus_balance"),
+        RINGFENCED_BALANCE("ringfenced_real_balance"),
+        BONUS_PENDING_WINNINGS_BALANCE("bonus_pending_winnings");
+
+        public final String exactName;
+
+        PromoBalanceTypes(String name) {
+            exactName = name;
+        }
+    }
 
     public enum MultiType {
         Double("Double"),
@@ -234,7 +241,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         Map<String, String> headers = new HashMap<>();
         headers.put("api_user_service_name", serviceName);
 
-        ReadContext resp = post("/external/bet/place", fields, headers,true);
+        ReadContext resp = post("/external/bet/place", fields, headers, true);
         List<String> contentStatus = resp.read("$..content");
         List<String> txnId = resp.read("$..transaction_id");
 
@@ -558,4 +565,24 @@ public class MOBI_V2 implements WagerPlayerAPI {
         assertThat(msg).isEqualToIgnoringCase("The set_customer_casino_loss_limit request has been submitted successfully");
     }
 
+    public BigDecimal getDynamicBalance(String accessToken, PromoBalanceTypes promoBalanceTypes) {
+
+        Map<String, Object> fields = new HashMap<>();
+        Map<String, String> payLoadMap = new HashMap<>();
+
+        payLoadMap.put("playerCurrency", "GBP");
+        // have to add all these in balanceTypes so that bonus gets reflected correctly.
+        payLoadMap.put("balanceTypes", "bonus_balance,bonus_pending_winnings,ringfenced_real_balance,external_real_balance");
+        fields.put("access_token", accessToken);
+        fields.put("action", "getDynamicBalances");
+        fields.put("payload", payLoadMap);
+
+        JSONObject jsonObject = new JSONObject(fields);
+        HttpResponse<String> resp = REST.postWithBody(URL_ROOT + "/playtech/player_request", jsonObject.toJSONString(), null);
+        Object response = REST.verifyAndParseResponse(resp);
+        String jsonPath = "$.balances.dynamicBalance[?(@.balanceType==\"" + promoBalanceTypes.exactName + "\")].balance.amount";
+        ReadContext readContext = parseVerifyJSON(response, jsonPath);
+        JSONArray amount = readContext.read(jsonPath);
+        return new BigDecimal(amount.get(0).toString());
+    }
 }

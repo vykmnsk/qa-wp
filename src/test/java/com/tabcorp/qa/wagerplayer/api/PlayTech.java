@@ -27,7 +27,7 @@ public class PlayTech {
 
 
     private String postXML(String url, Map<String, String> headers, String requestBody) {
-        HttpResponse<String> verifiedResponse = REST.postXML(url, requestBody, headers);
+        HttpResponse<String> verifiedResponse = REST.postWithBody(url, requestBody, headers);
         return REST.verifyXMLResponse(verifiedResponse);
     }
 

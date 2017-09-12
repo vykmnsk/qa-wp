@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tabcorp.qa.common.Storage.KEY.*;
+import static com.tabcorp.qa.wagerplayer.api.MOBI_V2.PromoBalanceTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CasinoSteps implements En {
@@ -25,7 +26,8 @@ public class CasinoSteps implements En {
 
         Then("^the loss limit should be \\$(\\d+.\\d\\d) and loss limit definition should be \"([^\"]*)\"$", (BigDecimal expectedLossLimit, String expectedLossLimitDefinition) -> {
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
-            String accessToken = api.login(custData.get("username"), custData.get("password"), null);
+            String clientIp = custData.getOrDefault("client_ip", null);
+            String accessToken = api.login(custData.get("username"), custData.get("password"), clientIp);
 
             MOBI_V2 mobi_v2 = new MOBI_V2();
             Pair<BigDecimal, String> lossLimitData = mobi_v2.getCustomerLossLimitAndDefinition(accessToken);
@@ -67,7 +69,7 @@ public class CasinoSteps implements En {
 
             List<Double> stakes = Helpers.convertList(stakesAsList, Double::parseDouble);
             stakes.forEach(stake -> {
-//                Stake negated because it is loss bet.
+                //Stake negated because it is loss bet.
                 Storage.put(BET_RESPONSE, playTech.placeBet(accessToken, custData, new BigDecimal(stake).negate(), gameProvider, gameType));
             });
         });
@@ -99,12 +101,33 @@ public class CasinoSteps implements En {
             assertThat(actualErrorCode).as("Error Code").isEqualTo(expectedErrorCode.toString());
         });
 
+        And("^the Bonus Balance should be \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBonusBalance) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
+            BigDecimal amount = mobi_v2.getDynamicBalance(accessToken, BONUS_BALANCE);
+            assertThat(Helpers.roundOff(amount)).as("Actual Bonus Balance").isGreaterThanOrEqualTo(expectedBonusBalance);
+        });
+
+        And("^the Ringfenced Balance should be \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedRingFencedBalance) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
+            BigDecimal amount = mobi_v2.getDynamicBalance(accessToken, RINGFENCED_BALANCE);
+            assertThat(Helpers.roundOff(amount)).as("Actual Ringfenced Balance").isGreaterThanOrEqualTo(expectedRingFencedBalance);
+        });
+
+        And("^the Bonus Pending Winnings should be \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBonusPendingWinningsBalance) -> {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
+            BigDecimal amount = mobi_v2.getDynamicBalance(accessToken, BONUS_PENDING_WINNINGS_BALANCE);
+            assertThat(Helpers.roundOff(amount)).as("Actual Bonus Pending Winnings Balance").isGreaterThanOrEqualTo(expectedBonusPendingWinningsBalance);
+        });
+
         Then("^I should get a Microgaming token for the customer successfully$", () -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             MOBI_V2 mobi_v2 = new MOBI_V2();
             String microGamingAccessToken = mobi_v2.getMicrogamingToken(accessToken);
             assertThat(microGamingAccessToken).isNotNull();
-            Storage.add(MICROGAMING_API_ACCESS_TOKEN,microGamingAccessToken);
+            Storage.add(MICROGAMING_API_ACCESS_TOKEN, microGamingAccessToken);
         });
 
     }
