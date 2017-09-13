@@ -1,5 +1,5 @@
 @redbook @feed
-Feature: Event Feeds
+Feature: Racing Event Feeds
 
   @smoke
   Scenario Outline: <type> Feed: Create <category> Event
@@ -63,19 +63,7 @@ Feature: Event Feeds
       | WIFT | Greyhound Racing | Addington   | wift-gh-addington-replaced-mollys-tourbo.json | Mollys    | Tourbo      |
 
 
-  @gearman
-  Scenario Outline: Gearman Feed from Sporting Solutions
-    When I feed Gearman with Event message based on "feeds/<template>"
-    Then WagerPlayer receives the Event in "<category>"-"<subcategory>"
 
-  @smoke
-    Examples:
-      | category | subcategory          | template                            |
-      | Football | NPL Women - Victoria | gearman-football-npl-women-vic.json |
-
-    Examples:
-      | category | subcategory    | template                             |
-      | Football | Premier League | gearman-football-premier-league.json |
 
 
 

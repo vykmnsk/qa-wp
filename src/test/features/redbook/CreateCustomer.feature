@@ -40,7 +40,7 @@ Feature: Create New Customer
 
   @api
     Examples:
-      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city     | suburb | postcode | state | country | timezone | secret_question         | currency_code | deposit_limit | client_ip | manual_verification | amlStatus             | depositAmount | withrawAmount | finalBalance |
-      | API     | Mr         | Oswald    | Petrucco | 1939-05-31 | @example.com          | 0463254781 | Level5   | 142 Tynte Street | Adelaide | N/A    | 5006     | N/A   | GB      | N/A      | Favourite Holiday Spot? | GBP           | N/A           | N/A       | Y                   | active_-_kyc_verified | 100.00        | 20.00              | 80.00   |
+      | UIorAPI | salutation | firstname | lastname | dob        | _email_address_suffix | telephone  | building | street           | city     | suburb | postcode | state | country | timezone | secret_question         | currency_code | deposit_limit | client_ip     | manual_verification | amlStatus             | depositAmount | withrawAmount | finalBalance |
+      | API     | Mr         | Oswald    | Petrucco | 1939-05-31 | @example.com          | 0463254781 | Level5   | 142 Tynte Street | Adelaide | N/A    | 5006     | N/A   | GB      | N/A      | Favourite Holiday Spot? | GBP           | N/A           | 212.58.244.18 | Y                   | active_-_kyc_verified | 100.00        | 20.00         | 80.00        |
 #      | API     | Ms         | Keli      | Cowey    | 1952-03-25 | @example.com          | 0421147741 | Level5   | 13a Alan Ave     | SEAFORTH | N/A    | 2092     | N/A   | IRL     | N/A      | Favourite Holiday Spot? | EUR           | N/A           | N/A       | N                   | UNVERIFIED            | 99.00         | 4.00              | 94.01    |
 
