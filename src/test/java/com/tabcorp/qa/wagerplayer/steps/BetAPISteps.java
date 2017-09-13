@@ -64,6 +64,19 @@ public class BetAPISteps implements En {
                     Storage.put(Storage.KEY.TXN_ID, txnId.get(0));
                 });
 
+        When("^I cancel an External bet", (DataTable table) -> {
+                    StrictHashMap<String, String> settings = new StrictHashMap<>();
+                    settings.putAll(table.asMap(String.class, String.class));
+                    String serviceName = settings.get("service name");
+                    String cancelNote =  settings.get("cancel note");
+                    String expectedBetStatus =  settings.get("bet status");
+                    String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+                    Integer betExtId = (Integer) Storage.get(BET_EXT_ID);
+                    MOBI_V2 mobi = new MOBI_V2();
+                    List<String> txnId = mobi.cancelExternalBet(accessToken, betExtId, serviceName, cancelNote, expectedBetStatus);
+                    assertThat(txnId).as("Cancel Bet Trans Id").isNotEmpty();
+                    Storage.put(Storage.KEY.TXN_ID, txnId.get(0));
+                });
 
         When("^I place a single Racing \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",
                 (String betTypeName, String runner, BigDecimal stake) -> {

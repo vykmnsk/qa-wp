@@ -227,7 +227,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return betTypeIds.stream().map(id -> BetType.fromId(Integer.valueOf("" + id))).collect(Collectors.toList());
     }
 
-    public List<String> placeExternalBet(String acessToken, Integer betExtId, BigDecimal stake, String betDescription, String serviceName, String betType, String betStatus) {
+    public List<String> placeExternalBet(String acessToken, Integer betExtId, BigDecimal stake, String betDescription, String serviceName, String betType, String expectedBetStatus) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", acessToken);
         fields.put("bet_stake", stake.toString());
@@ -245,14 +245,14 @@ public class MOBI_V2 implements WagerPlayerAPI {
         List<String> contentStatus = resp.read("$..content");
         List<String> txnId = resp.read("$..transaction_id");
 
-        assertThat(contentStatus).contains(betStatus);
+        assertThat(contentStatus).contains(expectedBetStatus);
         log.debug("Place External Bet Payload = " + fields);
         log.debug("Place External Bet Txn Id = " + txnId);
         log.debug("Place External Bet status=" + contentStatus);
         return resp.read("$..transaction_id");
     }
 
-    public List<String> settleExternalBet(String accessToken, Integer betExtId, BigDecimal payout, String numSettles, String betStatus, String serviceName) {
+    public List<String> settleExternalBet(String accessToken, Integer betExtId, BigDecimal payout, String numSettles, String expectedBetStatus, String serviceName) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
         fields.put("bet_payout", payout.toString());
@@ -265,11 +265,29 @@ public class MOBI_V2 implements WagerPlayerAPI {
 
         ReadContext resp = post("/external/bet/settle", fields, headers, true);
         List<String> contentStatus = resp.read("$..content");
-//        List<String> txnId = resp.read("$..transaction_id");
 
-        assertThat(contentStatus).contains(betStatus);
+        assertThat(contentStatus).contains(expectedBetStatus);
         log.debug("Settle External Bet Payload = " + fields);
         log.debug("Settle External Bet status=" + contentStatus);
+        return resp.read("$..transaction_id");
+    }
+
+    public List<String> cancelExternalBet(String accessToken, Integer betExtId, String serviceName, String cancelNote, String expectedBetStatus) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("ext_id", betExtId);
+        fields.put("cancel_note", cancelNote);
+        fields.put("show_transaction_id", "true");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("api_user_service_name", serviceName);
+
+        ReadContext resp = post("/external/bet/cancel", fields, headers, true);
+        List<String> contentStatus = resp.read("$..content");
+
+        assertThat(contentStatus).contains(expectedBetStatus);
+        log.debug("Cancel External Bet Payload = " + fields);
+        log.debug("Cancel External Bet status=" + contentStatus);
         return resp.read("$..transaction_id");
     }
 
