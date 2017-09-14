@@ -8,8 +8,7 @@ Feature: BonusBuyIn Balance and Loss-Limit
     And I get a PlayTech token for the new customer
     And I deposit $100.00 using stored "MC" card using promo code "JAGBONUS"
     Then customer balance is equal to $150.00
-
-  @r1
+    
   Scenario Outline:  Should have the correct amount for individual bonus components
     And the Bonus Balance should be <BonusBalance>
     And the Ringfenced Balance should be <RingfencedBalance>

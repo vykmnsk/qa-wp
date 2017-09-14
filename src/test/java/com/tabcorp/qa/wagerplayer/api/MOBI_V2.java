@@ -4,6 +4,7 @@ import com.jayway.jsonpath.ReadContext;
 import com.mashape.unirest.http.HttpResponse;
 import com.tabcorp.qa.common.BetType;
 import com.tabcorp.qa.common.REST;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tabcorp.qa.common.Storage.KEY.CUSTOMER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MOBI_V2 implements WagerPlayerAPI {
@@ -437,6 +439,7 @@ public class MOBI_V2 implements WagerPlayerAPI {
         ReadContext response = post("/customer", custData, true);
         Integer custId = response.read("$.success.customer_id");
         log.info("Customer ID=" + custId);
+        Storage.put(CUSTOMER_ID,custId.toString());
         return response.read("$.success.message");
     }
 
@@ -584,20 +587,17 @@ public class MOBI_V2 implements WagerPlayerAPI {
     }
 
     public BigDecimal getDynamicBalance(String accessToken, PromoBalanceTypes promoBalanceTypes) {
-
         Map<String, Object> fields = new HashMap<>();
         Map<String, String> payLoadMap = new HashMap<>();
-
+        // hard coded currency to GBP for now . Reconfigure , so that it accommodates EURO later.
         payLoadMap.put("playerCurrency", "GBP");
         // have to add all these in balanceTypes so that bonus gets reflected correctly.
         payLoadMap.put("balanceTypes", "bonus_balance,bonus_pending_winnings,ringfenced_real_balance,external_real_balance");
         fields.put("access_token", accessToken);
         fields.put("action", "getDynamicBalances");
         fields.put("payload", payLoadMap);
-
         JSONObject jsonObject = new JSONObject(fields);
-        HttpResponse<String> resp = REST.postWithBody(URL_ROOT + "/playtech/player_request", jsonObject.toJSONString(), null);
-        Object response = REST.verifyAndParseResponse(resp);
+        Object response = REST.postJSON(URL_ROOT + "/playtech/player_request", jsonObject.toJSONString());
         String jsonPath = "$.balances.dynamicBalance[?(@.balanceType==\"" + promoBalanceTypes.exactName + "\")].balance.amount";
         ReadContext readContext = parseVerifyJSON(response, jsonPath);
         JSONArray amount = readContext.read(jsonPath);

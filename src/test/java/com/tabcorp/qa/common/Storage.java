@@ -19,7 +19,7 @@ public class Storage {
         PRODUCT_NAMES,
         API_ACCESS_TOKEN,
         PLAYTECH_API_ACCESS_TOKEN,
-        MICROGAMING_API_ACCESS_TOKEN,
+        CUSTOMER_ID,
         CUSTOMER,
         BALANCE_BEFORE,
         BET_IDS,

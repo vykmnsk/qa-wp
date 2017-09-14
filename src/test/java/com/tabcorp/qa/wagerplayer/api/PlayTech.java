@@ -1,16 +1,9 @@
 package com.tabcorp.qa.wagerplayer.api;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.tabcorp.qa.common.FrameworkError;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.Version;
 
-import java.io.File;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,92 +12,44 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PlayTech {
 
-    private static String URL_ROOT = Config.env_URL();
-    private final String PLAYTECH_RSC_PATH = "src/test/resources/playtech/";
-    private final int MAX_MESSAGE_ID_RANGE = 999999999;
-    private final String messageIDPrefix = "auto-";
-    private final String FREE_MARKER_VERSION = "2.3.23";
-
-
-    private String postXML(String url, Map<String, String> headers, String requestBody) {
-        HttpResponse<String> verifiedResponse = REST.postWithBody(url, requestBody, headers);
-        return REST.verifyXMLResponse(verifiedResponse);
-    }
-
-    private Configuration getTemplateConfig() {
-        Configuration cfg = new Configuration(new Version(FREE_MARKER_VERSION));
-
-        try {
-            cfg.setDirectoryForTemplateLoading(new File(PLAYTECH_RSC_PATH));
-            cfg.setDefaultEncoding("UTF-8");
-        } catch (Exception e) {
-            throw new FrameworkError(String.format("Something went wrong in PlayTech::getTemplateConfiguration method : %s ",e));
-        }
-        return cfg;
-    }
-
-    private String getRequestPayLoad(Map<String, Object> templateData, Template template) {
-        String requestPayload;
-        try {
-            try (StringWriter out = new StringWriter()) {
-
-                template.process(templateData, out);
-                requestPayload = out.getBuffer().toString();
-                out.flush();
-            }
-        } catch (Exception e) {
-            throw new FrameworkError(String.format("Something went wrong in PlayTech::getRequestPayload method : %s", e));
-        }
-        return requestPayload;
-    }
+    private static final String API_URL = Config.env_URL() + "/playtech-gameplay-api/";
 
     public String login(String username, String password) {
-
-        Configuration cfg = getTemplateConfig();
         String accessToken;
         Map<String, Object> templateData = new HashMap<>();
-
+        String myXpath = "/*[local-name()='loginResponse']/*[local-name()='externalSessionToken']";
         templateData.put("username", username);
         templateData.put("password", password);
 
-        try {
-            Template template = cfg.getTemplate("login.ftl");
-            String requestPayload = getRequestPayLoad(templateData, template);
+        String requestPayload = Helpers.getRequestPayLoad(templateData, "playtech-login.ftl");
+        String response = REST.postXML(API_URL, requestPayload);
+        accessToken = Helpers.extractByXpath(response, myXpath).toString();
 
-            Map<String, String> headers = new HashMap<>();
-            headers.put("content-type", "text/xml");
-            String response = postXML(URL_ROOT + "/playtech-gameplay-api/", headers, requestPayload);
-            String myXpath = "/*[local-name()='loginResponse']/*[local-name()='externalSessionToken']";
-
-            accessToken = Helpers.extractByXpath(response, myXpath).toString();
-            assertThat(accessToken).isNotEmpty();
-
-        } catch (Exception e) {
-            throw new FrameworkError(String.format("Something went wrong in PlayTech::Login method : %s", e));
-        }
+        assertThat(accessToken).isNotEmpty();
         return accessToken;
     }
 
     public String placeWinBet(String accessToken, Map<String, String> custData, BigDecimal stake, String gameProvider, String gameType) {
-           return placeBet(accessToken, custData, stake, gameProvider, gameType,"place-and-win-bet.ftl");
+        return placeBet(accessToken, custData, stake, gameProvider, gameType, "playtech-place-and-win-bet.ftl");
     }
 
     public String placeBet(String accessToken, Map<String, String> custData, BigDecimal stake, String gameProvider, String gameType) {
-        return placeBet(accessToken, custData, stake, gameProvider, gameType,"bet.ftl");
+        return placeBet(accessToken, custData, stake, gameProvider, gameType, "playtech-bet.ftl");
     }
 
-    private String placeBet(String accessToken, Map<String, String> custData, BigDecimal betValue, String gameProvider, String gameType,String templateFile) {
-
+    private String placeBet(String accessToken, Map<String, String> custData, BigDecimal betValue, String gameProvider, String gameType, String templateFile) {
         // Add a different prefix to the message id ike "auto-xxx" easier to debug
+        int MAX_MESSAGE_ID_RANGE = 999999999;
+        String messageIDPrefix = "auto-";
         String messageID = messageIDPrefix.concat(Integer.toString(Helpers.randomBetweenInclusive(0, MAX_MESSAGE_ID_RANGE)));
         String transactionCode = Integer.toString(Helpers.randomBetweenInclusive(0, MAX_MESSAGE_ID_RANGE));
+        Map<String, Object> templateData = new HashMap<>();
+
         gameProvider = (gameProvider == null ? "rhino" : gameProvider);
         String timeStamp = Helpers.timestamp("yyyy/MM/dd HH:mm:ss.SSS");
         gameType = (gameType == null ? "jdean" : gameType);
         String betAmount = betValue.toString();
         String currency = "GBP";
-
-        Map<String, Object> templateData = new HashMap<>();
 
         templateData.put("playTechAccessToken", accessToken);
         templateData.put("username", custData.get("username"));
@@ -117,18 +62,9 @@ public class PlayTech {
         templateData.put("timeStamp", timeStamp);
         templateData.put("transactionCode", transactionCode);
 
-        try {
-            Template template = getTemplateConfig().getTemplate(templateFile);
-            String requestPayload = getRequestPayLoad(templateData, template);
+        String requestPayload = Helpers.getRequestPayLoad(templateData, templateFile);
 
-            Map<String, String> headers = new HashMap<>();
-            headers.put("content-type", "text/xml");
-            return postXML(URL_ROOT + "/playtech-gameplay-api/", headers, requestPayload);
-
-        } catch (Exception e) {
-            throw new FrameworkError(String.format("Something went wrong in PlayTech::placeBet method : %s", e));
-        }
-
+        return REST.postXML(API_URL,requestPayload);
     }
 
     public static String getErrorMessage(String betResponse) {
@@ -144,6 +80,5 @@ public class PlayTech {
         assertThat(errorCode).as("Playtech::Error-Code").isNotNull();
         return errorCode;
     }
-
 
 }

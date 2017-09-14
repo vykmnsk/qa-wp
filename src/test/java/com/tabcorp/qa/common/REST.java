@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +85,7 @@ public class REST {
         return verifyAndParseResponse(response);
     }
 
-    public static Object verifyAndParseResponse(HttpResponse<String> response) {
+    private static Object verifyAndParseResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText()).isBetween(200, 300);
 
         String body = response.getBody();
@@ -98,7 +99,7 @@ public class REST {
         return Configuration.defaultConfiguration().jsonProvider().parse(body);
     }
 
-    public static String verifyXMLResponse(HttpResponse<String> response) {
+    private static String verifyXMLResponse(HttpResponse<String> response) {
         assertThat(response.getStatus()).as("response status=" + response.getStatusText())
                 .isBetween(200, 300);
         String body = response.getBody();
@@ -106,7 +107,7 @@ public class REST {
         return body;
     }
 
-    public static HttpResponse<String> postWithBody(String url, String requestBody, Map<String, String> headers) {
+    private static HttpResponse<String> postWithBody(String url, String requestBody, Map<String, String> headers) {
         HttpResponse<String> response;
 
         try {
@@ -120,6 +121,22 @@ public class REST {
         }
         log.debug("response from POST with Body=" + response);
         return response;
+    }
+
+    public static Object postJSON(String url, String requestBody) {
+        log.info("REST::JSON URL -> " + url);
+        log.info("REST::postJSON requestBody->  " + requestBody);
+        HttpResponse<String> httpResponse = REST.postWithBody(url, requestBody, null);
+        return REST.verifyAndParseResponse(httpResponse);
+    }
+
+    public static String postXML(String url, String requestBody) {
+        log.info("REST::postXML URL -> " + url);
+        log.info("REST::postXML requestBody->  " + requestBody);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("content-type", "text/xml");
+        HttpResponse<String> httpResponse = REST.postWithBody(url, requestBody, headers);
+        return REST.verifyXMLResponse(httpResponse);
     }
 
 }

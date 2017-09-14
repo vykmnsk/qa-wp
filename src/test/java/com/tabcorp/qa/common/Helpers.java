@@ -1,6 +1,9 @@
 package com.tabcorp.qa.common;
 
 import com.tabcorp.qa.adyen.ClientSideEncrypter;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.Version;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -17,10 +20,7 @@ import org.yaml.snakeyaml.Yaml;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -34,9 +34,33 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 public class Helpers {
+
+    private static final String FREE_MARKER_VERSION = "2.3.23";
     private static final Logger log = LoggerFactory.getLogger(Helpers.class);
+
+    public static String getRequestPayLoad(Map<String, Object> templateData, String templateFileName) {
+        String requestPayload;
+        // Directory name of where all the templates reside.
+        String directoryName = "casino";
+        // May produce NPE when directory doesn't exist.
+        File file = new File(Helpers.class.getClassLoader().getResource(directoryName).getPath());
+        Configuration cfg = new Configuration(new Version(FREE_MARKER_VERSION));
+        cfg.setDefaultEncoding("UTF-8");
+        try {
+            // throws IOException
+            cfg.setDirectoryForTemplateLoading(file);
+            Template template = cfg.getTemplate(templateFileName);
+            try (StringWriter out = new StringWriter()) {
+                template.process(templateData, out);
+                requestPayload = out.getBuffer().toString();
+                out.flush();
+            }
+        } catch (Exception e) {
+            throw new FrameworkError(String.format("Something went wrong in Helpers::getRequestPayload method : %s", e));
+        }
+        return requestPayload;
+    }
 
     public static int randomBetweenInclusive(int min, int max) {
         return new Random().nextInt(max - min + 1) + min;
@@ -108,7 +132,6 @@ public class Helpers {
         return String.format("%s%s%d", baseName, timestamp("yyMMddHHmmss"), uniqPart);
     }
 
-
     public static List<String> extractCSV(String csv) {
         char separator = ',';
         return extractCSV(csv, separator);
@@ -141,7 +164,7 @@ public class Helpers {
                 return;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-            } catch (AssertionError | WebDriverException e ) {
+            } catch (AssertionError | WebDriverException e) {
                 log.info(String.format("Tried %d. Exception: %s", i, e.getMessage()));
             }
         }

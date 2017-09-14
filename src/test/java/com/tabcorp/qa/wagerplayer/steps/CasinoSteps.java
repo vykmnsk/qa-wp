@@ -4,9 +4,11 @@ import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.MOBI_V2;
+import com.tabcorp.qa.wagerplayer.api.MicroGaming;
 import com.tabcorp.qa.wagerplayer.api.PlayTech;
 import com.tabcorp.qa.wagerplayer.api.WagerPlayerAPI;
 import cucumber.api.java8.En;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
@@ -74,6 +76,16 @@ public class CasinoSteps implements En {
             });
         });
 
+        And("^I place a Microgaming bet for \\$(\\d+.\\d\\d)$",(BigDecimal stake) -> {
+            Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
+            String gameID = RandomStringUtils.randomNumeric(6);
+            MicroGaming microGaming = new MicroGaming();
+            // For a bet to placed , one needs to place it and then end the bet with the same gameID.
+            microGaming.placeBet((String) Storage.get(CUSTOMER_ID),gameID,stake);
+            microGaming.placeEndBet((String) Storage.get(CUSTOMER_ID),gameID);
+        });
+
+
         And("^I spin a winning \"([^\"]*)\" Casino \"([^\"]*)\" game with a stake of ([^\"]*)$", (String gameProvider, String gameType, String stakesAsString) -> {
             String accessToken = (String) Storage.get(PLAYTECH_API_ACCESS_TOKEN);
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
@@ -122,12 +134,11 @@ public class CasinoSteps implements En {
             assertThat(Helpers.roundOff(amount)).as("Actual Bonus Pending Winnings Balance").isGreaterThanOrEqualTo(expectedBonusPendingWinningsBalance);
         });
 
-        Then("^I should get a Microgaming token for the customer successfully$", () -> {
+        Then("^I get a Microgaming token for the customer successfully$", () -> {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             MOBI_V2 mobi_v2 = new MOBI_V2();
             String microGamingAccessToken = mobi_v2.getMicrogamingToken(accessToken);
-            assertThat(microGamingAccessToken).isNotNull();
-            Storage.add(MICROGAMING_API_ACCESS_TOKEN, microGamingAccessToken);
+            assertThat(microGamingAccessToken).as("Microgaming token").isNotNull();
         });
 
     }
