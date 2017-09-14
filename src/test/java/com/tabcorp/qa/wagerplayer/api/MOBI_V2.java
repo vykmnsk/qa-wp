@@ -274,6 +274,25 @@ public class MOBI_V2 implements WagerPlayerAPI {
         return resp.read("$..transaction_id");
     }
 
+    public List<String> cashoutExternalBet(String accessToken, Integer betExtId, BigDecimal cashout, String expectedBetStatus, String serviceName) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("access_token", accessToken);
+        fields.put("cash_out_amount", cashout.toString());
+        fields.put("ext_id", betExtId);
+        fields.put("show_transaction_id", "true");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("api_user_service_name", serviceName);
+
+        ReadContext resp = post("/external/bet/cash_out", fields, headers, true);
+        List<String> contentStatus = resp.read("$..content");
+
+        assertThat(contentStatus).contains(expectedBetStatus);
+        log.debug("Cashout External Bet Payload = " + fields);
+        log.debug("Cashout External Bet status=" + contentStatus);
+        return resp.read("$..transaction_id");
+    }
+
     public List<String> cancelExternalBet(String accessToken, Integer betExtId, String serviceName, String cancelNote, String expectedBetStatus) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("access_token", accessToken);
