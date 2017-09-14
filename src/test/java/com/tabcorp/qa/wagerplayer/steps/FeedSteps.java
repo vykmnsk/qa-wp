@@ -36,6 +36,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class FeedSteps implements En {
     private final static String EXCHANGE_NAME = "wift_all";
@@ -128,7 +129,7 @@ public class FeedSteps implements En {
                 GearmanJobEvent gearmanJobEvent = gearmanJobReturn.poll();
                 while (gearmanJobEvent.getEventType() != GearmanJobEventType.GEARMAN_EOF) {
                     gearmanJobEvent = gearmanJobReturn.poll();
-                    log.debug(".");
+                    log.debug("polling");
                 }
                 log.info("Job Taken by Gearman: {}", gearmanJobEvent);
             } catch (Exception e) {
@@ -180,6 +181,14 @@ public class FeedSteps implements En {
             Map selection = getSelection((String) eventReceived.get("id"), selName);
             Integer replacedPosition = Integer.valueOf((String)selection.get("position"));
             assertThat(replacedPosition).as("Replacement position match Scratched").isEqualTo(scratchedPosition);
+        });
+
+        Then("^the received Event contains markets$", () -> {
+            assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
+            String eventId = (String) eventReceived.get("id");
+            assertThatCode(() ->
+                    wapi.getEventMarkets(apiSessionId, eventId)
+                ).as("Reading Event Markets").doesNotThrowAnyException();
         });
 
     }
