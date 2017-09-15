@@ -6,8 +6,10 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.tabcorp.qa.common.FrameworkError;
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
+import cucumber.api.DataTable;
 import cucumber.api.java8.En;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gearman.Gearman;
@@ -191,6 +193,38 @@ public class FeedSteps implements En {
                 ).as("Reading Event Markets").doesNotThrowAnyException();
         });
 
+
+        Then("^the received Event market \"([^\"]+)\" data matches$", (String mktName, DataTable table) -> {
+            StrictHashMap<String, String> expected = new StrictHashMap<>();
+            expected.putAll(table.asMap(String.class, String.class));
+
+
+            String eventId = "22464";
+            WAPI wapi = new WAPI();
+            ReadContext resp = wapi.getEventMarkets(apiSessionId, eventId);
+
+            Map<String, String> actual = new HashMap<>();
+            expected.forEach((expectedKey, expVal) -> {
+                String actualVal = wapi.readMarketAttribute(resp, mktName, ui2api().get(expectedKey));
+                actual.put(expectedKey, api2ui().get(actualVal));
+            });
+            assertThat(actual).as(String.format("Actual=%s, Expected=%s", actual, expected)).isEqualTo(expected);
+        });
+
+    }
+
+    static Map<String, String> ui2api() {
+        Map<String, String> ui2apiMap = new StrictHashMap<>();
+        ui2apiMap.put("market status", "status");
+        ui2apiMap.put("betting status", "betting_status");
+        return ui2apiMap;
+    }
+
+    static Map<String, String> api2ui() {
+        Map<String, String> ui2apiMap = new StrictHashMap<>();
+        ui2apiMap.put("run", "Betting in the Run");
+        ui2apiMap.put("enabled", "Enabled");
+        return ui2apiMap;
     }
 
     private String createSportEventName(String participantName1, String participantName2) {

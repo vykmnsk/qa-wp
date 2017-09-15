@@ -27,6 +27,8 @@ public class WAPI implements WagerPlayerAPI {
     private static final String RESP_ROOT = "$.RSP";
 
 
+
+
     public enum MultiType {
         Double("Double"),
         Treble("Treble"),
@@ -536,15 +538,20 @@ public class WAPI implements WagerPlayerAPI {
         return selectionNames.stream().map(sn -> readSelectionId(resp, marketId, sn)).collect(Collectors.toList());
     }
 
+
     public String readSelectionId(ReadContext resp, String marketId, String selectionName) {
         String mktPath = ".markets.market" + jfilter("id", marketId);
         String selPath = ".selections.selection" + jfilter("name", selectionName);
         return readAttrOneOnly(resp, mktPath + selPath, "id");
     }
 
-    public String readMarketId(ReadContext resp, String mktName) {
+    public String readMarketAttribute(ReadContext resp, String mktName, String attr) {
         String mktPath = ".markets.market" + jfilter("name", mktName);
-        return readAttrOneOnly(resp, mktPath, "id");
+        return readAttrOneOnly(resp, mktPath, attr);
+    }
+
+    public String readMarketId(ReadContext resp, String mktName) {
+        return readMarketAttribute(resp, mktName, "id");
     }
 
     private String readPriceAttr(ReadContext resp, String pricePath, String betTypeName, String attrName) {

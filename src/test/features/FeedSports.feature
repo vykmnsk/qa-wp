@@ -17,3 +17,11 @@ Feature: Sporting Solutions Event Feeds
     Examples:
       | category | subcategory    | template                             |
       | Football | Premier League | gearman-football-premier-league.json |
+
+
+  @wip
+  Scenario: Gearman Feed: check arrived event data
+    And the received Event market "Match Winner" data matches
+      | betting status | Enabled            |
+      | market status  | Betting in the Run |
+
