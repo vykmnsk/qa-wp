@@ -76,15 +76,29 @@ public class CasinoSteps implements En {
             });
         });
 
-        And("^I place a Microgaming bet for \\$(\\d+.\\d\\d)$",(BigDecimal stake) -> {
-            Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
-            String gameID = RandomStringUtils.randomNumeric(6);
+        And("^I place multiple Microgaming bets for ([^\"]*)$",(String betAmounts) -> {
             MicroGaming microGaming = new MicroGaming();
-            // For a bet to placed , one needs to place it and then end the bet with the same gameID.
-            microGaming.placeBet((String) Storage.get(CUSTOMER_ID),gameID,stake);
-            microGaming.placeEndBet((String) Storage.get(CUSTOMER_ID),gameID);
+            List<String> stakes = Helpers.extractCSV(betAmounts);
+            List<Double> bets = Helpers.convertList(stakes, Double::parseDouble);
+            bets.forEach(bet -> {
+                // For a bet to placed , one needs to place it and then end the bet with the same gameID.
+                // And each bet has a different game ID.
+                String gameID = RandomStringUtils.randomNumeric(6);
+                //In case of loss limit trigger, the error is returned when placing a bet.
+                Storage.put(BET_RESPONSE,microGaming.placeBet((String) Storage.get(CUSTOMER_ID),gameID,new BigDecimal(bet)));
+                microGaming.placeEndBet((String) Storage.get(CUSTOMER_ID),gameID);
+            });
         });
 
+        And("^I place a Microgaming bet for \\$(\\d+.\\d\\d) and expecting to win of \\$(\\d+.\\d\\d)$",(BigDecimal stake, BigDecimal winningStake) -> {
+            String gameID = RandomStringUtils.randomNumeric(6);
+            MicroGaming microGaming = new MicroGaming();
+            // For a Win to be received  , it needs to be associated with a bet , with the same gameID.
+            // there can be a scenario where :  Bet 40$ and win 10$ --> net loss 30$
+            microGaming.placeBet((String) Storage.get(CUSTOMER_ID),gameID,stake);
+            microGaming.placeWinBet((String) Storage.get(CUSTOMER_ID),gameID,winningStake);
+            microGaming.placeEndBet((String) Storage.get(CUSTOMER_ID),gameID,stake,winningStake);
+        });
 
         And("^I spin a winning \"([^\"]*)\" Casino \"([^\"]*)\" game with a stake of ([^\"]*)$", (String gameProvider, String gameType, String stakesAsString) -> {
             String accessToken = (String) Storage.get(PLAYTECH_API_ACCESS_TOKEN);
@@ -103,14 +117,28 @@ public class CasinoSteps implements En {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualMessage = PlayTech.getErrorMessage(betResponse);
-            assertThat(actualMessage).isEqualToIgnoringCase(message);
+            assertThat(actualMessage).as("Playtech Error Description").isEqualToIgnoringCase(message);
         });
 
         And("^the error code should be (\\d+)$", (Integer expectedErrorCode) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualErrorCode = PlayTech.getErrorCode(betResponse);
-            assertThat(actualErrorCode).as("Error Code").isEqualTo(expectedErrorCode.toString());
+            assertThat(actualErrorCode).as("PlayTech Error Code").isEqualTo(expectedErrorCode.toString());
+        });
+
+        Then("^the Microgaming error message should be \"([^\"]*)\"$", (String message) -> {
+            String betResponse = (String) Storage.get(BET_RESPONSE);
+            assertThat(betResponse).isNotEmpty();
+            String actualMessage = MicroGaming.readErrorMessage(betResponse);
+            assertThat(actualMessage).as("Microgaming Error Description").isEqualToIgnoringCase(message);
+        });
+
+        And("^the Microgaming error code should be (\\d+)$", (Integer expectedErrorCode) -> {
+            String betResponse = (String) Storage.get(BET_RESPONSE);
+            assertThat(betResponse).isNotEmpty();
+            String actualErrorCode = MicroGaming.readErrorCode(betResponse);
+            assertThat(actualErrorCode).as("Microgaming Error Code").isEqualTo(expectedErrorCode.toString());
         });
 
         And("^the Bonus Balance should be \\$(\\d+\\.\\d\\d)$", (BigDecimal expectedBonusBalance) -> {
