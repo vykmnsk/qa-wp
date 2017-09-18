@@ -16,7 +16,7 @@ Feature: Microgaming
   Scenario Outline: Should trigger Loss Limit when loss limit is breached
     When I update the loss limit to $40.00 for 24 hours
     And I place multiple Microgaming bets for <Stakes>
-    Then the <ProviderType> error message should be "<ErrorMessage>"
+    Then the <ProviderType> error message should be <ErrorMessage>
     And the <ProviderType> error code should be <ErrorCode>
 
     Examples:

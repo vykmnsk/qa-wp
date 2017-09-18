@@ -113,21 +113,21 @@ public class CasinoSteps implements En {
             });
         });
 
-        Then("^the message should be \"([^\"]*)\"$", (String message) -> {
+        Then("^the PlayTech error message should be ([^\"]*)$", (String message) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualMessage = PlayTech.getErrorMessage(betResponse);
             assertThat(actualMessage).as("Playtech Error Description").isEqualToIgnoringCase(message);
         });
 
-        And("^the error code should be (\\d+)$", (Integer expectedErrorCode) -> {
+        And("^the PlayTech error code should be (\\d+)$", (Integer expectedErrorCode) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualErrorCode = PlayTech.getErrorCode(betResponse);
             assertThat(actualErrorCode).as("PlayTech Error Code").isEqualTo(expectedErrorCode.toString());
         });
 
-        Then("^the Microgaming error message should be \"([^\"]*)\"$", (String message) -> {
+        Then("^the Microgaming error message should be ([^\"]*)$", (String message) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualMessage = MicroGaming.readErrorMessage(betResponse);
