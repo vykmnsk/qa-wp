@@ -199,7 +199,8 @@ public class FeedSteps implements En {
             expected.putAll(table.asMap(String.class, String.class));
 
 
-            String eventId = "22464";
+            String eventId = "29404";
+            log.info("trying ID=" + eventId);
             WAPI wapi = new WAPI();
             ReadContext resp = wapi.getEventMarkets(apiSessionId, eventId);
 
@@ -224,6 +225,8 @@ public class FeedSteps implements En {
         Map<String, String> ui2apiMap = new StrictHashMap<>();
         ui2apiMap.put("run", "Betting in the Run");
         ui2apiMap.put("enabled", "Enabled");
+        ui2apiMap.put("disabled", "Enabled");
+        ui2apiMap.put(null, "null");
         return ui2apiMap;
     }
 
