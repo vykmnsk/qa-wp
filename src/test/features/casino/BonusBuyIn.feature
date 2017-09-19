@@ -5,7 +5,7 @@ Feature: BonusBuyIn Balance and Loss-Limit
 
   Background:
     Given A new default customer with $100.00 balance is created and logged in API
-    And I get a PlayTech token for the new customer
+    And I get a PlayTech token for the customer successfully
     And I deposit $100.00 using stored "MC" card using promo code "JAGBONUS"
     Then customer balance is equal to $150.00
 

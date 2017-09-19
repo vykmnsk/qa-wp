@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MOBI_V2 implements WagerPlayerAPI {
 
-    private static String URL_ROOT = Config.moby_V2_URL();
+    private static String URL_ROOT = Config.env_URL() + "/mobi/v2/web";
     private static final String RESP_ROOT = "$";
 
     public enum PromoBalanceTypes {
@@ -175,12 +175,20 @@ public class MOBI_V2 implements WagerPlayerAPI {
         ReadContext response = get("/casino/get_microgaming_token", queryParams);
 
         String microGamingAccessToken = response.read("$.microgaming_token");
-        Assertions.assertThat(microGamingAccessToken).as("Microgaming Access Token ").isNotEmpty();
-        log.debug("Microgaming Access Token :" + microGamingAccessToken);
+        log.info("Microgaming Access Token :" + microGamingAccessToken);
         return microGamingAccessToken;
     }
 
+    public String getGSIToken(String accessToken) {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("access_token", accessToken);
+        ReadContext response = get("/customer/get_gsi_token", queryParams);
 
+        String gsiToken = response.read("$.gsi_token");
+        log.info("GSI Access Token :" + gsiToken);
+        return gsiToken;
+    }
+    
     private ReadContext checkoutBet(String reqJSON) {
         ReadContext resp = put("/betslip/checkout", reqJSON);
         verifyNoErrors(resp, reqJSON, "$..selections..error_message");

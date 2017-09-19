@@ -4,7 +4,7 @@ Feature: Sunbets Casino Loss Limit
 
   Background:
     Given A new default customer with $20000.00 balance is created and logged in API
-    And I get a PlayTech token for the new customer
+    And I get a PlayTech token for the customer successfully
 
   Scenario Outline: Placing multiple spins on <GameType> game with no Casino Loss Limit
     When the loss limit should be $0.00 and loss limit definition should be "24 hours"
