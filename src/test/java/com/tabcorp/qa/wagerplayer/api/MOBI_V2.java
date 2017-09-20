@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MOBI_V2 implements WagerPlayerAPI {
 
-    private static String URL_ROOT = Config.env_URL() + "/mobi/v2/web";
+    private static String URL_ROOT = Config.moby_V2_URL();
     private static final String RESP_ROOT = "$";
 
     public enum PromoBalanceTypes {

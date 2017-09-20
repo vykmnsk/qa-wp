@@ -1,6 +1,9 @@
 @redbook @feed
 Feature: Racing Event Feeds
 
+  Background:
+    Given A new default customer with $0.00 balance is created and logged in API
+
   @smoke
   Scenario Outline: <type> Feed: Create <category> Event
     When I feed "<type>" RabbitMQ with Event message based on "feeds/<template>"
