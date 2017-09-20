@@ -205,7 +205,7 @@ public class FeedSteps implements En {
 
 
         Then("^the received Event market \"([^\"]+)\" data matches$", (String mktName, DataTable table) -> {
-            StrictHashMap<String, String> expected = new StrictHashMap<>();
+            StrictHashMap<String, String> expected = new StrictHashMap<>(); //expected market attributes
             expected.putAll(table.asMap(String.class, String.class));
 
             assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
@@ -215,22 +215,22 @@ public class FeedSteps implements En {
 
             Map<String, String> actual = new HashMap<>();
             expected.forEach((expectedKey, expVal) -> {
-                String actualVal = wapi.readMarketAttribute(resp, mktName, ui2api().get(expectedKey));
-                actual.put(expectedKey, api2ui().get(actualVal));
+                String actualVal = wapi.readMarketAttribute(resp, mktName, uiToApi().get(expectedKey));
+                actual.put(expectedKey, apiToUI().get(actualVal));
             });
             assertThat(actual).as(String.format("Actual=%s, Expected=%s", actual, expected)).isEqualTo(expected);
         });
 
     }
 
-    static Map<String, String> ui2api() {
+    static Map<String, String> uiToApi() {
         Map<String, String> ui2apiMap = new StrictHashMap<>();
         ui2apiMap.put("market status", "status");
         ui2apiMap.put("betting status", "betting_status");
         return ui2apiMap;
     }
 
-    static Map<String, String> api2ui() {
+    static Map<String, String> apiToUI() {
         Map<String, String> ui2apiMap = new StrictHashMap<>();
         ui2apiMap.put("run", "Betting in the Run");
         ui2apiMap.put("enabled", "Enabled");
