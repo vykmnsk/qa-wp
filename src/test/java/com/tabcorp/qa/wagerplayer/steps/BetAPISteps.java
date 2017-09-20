@@ -32,7 +32,7 @@ public class BetAPISteps implements En {
     public BetAPISteps() {
 
         When ("^I place an External bet for \\$(\\d+.\\d\\d) with status of \\\"([^\\\"]*)\\\"",
-                        (BigDecimal stake, String expectedBetStatus, DataTable table) -> {
+                (BigDecimal stake, String expectedBetStatus, DataTable table) -> {
                     StrictHashMap<String, String> settings = new StrictHashMap<>();
                     settings.putAll(table.asMap(String.class, String.class));
                     String betDescription = settings.get("bet description");
@@ -43,9 +43,9 @@ public class BetAPISteps implements En {
                     Integer betExtId = Integer.parseInt(genExtId);
                     Storage.put(Storage.KEY.BET_EXT_ID, betExtId);
                     MOBI_V2 mobi = new MOBI_V2();
-                    List<String> txnIds = mobi.placeExternalBet(accessToken, betExtId, stake, betDescription, serviceName, betType, expectedBetStatus);
-                    assertThat(txnIds).as("Place Bet Trans Id").isNotEmpty();
-                    Storage.put(Storage.KEY.TXN_ID, txnIds.get(0));
+                    Integer txnId = mobi.placeExternalBet(accessToken, betExtId, stake, betDescription, serviceName, betType, expectedBetStatus);
+                    assertThat(txnId).as("Place Bet Trans Id").isNotNull();
+                    Storage.put(Storage.KEY.TXN_ID, txnId);
                 });
 
         When("^I settle an External bet for \\$(\\d+.\\d\\d)$",
@@ -58,9 +58,11 @@ public class BetAPISteps implements En {
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
                     Integer betExtId = (Integer) Storage.get(BET_EXT_ID);
                     MOBI_V2 mobi = new MOBI_V2();
-                    List<String> txnIds = mobi.settleExternalBet(accessToken, betExtId, payout, numSettles, expectedBetStatus, serviceName);
-                    assertThat(txnIds).as("Settle Bet Trans Id").isNotEmpty();
-                    Storage.put(Storage.KEY.TXN_ID, txnIds.get(0));
+                    Integer txnId = mobi.settleExternalBet(accessToken, betExtId, payout, numSettles, expectedBetStatus, serviceName);
+                    if (!expectedBetStatus.contains("Settled - Bet Loss")) {
+                        assertThat(txnId).as("Settle Bet Trans Id").isNotNull();
+                        Storage.put(Storage.KEY.TXN_ID, txnId);
+                    }
                 });
 
         When("^I cashout an External bet for \\$(\\d+.\\d\\d) with status of \\\"([^\\\"]*)\\\"",
@@ -71,9 +73,9 @@ public class BetAPISteps implements En {
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
                     Integer betExtId = (Integer) Storage.get(BET_EXT_ID);
                     MOBI_V2 mobi = new MOBI_V2();
-                    List<String> txnIds = mobi.cashoutExternalBet(accessToken, betExtId, cashout, expectedBetStatus, serviceName);
-                    assertThat(txnIds).as("Cashout Bet Trans Id").isNotEmpty();
-                    Storage.put(Storage.KEY.TXN_ID, txnIds.get(0));
+                    Integer txnId = mobi.cashoutExternalBet(accessToken, betExtId, cashout, expectedBetStatus, serviceName);
+                    assertThat(txnId).as("Cashout Bet Trans Id").isNotNull();
+                    Storage.put(Storage.KEY.TXN_ID, txnId);
                 });
 
         When("^I cancel an External bet with status of \\\"([^\\\"]*)\\\"", (String expectedBetStatus, DataTable table) -> {
@@ -84,9 +86,9 @@ public class BetAPISteps implements En {
                     String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
                     Integer betExtId = (Integer) Storage.get(BET_EXT_ID);
                     MOBI_V2 mobi = new MOBI_V2();
-                    List<String> txnIds = mobi.cancelExternalBet(accessToken, betExtId, serviceName, cancelNote, expectedBetStatus);
-                    assertThat(txnIds).as("Cancel Bet Trans Id").isNotEmpty();
-                    Storage.put(Storage.KEY.TXN_ID, txnIds.get(0));
+                    Integer txnId = mobi.cancelExternalBet(accessToken, betExtId, serviceName, cancelNote, expectedBetStatus);
+                    assertThat(txnId).as("Cancel Bet Trans Id").isNotNull();
+                    Storage.put(Storage.KEY.TXN_ID, txnId);
                 });
 
         When("^I place a single Racing \"([a-zA-Z]+)\" bet on the runner \"([^\"]*)\" for \\$(\\d+.\\d\\d)$",

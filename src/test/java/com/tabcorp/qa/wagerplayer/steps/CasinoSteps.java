@@ -55,7 +55,7 @@ public class CasinoSteps implements En {
             mobi_v2.applyPromo(accessToken, promoCode);
         });
 
-        When("^I get a PlayTech token for the new customer$", () -> {
+        When("^I get a PlayTech token for the customer successfully$", () -> {
             Map<String, String> custData = (Map<String, String>) Storage.get(Storage.KEY.CUSTOMER);
             playTech = new PlayTech();
             String accessToken = playTech.login(custData.get("username"), custData.get("password"));
@@ -113,21 +113,21 @@ public class CasinoSteps implements En {
             });
         });
 
-        Then("^the message should be \"([^\"]*)\"$", (String message) -> {
+        Then("^the PlayTech error message should be ([^\"]*)$", (String message) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualMessage = PlayTech.getErrorMessage(betResponse);
             assertThat(actualMessage).as("Playtech Error Description").isEqualToIgnoringCase(message);
         });
 
-        And("^the error code should be (\\d+)$", (Integer expectedErrorCode) -> {
+        And("^the PlayTech error code should be (\\d+)$", (Integer expectedErrorCode) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualErrorCode = PlayTech.getErrorCode(betResponse);
             assertThat(actualErrorCode).as("PlayTech Error Code").isEqualTo(expectedErrorCode.toString());
         });
 
-        Then("^the Microgaming error message should be \"([^\"]*)\"$", (String message) -> {
+        Then("^the Microgaming error message should be ([^\"]*)$", (String message) -> {
             String betResponse = (String) Storage.get(BET_RESPONSE);
             assertThat(betResponse).isNotEmpty();
             String actualMessage = MicroGaming.readErrorMessage(betResponse);
@@ -166,7 +166,14 @@ public class CasinoSteps implements En {
             String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
             MOBI_V2 mobi_v2 = new MOBI_V2();
             String microGamingAccessToken = mobi_v2.getMicrogamingToken(accessToken);
-            assertThat(microGamingAccessToken).as("Microgaming token").isNotNull();
+            assertThat(microGamingAccessToken).as("Microgaming token").isNotEmpty();
+        });
+
+        Then("^I get a GSI token for the customer successfully$",() ->  {
+            String accessToken = (String) Storage.get(API_ACCESS_TOKEN);
+            MOBI_V2 mobi_v2 = new MOBI_V2();
+            String gsiAccessToken = mobi_v2.getGSIToken(accessToken);
+            assertThat(gsiAccessToken).as("GSI token").isNotEmpty();
         });
 
     }

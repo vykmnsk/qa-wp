@@ -3,6 +3,8 @@ package com.tabcorp.qa.wagerplayer.api;
 import com.tabcorp.qa.common.Helpers;
 import com.tabcorp.qa.common.REST;
 import com.tabcorp.qa.wagerplayer.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -14,18 +16,18 @@ public class PlayTech {
 
     private static final String API_URL = Config.env_URL() + "/playtech-gameplay-api/";
 
+    private static final Logger log = LoggerFactory.getLogger(PlayTech.class);
+
     public String login(String username, String password) {
         String accessToken;
         Map<String, Object> templateData = new HashMap<>();
         String myXpath = "/*[local-name()='loginResponse']/*[local-name()='externalSessionToken']";
         templateData.put("username", username);
         templateData.put("password", password);
-
         String requestPayload = Helpers.getRequestPayLoad(templateData, "playtech-login.ftl");
         String response = REST.postXML(API_URL, requestPayload);
         accessToken = Helpers.extractByXpath(response, myXpath).toString();
-
-        assertThat(accessToken).isNotEmpty();
+        log.info("PlayTech Access Token :" + accessToken);
         return accessToken;
     }
 

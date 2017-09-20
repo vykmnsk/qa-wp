@@ -114,10 +114,10 @@ public class CustomerSteps implements En {
             String transId = Storage.get(Storage.KEY.TXN_ID).toString();
             Map transRecord = mobi.extractTransRecord(custTransRecords, transId);
 
-            Assertions.assertThat(transRecord.get("type")).isEqualTo(txnData.get("type"));
-            Assertions.assertThat(transRecord.get("dr")).isEqualTo(txnData.get("debit amount"));
-            Assertions.assertThat(transRecord.get("cr")).isEqualTo(txnData.get("credit amount"));
-            Assertions.assertThat(transRecord.get("balance")).isEqualTo(txnData.get("balance"));
+            Assertions.assertThat(transRecord.get("type")).as("Transaction Type").isEqualTo(txnData.get("type"));
+            Assertions.assertThat(transRecord.get("dr")).as("Transaction Settle Amount").isEqualTo(txnData.get("debit amount"));
+            Assertions.assertThat(transRecord.get("cr")).as("Trnsaction Credit Amount").isEqualTo(txnData.get("credit amount"));
+            Assertions.assertThat(transRecord.get("balance")).as("Customer Balance").isEqualTo(txnData.get("balance"));
 
             String txnDesc = (txnData.get("type")+ ": " + Storage.get(Storage.KEY.BET_EXT_ID) + " - " + txnData.get("description"));
             log.debug("Transaction Desc=" + txnDesc);
