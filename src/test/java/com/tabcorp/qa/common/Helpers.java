@@ -264,18 +264,5 @@ public class Helpers {
         return from.stream().map(function).collect(Collectors.toList());
     }
 
-    public static String adyenEncode(org.json.JSONObject json) throws Exception {
-        String publicKey = Helpers.readResourceFile("adyen-encryption-key.txt");
-        return adyenEncode(json, publicKey);
-    }
-
-    private static String adyenEncode(org.json.JSONObject json, String publicKey) throws Exception {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        ClientSideEncrypter encrypter = new ClientSideEncrypter(publicKey);
-        json.put("generationtime", simpleDateFormat.format(new Date()));
-        return encrypter.encrypt(json.toString());
-    }
-
 }
 

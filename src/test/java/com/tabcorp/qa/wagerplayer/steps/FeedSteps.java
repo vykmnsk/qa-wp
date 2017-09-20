@@ -6,6 +6,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.tabcorp.qa.common.FrameworkError;
 import com.tabcorp.qa.common.Helpers;
+import com.tabcorp.qa.common.Storage;
 import com.tabcorp.qa.common.StrictHashMap;
 import com.tabcorp.qa.wagerplayer.Config;
 import com.tabcorp.qa.wagerplayer.api.WAPI;
@@ -100,7 +101,7 @@ public class FeedSteps implements En {
         });
 
         When("^I feed Gearman with Event message based on \"([^\"]*)\"$", (String templateFile) -> {
-             final String WORKER_NAME = "ss_snapshot";
+            final String WORKER_NAME = "ss_snapshot";
             final String WORKLOAD_TYPE = "ss_snapshot";
 
             final String participantName1 = "QAFEED";
@@ -113,6 +114,7 @@ public class FeedSteps implements En {
             int startInMinutes = 30;
             String workload = prepareGearmanWorkload(templateFile, eventId, participantName1, participantName2, startInMinutes, WORKER_NAME, WORKLOAD_TYPE);
             log.debug("Workload for Gearman: {}", workload);
+            GearmanClient client = null;
             try {
                 log.info("Submitting job for eventName={} to worker={} of type={}", eventNameRequested, WORKER_NAME, WORKLOAD_TYPE);
                 Gearman gearman;
@@ -123,19 +125,21 @@ public class FeedSteps implements En {
                 }
                 GearmanServer server = gearman.createGearmanServer(Config.feedMQGearmanHost(), Config.feedMQGearmanPort());
 
-                final GearmanClient client = gearman.createGearmanClient();
+                client = gearman.createGearmanClient();
                 client.addServer(server);
 
                 GearmanJobReturn gearmanJobReturn;
                 gearmanJobReturn = client.submitJob(WORKLOAD_TYPE, workload.getBytes("UTF-8"));
                 GearmanJobEvent gearmanJobEvent = gearmanJobReturn.poll();
-                while (gearmanJobEvent.getEventType() != GearmanJobEventType.GEARMAN_EOF) {
-                    gearmanJobEvent = gearmanJobReturn.poll();
-                    log.debug("polling");
-                }
+                assertThat(gearmanJobEvent.getEventType() == GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS);
                 log.info("Job Taken by Gearman: {}", gearmanJobEvent);
             } catch (Exception e) {
                 throw new FrameworkError(e);
+            } finally {
+                if (null != client) {
+                    client.removeAllServers();
+                    client.shutdown();
+                }
             }
         });
 
@@ -152,8 +156,14 @@ public class FeedSteps implements En {
 
             assertThat(eventNameRequested).as("Event Name sent to feed in previous step").isNotEmpty();
             Helpers.delayInMillis(FEED_TRAVEL_SECONDS * 1000);
+
+            Map custData = (Map) Storage.get(Storage.KEY.CUSTOMER);
+            String username = (String) custData.get("username");
+            String password = (String) custData.get("password");
+            String clientIp = (String) custData.get("client_ip");
+
             wapi = new WAPI();
-            apiSessionId = wapi.login();
+            apiSessionId = wapi.login(username, password, clientIp);
 
             final int EXTRA_WAIT_MINS = 10;
             LocalDateTime from = LocalDateTime.now().plusHours(SERVER_OFFSET_HOURS);
@@ -198,9 +208,8 @@ public class FeedSteps implements En {
             StrictHashMap<String, String> expected = new StrictHashMap<>();
             expected.putAll(table.asMap(String.class, String.class));
 
-
-            String eventId = "29404";
-            log.info("trying ID=" + eventId);
+            assertThat(eventReceived).as("Event created by feed in previous step").isNotNull();
+            String eventId = (String) eventReceived.get("id");
             WAPI wapi = new WAPI();
             ReadContext resp = wapi.getEventMarkets(apiSessionId, eventId);
 
