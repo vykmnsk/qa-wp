@@ -1,27 +1,26 @@
 #Env vars required
 ### for Redbook
-- ENV_URL= [http://pre-wagering.test.sunbets.co.uk |  corresponding env]
-- WAGERPLAYER_APP_NAME=redbook
-- WAGERPLAYER_BASE_URL
-- WAGERPLAYER_USERNAME
-- WAGERPLAYER_PASSWORD
-- WAGERPLAYER_WAPI_URL
-- WAGERPLAYER_WAPI_USERNAME
-- WAGERPLAYER_WAPI_PASSWORD
-- WAGERPLAYER_CUSTOMER_USERNAME
-- WAGERPLAYER_CUSTOMER_PASSWORD
-- WAGERPLAYER_MOBIV2_URL
-- WAGERPLAYER_RUN_MODE=[ DOCKER | anything-else ]
+- WP_APP_NAME=redbook
+- WP_BASE_URL
+- WP_USERNAME
+- WP_PASSWORD
+- WP_WAPI_URL
+- WP_WAPI_USERNAME
+- WP_WAPI_PASSWORD
+- WP_CUSTOMER_USERNAME
+- WP_CUSTOMER_PASSWORD
+- WP_MOBIV2_URL
+- WP_RUN_MODE=[ DOCKER | anything-else ]
 
 ### for Luxbet
-- WAGERPLAYER_APP_NAME=luxbet
+- WP_APP_NAME=luxbet
 -  Use the above mentioned env variables with the correct values.
 
 ### for LuxbetMobile
-- WAGERPLAYER_APP_NAME=luxbet
-- WAGERPLAYER_WAPI_URL
-- WAGERPLAYER_WAPI_USERNAME=puntclub
-- WAGERPLAYER_LUXMOBILE_URL
+- WP_APP_NAME=luxbet
+- WP_WAPI_URL
+- WP_WAPI_USERNAME
+- WP_LUXMOBILE_URL
  
 
 #Run Tests
@@ -55,4 +54,4 @@ mvn clean test -DforkMode=never ...
 - and then one should be able to see the test runs in the conatiner.
 
 # Confluence Link
-   [Click-this](http://wiki.corpad.net.local:8090/display/WTG/qa-wagerplayer+code+setup)
+   [Click-this](http://wiki.corpad.net.local:8090/display/WTG/qa-WP+code+setup)

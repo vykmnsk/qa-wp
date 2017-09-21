@@ -2,8 +2,8 @@
 @Library('potatocannon-global')
 import au.com.tabcorp.potatocannon.*
 
-def USERNAME = "tabcorp-qa-bot"
-def ENCRYPTED_API_KEY = "AQECAHhggPTequCEJZiWje2nomwraogaydeiw6VFPgL4Kmh9JQAAAKswgagGCSqGSIb3DQEHBqCBmjCBlwIBADCBkQYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzW6c5WzBP2mJddsXICARCAZJmeAANoGnXwV0srjY3M3JKo03i6PwqZwsoCYxjoF9Nh7Oswzhueq2ktoetTqglOqeV2JuZjgsCxd1dfFzkyntdaXqwT/bPkP2ApeHAVH+KX4PtHMjlJzgb4sk4PJ7/z6QvdXbk="
+def USERNAME = "qa-bot"
+def ENCRYPTED_API_KEY = ""
 
 pipeline {
 
@@ -84,7 +84,7 @@ pipeline {
                     addDockerAuth {
                         username = USERNAME
                         password = ENCRYPTED_API_KEY
-                        repo = "redbook-docker-dev.artifacts.tabdigital.com.au"
+                        repo = "redbook-docker-dev.artifacts.com"
                     }
                 }
 

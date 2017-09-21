@@ -2,13 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.tabcorp</groupId>
-  <artifactId>qa-wager-player</artifactId>
+  <groupId>com.corp</groupId>
+  <artifactId>qa-wp</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>wager-player</name>
-  <description>Automated Tests for Luxbet and Redbook wager-player</description>
+  <name>wp</name>
+  <description>Automated Tests for WP</description>
 
   <properties>
     <cucumber.options>--plugin pretty</cucumber.options>
